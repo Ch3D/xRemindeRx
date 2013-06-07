@@ -5,4 +5,10 @@
         android:showAsAction="ifRoom"
         android:icon="@drawable/ic_edit"
         android:title="@string/edit"/>
+    <item
+        android:id="@+menu/action_delete"
+        android:orderInCategory="101"
+        android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_cab_cancel"
+        android:title="@string/delete"/>
 </menu>

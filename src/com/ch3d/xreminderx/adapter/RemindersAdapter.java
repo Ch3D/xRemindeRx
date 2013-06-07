@@ -9,10 +9,8 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.app.Activity;
 import android.app.ActivityOptions;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -36,7 +34,6 @@ import android.widget.TextView;
 import com.ch3d.xreminderx.R;
 import com.ch3d.xreminderx.model.ReminderType;
 import com.ch3d.xreminderx.provider.RemindersContract;
-import com.ch3d.xreminderx.provider.RemindersProvider;
 import com.ch3d.xreminderx.utils.ActivityUtils;
 import com.ch3d.xreminderx.utils.PreferenceHelper;
 import com.ch3d.xreminderx.utils.ReminderUtils;
@@ -302,16 +299,7 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 		anim.addListener(new AnimatorListenerAdapter() {
 			@Override
 			public void onAnimationEnd(final Animator animation) {
-				final Context context = convertView.getContext();
-				context.getContentResolver().delete(
-						RemindersProvider.REMINDERS_URI, "_id = ?",
-						new String[] { Long.toString(id) });
-				context.getContentResolver().notifyChange(
-						RemindersProvider.REMINDERS_URI, null);
-
-				cancelAlarm(id, context);
-				cancelNotification(context, id);
-
+				ReminderUtils.deleteReminder(convertView.getContext(), id);
 				convertView.post(new Runnable() {
 					@Override
 					public void run() {
@@ -333,18 +321,5 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 	public void uncheckItems() {
 		mChecked.clear();
 		notifyDataSetChanged();
-	}
-
-	protected void cancelAlarm(final int id, final Context context) {
-		final AlarmManager alarmManager = (AlarmManager) context
-				.getSystemService(Context.ALARM_SERVICE);
-		alarmManager
-				.cancel(ReminderUtils.getPendingAlarmOperation(context, id));
-	}
-
-	protected void cancelNotification(final Context context, final int intId) {
-		final NotificationManager notifManager = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-		notifManager.cancel(intId);
 	}
 }

@@ -65,4 +65,6 @@
     <string name="postpone_time">Postpone Time</string>
     <string name="time_to_postpone_reminder">Time to postpone reminder</string>
     <string name="color">Color</string>
+    <string name="delete">Delete</string>
+    <string name="quick_reminder_text">Quick reminder text</string>
 </resources>

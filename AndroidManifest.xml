@@ -58,6 +58,7 @@
         <activity
             android:name="com.ch3d.xreminderx.activity.RemindersActivity"
             android:label="@string/app_name"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
             android:launchMode="singleTask" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
