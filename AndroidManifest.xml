@@ -23,7 +23,7 @@
         android:theme="@style/AppTheme" >
         
         <receiver
-			android:name="com.ch3d.xreminderx.reminders.notifications.AlarmReceiver"
+			android:name="com.ch3d.xreminderx.notifications.AlarmReceiver"
 			android:enabled="true"
 			android:exported="false" >
 			<intent-filter>
@@ -35,7 +35,7 @@
 			</intent-filter>
 		</receiver>
 		
-        <service android:name="com.ch3d.xreminderx.reminders.notifications.RingerService"
+        <service android:name="com.ch3d.xreminderx.notifications.RingerService"
             android:exported="false"
             android:enabled="true">
             <intent-filter>
@@ -43,12 +43,12 @@
 			</intent-filter>
         </service>
 
-        <activity android:name="com.ch3d.xreminderx.reminders.notifications.ContactDetailsActivity"
+        <activity android:name="com.ch3d.xreminderx.activity.ContactDetailsActivity"
             android:exported="false"
             android:enabled="true" />
         
         <activity
-            android:name="com.ch3d.xreminderx.reminders.settings.SettingsActivity"
+            android:name="com.ch3d.xreminderx.activity.SettingsActivity"
             android:label="@string/settings" >
             <intent-filter>
                 <category android:name="android.intent.category.PREFERENCE" />
@@ -56,7 +56,7 @@
         </activity>
         
         <activity
-            android:name="com.ch3d.xreminderx.reminders.RemindersActivity"
+            android:name="com.ch3d.xreminderx.activity.RemindersActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask" >
             <intent-filter>
@@ -71,7 +71,7 @@
         </activity>
         
         <activity
-            android:name="com.ch3d.xreminderx.reminders.details.ReminderDetailsActivity"
+            android:name="com.ch3d.xreminderx.activity.ReminderDetailsActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize" >
             <intent-filter>
@@ -79,7 +79,7 @@
             </intent-filter>
         </activity>
         
-        <provider android:name="com.ch3d.xreminderx.reminders.provider.RemindersProvider"
+        <provider android:name="com.ch3d.xreminderx.provider.RemindersProvider"
             android:authorities="com.ch3d.xreminderx.provider"
             android:readPermission="com.ch3d.xreminderx.READ_REMINDERS"
             android:exported="false"

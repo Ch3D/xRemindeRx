@@ -8,7 +8,7 @@
 			android:defaultValue="@bool/show_prompt_default" />
 	</PreferenceCategory>
     <PreferenceCategory android:title="@string/reminders">
-		<com.ch3d.xreminderx.reminders.settings.PostponePreference
+		<com.ch3d.xreminderx.settings.PostponePreference
 			android:key="com.ch3d.xreminderx.preferences.postpone_time"
 	        android:title="@string/postpone_time"
 	        android:summary="@string/time_to_postpone_reminder"

@@ -2,7 +2,7 @@
     android:id="@+x_reminders/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <fragment class="com.ch3d.xreminderx.reminders.RemindersListFragment"
+    <fragment class="com.ch3d.xreminderx.fragment.RemindersListFragment"
         android:id="@+x_reminders/fragment_reminders_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
