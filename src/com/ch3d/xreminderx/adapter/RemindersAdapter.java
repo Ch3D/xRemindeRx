@@ -12,16 +12,14 @@ import android.app.ActivityOptions;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
@@ -40,7 +38,7 @@ import com.ch3d.xreminderx.model.ReminderType;
 import com.ch3d.xreminderx.provider.RemindersContract;
 import com.ch3d.xreminderx.provider.RemindersProvider;
 import com.ch3d.xreminderx.utils.ActivityUtils;
-import com.ch3d.xreminderx.utils.Consts;
+import com.ch3d.xreminderx.utils.PreferenceHelper;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 
 public class RemindersAdapter extends CursorAdapter implements OnClickListener {
@@ -249,15 +247,11 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 	}
 
 	private void onRemove(final View v) {
-		final Long id = (Long) v.getTag();
+		final Long idLong = (Long) v.getTag();
+		final int id = idLong.intValue();
 		final ViewGroup parent = (ViewGroup) v.getTag(R.id.parent);
 
-		final SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(mContext);
-		final boolean showPromt = preferences.getBoolean(
-				Consts.PREFS.SHOW_REMINDER_REMOVE_PROMT, mContext
-						.getResources().getBoolean(R.bool.show_prompt_default));
-		if (showPromt) {
+		if (PreferenceHelper.isShowDisplayPrompt(mContext)) {
 			final View dialogView = mInflater.inflate(
 					R.layout.f_dialog_remove_promt, null);
 			final CheckBox cb = (CheckBox) dialogView
@@ -266,10 +260,7 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 				@Override
 				public void onCheckedChanged(final CompoundButton buttonView,
 						final boolean isChecked) {
-					final Editor editor = preferences.edit();
-					editor.putBoolean(Consts.PREFS.SHOW_REMINDER_REMOVE_PROMT,
-							!isChecked);
-					editor.commit();
+					PreferenceHelper.setShowDisplayPrompt(mContext, !isChecked);
 				}
 			});
 			final AlertDialog.Builder builder = new Builder(mContext);
@@ -297,7 +288,7 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 		}
 	}
 
-	public void removeReminder(final View convertView, final Long id) {
+	public void removeReminder(final View convertView, final int id) {
 		final PropertyValuesHolder[] arrayOfPropertyValuesHolder = new PropertyValuesHolder[2];
 		arrayOfPropertyValuesHolder[0] = PropertyValuesHolder.ofFloat(View.X,
 				800);
@@ -318,10 +309,8 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 				context.getContentResolver().notifyChange(
 						RemindersProvider.REMINDERS_URI, null);
 
-				final AlarmManager alarmManager = (AlarmManager) context
-						.getSystemService(Context.ALARM_SERVICE);
-				alarmManager.cancel(ReminderUtils.getPendingAlarmOperation(
-						context, id));
+				cancelAlarm(id, context);
+				cancelNotification(context, id);
 
 				convertView.post(new Runnable() {
 					@Override
@@ -344,5 +333,18 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 	public void uncheckItems() {
 		mChecked.clear();
 		notifyDataSetChanged();
+	}
+
+	protected void cancelAlarm(final int id, final Context context) {
+		final AlarmManager alarmManager = (AlarmManager) context
+				.getSystemService(Context.ALARM_SERVICE);
+		alarmManager
+				.cancel(ReminderUtils.getPendingAlarmOperation(context, id));
+	}
+
+	protected void cancelNotification(final Context context, final int intId) {
+		final NotificationManager notifManager = (NotificationManager) context
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		notifManager.cancel(intId);
 	}
 }

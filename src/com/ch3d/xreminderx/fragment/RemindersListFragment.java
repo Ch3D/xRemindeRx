@@ -35,61 +35,98 @@ import com.ch3d.xreminderx.provider.RemindersProvider;
 import com.ch3d.xreminderx.utils.ActivityUtils;
 import com.ch3d.xreminderx.utils.ReminderIntent;
 
-public class RemindersListFragment extends ListFragment implements LoaderCallbacks<Cursor>
-{
+public class RemindersListFragment extends ListFragment implements
+		LoaderCallbacks<Cursor> {
 	private ActionMode						mActionMode;
 
-	private final MultiChoiceModeListener	mActionModeCallback	= new MultiChoiceModeListener()
-																{
+	private final MultiChoiceModeListener	mActionModeCallback	= new MultiChoiceModeListener() {
 
-																	// Called when the user selects a contextual menu
+																	// Called
+																	// when the
+																	// user
+																	// selects a
+																	// contextual
+																	// menu
 																	// item
 																	@Override
 																	public boolean onActionItemClicked(
-																			final ActionMode mode, final MenuItem item)
-																	{
+																			final ActionMode mode,
+																			final MenuItem item) {
 																		return onOptionsItemSelected(item);
 																	}
 
-																	// Called when the action mode is created;
-																	// startActionMode() was called
+																	// Called
+																	// when the
+																	// action
+																	// mode is
+																	// created;
+																	// startActionMode()
+																	// was
+																	// called
 																	@Override
 																	public boolean onCreateActionMode(
-																			final ActionMode mode, final Menu menu)
-																	{
+																			final ActionMode mode,
+																			final Menu menu) {
 																		final MenuInflater inflater = mode
 																				.getMenuInflater();
 																		inflater.inflate(
-																				R.menu.reminders_list_contextual, menu);
+																				R.menu.reminders_list_contextual,
+																				menu);
 																		return true;
 																	}
 
-																	// Called when the user exits the action mode
+																	// Called
+																	// when the
+																	// user
+																	// exits the
+																	// action
+																	// mode
 																	@Override
 																	public void onDestroyActionMode(
-																			final ActionMode mode)
-																	{
+																			final ActionMode mode) {
 																		mAdapter.uncheckItems();
 																		mActionMode = null;
 																	}
 
 																	@Override
 																	public void onItemCheckedStateChanged(
-																			final ActionMode mode, final int position,
-																			final long id, final boolean checked)
-																	{
-																		mAdapter.setChecked(position, checked);
+																			final ActionMode mode,
+																			final int position,
+																			final long id,
+																			final boolean checked) {
+																		mAdapter.setChecked(
+																				position,
+																				checked);
 																	}
 
-																	// Called each time the action mode is shown. Always
-																	// called after onCreateActionMode, but
-																	// may be called multiple times if the mode is
+																	// Called
+																	// each time
+																	// the
+																	// action
+																	// mode is
+																	// shown.
+																	// Always
+																	// called
+																	// after
+																	// onCreateActionMode,
+																	// but
+																	// may be
+																	// called
+																	// multiple
+																	// times if
+																	// the mode
+																	// is
 																	// invalidated.
 																	@Override
 																	public boolean onPrepareActionMode(
-																			final ActionMode mode, final Menu menu)
-																	{
-																		return false; // Return false if nothing is done
+																			final ActionMode mode,
+																			final Menu menu) {
+																		return false; // Return
+																						// false
+																						// if
+																						// nothing
+																						// is
+																						// done
 																	}
 																};
 
@@ -101,33 +138,30 @@ public class RemindersListFragment extends ListFragment implements LoaderCallbac
 
 	private RemindersAdapter				mAdapter;
 
-	public RemindersListFragment()
-	{
+	public RemindersListFragment() {
 	}
 
 	@Override
-	public void onCreate(final Bundle savedInstanceState)
-	{
+	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
 	}
 
 	@Override
-	public Loader<Cursor> onCreateLoader(final int arg0, final Bundle bundle)
-	{
+	public Loader<Cursor> onCreateLoader(final int arg0, final Bundle bundle) {
 		return new RemindersLoader(getActivity(), bundle);
 	}
 
 	@Override
-	public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater)
-	{
+	public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
 		inflater.inflate(R.menu.reminders_list, menu);
 	}
 
 	@Override
-	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState)
-	{
-		final View view = super.onCreateView(inflater, container, savedInstanceState);
+	public View onCreateView(final LayoutInflater inflater,
+			final ViewGroup container, final Bundle savedInstanceState) {
+		final View view = super.onCreateView(inflater, container,
+				savedInstanceState);
 
 		final LoaderManager loaderManager = getLoaderManager();
 		loaderManager.initLoader(0, getArguments(), this);
@@ -137,27 +171,24 @@ public class RemindersListFragment extends ListFragment implements LoaderCallbac
 	}
 
 	@Override
-	public void onListItemClick(final ListView l, final View v, final int position, final long id)
-	{
-		if(mActionMode == null)
-		{
-			final RemindersAdapter.ViewHolder holder = (ViewHolder)v.getTag();
-			final Intent intent = new Intent(getActivity(), ReminderDetailsActivity.class);
+	public void onListItemClick(final ListView l, final View v,
+			final int position, final long id) {
+		if (mActionMode == null) {
+			final RemindersAdapter.ViewHolder holder = (ViewHolder) v.getTag();
+			final Intent intent = new Intent(getActivity(),
+					ReminderDetailsActivity.class);
 			intent.setAction(Intent.ACTION_VIEW);
-			intent.setData(ContentUris.withAppendedId(RemindersProvider.REMINDERS_URI, holder.id));
-			if(ActivityUtils.isJeallyBean())
-			{
-				final ActivityOptions options = ActivityOptions.makeCustomAnimation(getActivity(),
-						android.R.anim.fade_in, android.R.anim.fade_out);
+			intent.setData(ContentUris.withAppendedId(
+					RemindersProvider.REMINDERS_URI, holder.id));
+			if (ActivityUtils.isJeallyBean()) {
+				final ActivityOptions options = ActivityOptions
+						.makeCustomAnimation(getActivity(),
+								android.R.anim.fade_in, android.R.anim.fade_out);
 				getActivity().startActivity(intent, options.toBundle());
-			}
-			else
-			{
+			} else {
 				startActivity(intent);
 			}
-		}
-		else
-		{
+		} else {
 			getListView().setItemChecked(position, true);
 			getListView().setSelection(position);
 			v.setSelected(true);
@@ -165,42 +196,40 @@ public class RemindersListFragment extends ListFragment implements LoaderCallbac
 	}
 
 	@Override
-	public void onLoaderReset(final Loader<Cursor> arg0)
-	{
+	public void onLoaderReset(final Loader<Cursor> arg0) {
 		mAdapter.swapCursor(null);
 	}
 
 	@Override
-	public void onLoadFinished(final Loader<Cursor> loader, final Cursor cursor)
-	{
-		cursor.setNotificationUri(getActivity().getContentResolver(), RemindersProvider.REMINDERS_URI);
+	public void onLoadFinished(final Loader<Cursor> loader, final Cursor cursor) {
+		cursor.setNotificationUri(getActivity().getContentResolver(),
+				RemindersProvider.REMINDERS_URI);
 		mAdapter.swapCursor(cursor);
 		setListAdapter(mAdapter);
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(final MenuItem item)
-	{
-		switch(item.getItemId())
-		{
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		switch (item.getItemId()) {
 			case R.menu.action_new_reminder:
-				final Intent intent = new Intent(getActivity(), ReminderDetailsActivity.class);
+				final Intent intent = new Intent(getActivity(),
+						ReminderDetailsActivity.class);
 				intent.setAction(ReminderIntent.ACTION_NEW);
 				startActivity(intent);
 				return true;
 
 			case R.menu.action_remove:
-				final Iterator<Integer> iterator = mAdapter.getCheckedItemPositions();
-				while(iterator.hasNext())
-				{
+				final Iterator<Integer> iterator = mAdapter
+						.getCheckedItemPositions();
+				while (iterator.hasNext()) {
 					final Integer next = iterator.next();
 					final View view = getListView().getChildAt(next);
-					final ViewHolder tag = (ViewHolder)view.getTag();
-					mAdapter.removeReminder(view, tag.id);
+					final ViewHolder tag = (ViewHolder) view.getTag();
+					final long idLong = tag.id;
+					mAdapter.removeReminder(view, (int) idLong);
 				}
 				mAdapter.uncheckItems();
-				if(mActionMode != null)
-				{
+				if (mActionMode != null) {
 					mActionMode.finish();
 				}
 				return true;
@@ -216,8 +245,7 @@ public class RemindersListFragment extends ListFragment implements LoaderCallbac
 	}
 
 	@Override
-	public void onViewCreated(final View view, final Bundle savedInstanceState)
-	{
+	public void onViewCreated(final View view, final Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		setEmptyText(getActivity().getString(R.string.you_have_no_reminders));
 		final ListView listView = getListView();
