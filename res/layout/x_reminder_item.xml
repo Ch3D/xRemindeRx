@@ -1,0 +1,102 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".RemindersList$DummySectionFragment" >
+    <RelativeLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="?android:attr/listPreferredItemHeightLarge"
+	    tools:context=".RemindersList$DummySectionFragment"
+	    android:layout_margin="4dp"
+	    android:background="@drawable/bg_reminder_item" >
+	    <View android:id="@+x_reminder_item/color" 
+	        android:layout_width="16dp"
+	        android:layout_height="match_parent" />
+		<View 
+	        android:id="@+x_reminder_item/colorDelimiter"
+	        android:layout_width="1dp"
+	        android:layout_height="match_parent"
+	        android:layout_toRightOf="@+x_reminder_item/color"
+	        android:background="#22000000"/>	    
+	    <ImageView
+			android:id="@+x_reminder_item/icon"        
+	        android:layout_toRightOf="@+x_reminder_item/color"
+	        android:layout_alignParentTop="true"
+	        android:layout_centerVertical="true"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:paddingLeft="4dp"
+	        android:paddingRight="4dp"
+	        android:src="@drawable/ic_event" />
+	    <ImageView
+			android:id="@+x_reminder_item/icon_type"
+			android:layout_alignLeft="@+x_reminder_item/icon"
+			android:layout_below="@+x_reminder_item/icon"        
+	        android:layout_centerVertical="true"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:paddingLeft="4dp"
+	        android:paddingRight="4dp"
+	        android:src="@drawable/ic_reminder_type" />
+	    <LinearLayout
+	        android:orientation="vertical"
+	        android:layout_alignParentTop="true"
+	        android:layout_toLeftOf="@+x_reminder_item/delimiter"
+	        android:layout_toRightOf="@+x_reminder_item/icon"
+	        android:layout_width="match_parent"
+	        android:layout_height="?android:attr/listPreferredItemHeightLarge"
+	        android:paddingRight="@dimen/activity_horizontal_margin">
+	        <TextView
+		        android:id="@+x_reminder_item/text"
+		        android:ellipsize="end"
+		        android:singleLine="true"
+		        android:layout_weight="1"
+		        android:layout_width="match_parent"
+		        android:fontFamily="sans-serif"
+		        android:layout_height="0dp"
+		        android:textColor="@android:color/primary_text_light"
+		        android:textAppearance="?android:attr/textAppearanceMedium" />
+		    <TextView
+		        android:id="@+x_reminder_item/date"
+		        android:ellipsize="end"
+		        android:singleLine="true"
+		        android:layout_weight="1"
+		        android:layout_width="match_parent"
+		        android:fontFamily="sans-serif-thin"
+		        android:layout_height="0dp"
+		        android:textColor="@android:color/secondary_text_light"
+		        android:textAppearance="?android:attr/textAppearance" />
+		    <TextView
+		        android:id="@+x_reminder_item/time"
+		        android:ellipsize="end"
+		        android:singleLine="true"
+		        android:layout_weight="1"
+		        android:layout_width="match_parent"
+		        android:fontFamily="sans-serif-thin"
+		        android:layout_height="0dp"
+		        android:textColor="@android:color/secondary_text_light"
+		        android:textAppearance="?android:attr/textAppearanceSmall" />
+	    </LinearLayout>
+	    <Button
+	        android:id="@+x_reminder_item/btn_remove"
+	        android:layout_width="32dp"
+	        android:layout_height="32dp"
+	        android:layout_marginLeft="8dp"
+	        android:layout_marginRight="8dp"
+	        android:layout_alignParentRight="true"
+	        android:layout_centerVertical="true"
+	        android:focusable="false"
+	        android:focusableInTouchMode="false"
+	        android:scaleType="centerInside"
+	        android:background="@drawable/btn_remove"
+	        style="@android:style/Widget.Holo.Button.Borderless"/>
+	    <View 
+	        android:id="@+x_reminder_item/delimiter"
+	        android:layout_width="1dp"
+	        android:layout_marginTop="16dp"
+	        android:layout_marginBottom="16dp"
+	        android:layout_height="?android:attr/listPreferredItemHeightLarge"
+	        android:layout_toLeftOf="@+x_reminder_item/btn_remove"
+	        android:background="#22000000"/>
+	</RelativeLayout>
+</FrameLayout>

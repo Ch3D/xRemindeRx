@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">XRemindeRX</string>
+    
+   	<string name="today">Today</string>
+   	<string name="tomorrow">Tomorrow</string>
+   	<string name="yesterday">Yesterday</string>
+   	<string name="date_format">dd MMM yyyy hh:mm a</string>
+	<string name="date_format_month_day">dd MMMM</string>
+	<string name="date_format_year_month_day">dd MMMM yyyy</string>
+	<string name="date_format_month_day_time">dd MMM kk:mm</string>
+	<string name="date_format_year_month_day_time">dd MMM yyyy kk:mm</string>
+    
+    <!-- preferences -->
+    <string name="ui">UI</string>
+    <string name="show_promt_when_removing_reminder">Show promt when removing reminder</string>
+    <string name="show_removing_promt">Show removing promt</string>
+    
+    <!-- menus -->
+    <string name="action_settings">Settings</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="details">Details</string>
+    <string name="edit">Edit</string>
+    <string name="new_reminder">New Reminder</string>
+    <string name="remove">Remove</string>
+    <string name="save">Save</string>
+    
+    <!-- action bar titles -->
+    <string name="create_new_event">Create new event</string>
+    <string name="edit_reminder">Edit reminder</string>
+    <string name="view_reminder">View reminder</string>
+    <string name="reminders">Reminders</string>
+    <string name="settings">Settings</string>
+    
+    <!-- reminder details -->
+    <string name="event_title">Event title</string>
+    <string name="event_time">Event time</string>
+    <string name="alarm_time">Alarm time</string>
+    <string name="please_enter_event_title">Please enter event title</string>
+    <string name="reminder_type">Reminder type</string>
+    <string name="contact">Contact</string>
+    <string name="silent">Silent</string>
+    <string name="ongoing">Ongoing</string>
+    
+    <!-- reminders list -->
+    <string name="title_all">All</string>
+    <string name="title_today">Today</string>
+    <string name="you_have_no_reminders">You have no reminders.</string>
+    
+    <!-- notifications -->
+    <string name="dismiss">Dismiss</string>
+    <string name="postpone">Postpone</string>
+	
+    <!-- dialog : removing promt -->
+    <string name="are_you_sure_that_you_want_to_remove_this_reminders">Are you sure that you want to remove this reminders?</string>
+    <string name="don_t_show_this_dialog_next_time">Don\'t show this dialog next time</string>
+    <string name="reminder_is_already_exist">Reminder is already exist</string>
+    
+    <string name="no_contact">No contact</string>
+    <string name="select_contact">Select contact</string>
+    
+    <!-- settings -->
+    <string name="postfix_minutes"> minutes</string>
+    <string name="postpone_time">Postpone Time</string>
+    <string name="time_to_postpone_reminder">Time to postpone reminder</string>
+    <string name="color">Color</string>
+</resources>

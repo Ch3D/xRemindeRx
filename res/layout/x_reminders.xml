@@ -1,0 +1,9 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+x_reminders/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <fragment class="com.ch3d.xreminderx.reminders.RemindersListFragment"
+        android:id="@+x_reminders/fragment_reminders_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</FrameLayout>

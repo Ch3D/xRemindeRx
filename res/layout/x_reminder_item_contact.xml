@@ -1,0 +1,95 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    tools:context=".RemindersList$DummySectionFragment" >
+    <RelativeLayout 
+        android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_margin="4dp"
+        android:background="@drawable/bg_reminder_item">
+   	    <ImageView 
+	        android:id="@+x_reminder_item_contact/img"
+	        android:layout_width="match_parent" 
+	        android:layout_height="match_parent"
+	        android:src="@drawable/ic_contact_picture"
+	        android:scaleType="centerCrop" />
+	    <RelativeLayout 
+	        android:id="@+x_reminder_item_contact/header"
+	        android:padding="8dp"
+	        android:background="#AAffffff"
+	        android:layout_alignParentTop="true"
+	        android:layout_width="match_parent"
+	        android:layout_height="?android:attr/actionBarSize">
+	        <TextView
+	            android:id="@+x_reminder_item_contact/txt_msg"
+	            android:layout_alignParentLeft="true" 
+	            android:text="to Ajax"
+	            android:textAppearance="?android:attr/textAppearanceLarge"
+	            android:textColor="@android:color/primary_text_light"
+	            android:layout_centerVertical="true"
+	            android:layout_gravity="center_vertical"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"/>
+	        <TextView
+	            android:id="@+x_reminder_item_contact/txt_datetime"
+	            android:text="Today 12:34"
+	            android:textAppearance="?android:attr/textAppearanceMedium"
+	            android:textColor="@android:color/secondary_text_light"
+	            android:fontFamily="sans-serif-thin"
+	            android:layout_centerVertical="true"
+	            android:layout_alignParentRight="true"
+	            android:layout_gravity="center_vertical"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"/>
+	    </RelativeLayout>
+		<View 
+		    android:id="@+x_reminder_item_contact/delimiter"
+		    android:layout_below="@+x_reminder_item_contact/header" 
+		    android:layout_width="match_parent" 
+		    android:layout_height="6dp"
+		    android:background="@drawable/shadow_top_bottom"/>
+	    <View 
+	        android:id="@+x_reminder_item_contact/delimiter_img"
+		    android:layout_above="@+x_reminder_item_contact/bottom_menu" 
+		    android:layout_width="match_parent" 
+		    android:layout_height="6dp"
+		    android:background="@drawable/shadow_bottom_top"/>
+	    <LinearLayout 
+	        android:id="@+x_reminder_item_contact/bottom_menu"
+	        android:background="#AAffffff"
+	        android:layout_alignParentBottom="true"
+	        android:layout_width="match_parent"
+	        android:layout_height="?android:attr/actionBarSize">
+	        <Button 
+	            android:id="@+x_reminder_item_contact/btn_details"
+	            android:drawableLeft="@drawable/ic_action_ic_contact_details"
+	            android:text="@string/details"
+	            android:textColor="@android:color/secondary_text_light"
+	            android:layout_width="0dp"
+	            android:layout_weight="1"
+	            android:layout_height="match_parent"
+	            android:focusable="false"
+	        	android:focusableInTouchMode="false"
+	            style="@android:style/Widget.Holo.Button.Borderless" />
+	        <View 
+		        android:id="@+x_reminder_item_contact/delimiter"
+		        android:layout_width="1dp"
+		        android:layout_marginTop="8dp"
+		        android:layout_marginBottom="8dp"
+		        android:layout_height="match_parent"
+		        android:background="#000000" />
+			<Button
+		        android:id="@+x_reminder_item_contact/btn_remove"
+		        android:drawableLeft="@drawable/btn_remove"
+		        android:text="@string/remove"
+		        android:textColor="@android:color/secondary_text_light"
+		        android:layout_width="0dp"
+		        android:layout_weight="1"
+		        android:layout_height="match_parent"
+		        android:focusable="false"
+	        	android:focusableInTouchMode="false"
+		        style="@android:style/Widget.Holo.Button.Borderless" />
+	    </LinearLayout>
+    </RelativeLayout>
+</FrameLayout>
