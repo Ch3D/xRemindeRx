@@ -72,7 +72,7 @@
 	            android:focusable="false"
 	        	android:focusableInTouchMode="false"
 	            style="@android:style/Widget.Holo.Button.Borderless" />
-	        <View 
+	        <!-- <View 
 		        android:id="@+x_reminder_item_contact/delimiter"
 		        android:layout_width="1dp"
 		        android:layout_marginTop="8dp"
@@ -89,7 +89,7 @@
 		        android:layout_height="match_parent"
 		        android:focusable="false"
 	        	android:focusableInTouchMode="false"
-		        style="@android:style/Widget.Holo.Button.Borderless" />
+		        style="@android:style/Widget.Holo.Button.Borderless" /> -->
 	    </LinearLayout>
     </RelativeLayout>
 </FrameLayout>

@@ -77,7 +77,7 @@
 		        android:textColor="@android:color/secondary_text_light"
 		        android:textAppearance="?android:attr/textAppearanceSmall" />
 	    </LinearLayout>
-	    <Button
+	    <!-- <Button
 	        android:id="@+x_reminder_item/btn_remove"
 	        android:layout_width="32dp"
 	        android:layout_height="32dp"
@@ -97,6 +97,6 @@
 	        android:layout_marginBottom="16dp"
 	        android:layout_height="?android:attr/listPreferredItemHeightLarge"
 	        android:layout_toLeftOf="@+x_reminder_item/btn_remove"
-	        android:background="#22000000"/>
+	        android:background="#22000000"/> -->
 	</RelativeLayout>
 </FrameLayout>

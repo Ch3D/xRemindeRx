@@ -65,7 +65,7 @@
 	           	android:textAppearance="?android:attr/textAppearanceMedium"
 	           	android:textColor="@android:color/secondary_text_light"
 	           	android:fontFamily="sans-serif-thin"/>
-			<Button
+			<!-- <Button
 		        android:id="@+x_reminder_item_contact/btn_remove"
 		        android:layout_alignParentRight="true"
 		        android:layout_centerVertical="true"
@@ -85,7 +85,7 @@
 		        android:layout_marginBottom="10dp"
 		        android:layout_height="?android:attr/listPreferredItemHeightLarge"
 		        android:layout_toLeftOf="@+x_reminder_item_contact/btn_remove"
-		        android:background="#22000000"/>
+		        android:background="#22000000"/> -->
 	    </RelativeLayout>
     </RelativeLayout>
 	<Button 
