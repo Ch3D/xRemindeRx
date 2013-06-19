@@ -15,6 +15,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.v4.app.NotificationCompat;
 
 import com.ch3d.xreminderx.R;
@@ -27,6 +28,31 @@ import com.ch3d.xreminderx.utils.ReminderIntent;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 
 public class AlarmReceiver extends BroadcastReceiver {
+	private void addCallAction(final Context context,
+			final ReminderEntry reminder, final Notification.Builder builder) {
+		Cursor c = null;
+		try {
+			c = context.getContentResolver()
+					.query(reminder.getContactUri(),
+							new String[] { ContactsContract.CommonDataKinds.Phone.NUMBER },
+					null, null, null);
+
+			if ((c != null) && c.moveToFirst()) {
+				final Intent caIntent = new Intent(Intent.ACTION_CALL,
+						Uri.parse("tel:" + c.getString(0)));
+				final PendingIntent callIntent = PendingIntent
+						.getActivity(context, 0, caIntent,
+								PendingIntent.FLAG_UPDATE_CURRENT);
+				builder.addAction(R.drawable.ic_dial_action_call,
+						context.getString(R.string.call), callIntent);
+			}
+		} finally {
+			if (c != null) {
+				c.close();
+			}
+		}
+	}
+
 	private void onDismiss(final Context context, final ReminderEntry reminder) {
 		final AlarmManager aManager = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
@@ -157,6 +183,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 				// below status bar.
 				builder.addAction(R.drawable.ic_n_contact_details,
 						context.getString(R.string.contact), detailsIntent);
+
+				addCallAction(context, reminder, builder);
 			}
 
 			if (reminder.isContactRelated() && hasAddressbookContact) {
