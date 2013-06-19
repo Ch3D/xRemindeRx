@@ -227,9 +227,6 @@ public class SwipeDismissListViewTouchListener implements View.OnTouchListener,
 						.getYVelocity());
 				boolean dismiss = false;
 				boolean dismissRight = false;
-				System.err.println(">>>" + Math.abs(deltaX));
-				System.err.println(">>>" + deltaX);
-				System.err.println(">>>" + velocityX);
 				if (Math.abs(deltaX) > (mViewWidth / 2)) {
 					dismiss = true;
 					dismissRight = deltaX > 0;
