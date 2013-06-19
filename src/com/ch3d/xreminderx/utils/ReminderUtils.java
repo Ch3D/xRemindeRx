@@ -12,6 +12,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.nfc.NdefRecord;
 import android.os.Parcel;
@@ -126,6 +132,34 @@ public class ReminderUtils {
 	public static Bitmap fetchThumbnail(final Context context,
 			final ReminderEntry reminder, final Bitmap defaultImg) {
 		return fetchThumbnail(context, reminder.getContactUri(), defaultImg);
+	}
+
+	public static Bitmap createGhostIcon(final Drawable src, final int color,
+			final boolean invert) {
+		final int width = src.getIntrinsicWidth();
+		final int height = src.getIntrinsicHeight();
+		if ((width <= 0) || (height <= 0)) {
+			throw new UnsupportedOperationException(
+					"Source drawable needs an intrinsic size.");
+		}
+
+		final Bitmap bitmap = Bitmap.createBitmap(width, height,
+				Bitmap.Config.ARGB_8888);
+		final Canvas canvas = new Canvas(bitmap);
+		final Paint colorToAlphaPaint = new Paint();
+		final int invMul = invert ? -1 : 1;
+		colorToAlphaPaint.setColorFilter(new ColorMatrixColorFilter(
+				new ColorMatrix(new float[] { 0, 0, 0, 0, Color.red(color), 0,
+						0, 0, 0, Color.green(color), 0, 0, 0, 0,
+						Color.blue(color), invMul * 0.213f, invMul * 0.715f,
+						invMul * 0.072f, 0, invert ? 255 : 0, })));
+		canvas.saveLayer(0, 0, width, height, colorToAlphaPaint,
+				Canvas.ALL_SAVE_FLAG);
+		canvas.drawColor(invert ? Color.WHITE : Color.BLACK);
+		src.setBounds(0, 0, width, height);
+		src.draw(canvas);
+		canvas.restore();
+		return bitmap;
 	}
 
 	public static Bitmap fetchThumbnail(final Context context,

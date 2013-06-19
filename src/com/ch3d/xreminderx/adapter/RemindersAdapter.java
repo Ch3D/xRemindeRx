@@ -17,6 +17,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.CursorAdapter;
@@ -97,6 +99,7 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 		}
 
 		final int type = cursor.getInt(RemindersContract.Indexes.TYPE);
+		final int color = cursor.getInt(RemindersContract.Indexes.COLOR);
 		if (ReminderType.parse(type) == ReminderType.CONTACT) {
 			final Uri contactUri = Uri.parse(cursor
 					.getString(RemindersContract.Indexes.CONTACT_URI));
@@ -105,8 +108,7 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 			holder.id = id;
 			holder.text.setText(cursor
 					.getString(RemindersContract.Indexes.TEXT));
-			holder.color.setBackgroundColor(cursor
-					.getInt(RemindersContract.Indexes.COLOR));
+			holder.color.setBackgroundColor(color);
 
 			final String dateTime = ReminderUtils.formatDate(context,
 					cursor.getLong(RemindersContract.Indexes.TIMESTAMP))
@@ -124,8 +126,13 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 			holder.btnRemove.setTag(id);
 			holder.btnRemove.setOnClickListener(this);
 			holder.btnRemove.setEnabled(mChecked.size() == 0);
-			holder.imgContact.setImageBitmap(ReminderUtils.fetchThumbnail(
-					context, contactUri, mDefaultImg));
+			final Bitmap fetchThumbnail = ReminderUtils.fetchThumbnail(context,
+					contactUri, mDefaultImg);
+			final BitmapDrawable bitmapDrawable = new BitmapDrawable(
+					mContext.getResources(), fetchThumbnail);
+			final Bitmap ghostIcon = ReminderUtils.createGhostIcon(
+					bitmapDrawable, Color.DKGRAY, true);
+			holder.imgContact.setImageBitmap(ghostIcon);
 			holder.imgContact.setTag(contactUri);
 			holder.imgContact.setOnClickListener(this);
 		} else {
@@ -133,8 +140,7 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 			holder.id = id;
 			holder.text.setText(cursor
 					.getString(RemindersContract.Indexes.TEXT));
-			holder.color.setBackgroundColor(cursor
-					.getInt(RemindersContract.Indexes.COLOR));
+			holder.color.setBackgroundColor(color);
 			holder.iconType.setImageLevel(cursor
 					.getInt(RemindersContract.Indexes.TYPE));
 			holder.date.setText(ReminderUtils.formatDate(context,
