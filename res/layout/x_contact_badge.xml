@@ -3,6 +3,7 @@
     android:orientation="horizontal"
     android:layout_width="128dp"
     android:padding="2dp"
+    android:layout_gravity="center_vertical"
     android:layout_height="wrap_content"
     android:background="@android:color/holo_blue_light">
     <ImageView android:id="@+x_contact_badge/imgAvatar"
@@ -20,8 +21,9 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/no_contact"
         android:layout_gravity="center_vertical" />
-    <Button android:id="@+x_contact_badge/btnRemove" 
+    <Button android:id="@+x_contact_badge/btnRemove"
         android:padding="2dp" 
+        android:layout_gravity="center_vertical"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:background="@drawable/ic_cancel"
