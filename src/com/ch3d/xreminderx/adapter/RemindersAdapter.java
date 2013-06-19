@@ -245,9 +245,8 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 
 	private void onRemove(final View v) {
 		final Long idLong = (Long) v.getTag();
-		final int id = idLong.intValue();
 		final ViewGroup parent = (ViewGroup) v.getTag(R.id.parent);
-
+		final int id = idLong.intValue();
 		if (PreferenceHelper.isShowDisplayPrompt(mContext)) {
 			final View dialogView = mInflater.inflate(
 					R.layout.f_dialog_remove_promt, null);

@@ -34,6 +34,9 @@ import com.ch3d.xreminderx.loader.RemindersLoader;
 import com.ch3d.xreminderx.provider.RemindersProvider;
 import com.ch3d.xreminderx.utils.ActivityUtils;
 import com.ch3d.xreminderx.utils.ReminderIntent;
+import com.ch3d.xreminderx.utils.ReminderUtils;
+import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener;
+import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener.DismissCallbacks;
 
 public class RemindersListFragment extends ListFragment implements
 		LoaderCallbacks<Cursor> {
@@ -67,6 +70,7 @@ public class RemindersListFragment extends ListFragment implements
 																	public boolean onCreateActionMode(
 																			final ActionMode mode,
 																			final Menu menu) {
+																		mActionMode = mode;
 																		final MenuInflater inflater = mode
 																				.getMenuInflater();
 																		inflater.inflate(
@@ -256,5 +260,25 @@ public class RemindersListFragment extends ListFragment implements
 		listView.setMultiChoiceModeListener(mActionModeCallback);
 		listView.addFooterView(View.inflate(getActivity(),
 				R.layout.footer_reminders, null));
+
+		listView.setOnTouchListener(new SwipeDismissListViewTouchListener(
+				listView, new DismissCallbacks() {
+					@Override
+					public boolean canDismiss(final int position) {
+						return mActionMode == null;
+					}
+
+					@Override
+					public void onDismiss(final ListView listView,
+							final int[] reverseSortedPositions) {
+						for (final int position : reverseSortedPositions) {
+							final ViewGroup view = (ViewGroup) getListView()
+									.getChildAt(position);
+							final ViewHolder tag = (ViewHolder) view.getTag();
+							ReminderUtils.deleteReminder(getActivity(),
+									(int) tag.id);
+						}
+					}
+				}));
 	}
 }
