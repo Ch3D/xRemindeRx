@@ -21,6 +21,7 @@ import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.model.ReminderFactory;
 import com.ch3d.xreminderx.provider.RemindersProvider;
 import com.ch3d.xreminderx.utils.ReminderUtils;
+import com.ch3d.xreminderx.utils.StringUtils;
 import com.ch3d.xreminderx.utils.ViewUtils;
 
 public class RemindersActivity extends FragmentActivity implements
@@ -120,15 +121,19 @@ public class RemindersActivity extends FragmentActivity implements
 	public void onClick(final View v) {
 		switch (v.getId()) {
 			case android.R.id.button1:
+				final String title = mEditQuickText.getText().toString().trim();
+				if (StringUtils.isBlank(title)) {
+					return;
+				}
 				final ReminderEntry reminder = ReminderFactory.createNull();
-				reminder.setText(mEditQuickText.getText().toString());
+				reminder.setText(title);
 				reminder.setOngoing(0);
 				reminder.setSilent(1);
 				reminder.setColor(0);
 
-				RemindersProvider.addReminder(this, reminder, true);
 				mEditQuickText.getText().clear();
 				ViewUtils.hideKeyboard(mEditQuickText);
+				RemindersProvider.addReminder(this, reminder, true);
 				break;
 
 			default:
