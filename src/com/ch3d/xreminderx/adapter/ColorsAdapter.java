@@ -56,7 +56,8 @@ public class ColorsAdapter extends BaseAdapter
 	@Override
 	public View getView(final int position, final View convertView, final ViewGroup parent)
 	{
-		final View inflate = mInflater.inflate(android.R.layout.simple_spinner_item, parent, false);
+		final View inflate = mInflater.inflate(R.layout.simple_spinner_item,
+				parent, false);
 		inflate.setBackgroundColor(mColors[position]);
 		return inflate;
 	}

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -39,6 +40,30 @@ public class RemindersActivity extends FragmentActivity implements
 			}
 		}
 		return msgs;
+	}
+
+	@Override
+	public void onClick(final View v) {
+		switch (v.getId()) {
+			case android.R.id.button1:
+				final String title = mEditQuickText.getText().toString().trim();
+				if (StringUtils.isBlank(title)) {
+					return;
+				}
+				final ReminderEntry reminder = ReminderFactory.createNull();
+				reminder.setText(title);
+				reminder.setOngoing(0);
+				reminder.setSilent(1);
+				reminder.setColor(Color.WHITE);
+
+				mEditQuickText.getText().clear();
+				ViewUtils.hideKeyboard(mEditQuickText);
+				RemindersProvider.addReminder(this, reminder, true);
+				break;
+
+			default:
+				break;
+		}
 	}
 
 	@Override
@@ -114,30 +139,6 @@ public class RemindersActivity extends FragmentActivity implements
 		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
 			final NdefMessage[] msgs = getNdefMessages(intent);
 			parseNdefMessages(msgs);
-		}
-	}
-
-	@Override
-	public void onClick(final View v) {
-		switch (v.getId()) {
-			case android.R.id.button1:
-				final String title = mEditQuickText.getText().toString().trim();
-				if (StringUtils.isBlank(title)) {
-					return;
-				}
-				final ReminderEntry reminder = ReminderFactory.createNull();
-				reminder.setText(title);
-				reminder.setOngoing(0);
-				reminder.setSilent(1);
-				reminder.setColor(0);
-
-				mEditQuickText.getText().clear();
-				ViewUtils.hideKeyboard(mEditQuickText);
-				RemindersProvider.addReminder(this, reminder, true);
-				break;
-
-			default:
-				break;
 		}
 	}
 }

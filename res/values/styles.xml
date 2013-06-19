@@ -37,6 +37,16 @@
     
     <style name="View"/>
     
+	<style name="View.Container">
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+    </style>
+    
+	<style name="View.Container.Color">
+        <item name="android:layout_marginLeft">16dp</item>
+        <item name="android:layout_marginRight">16dp</item>
+    </style>
+    
     <style name="View.Delimiter"/>
     
     <style name="View.Delimiter.Horizontal">

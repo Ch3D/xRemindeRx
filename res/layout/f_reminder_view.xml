@@ -70,7 +70,8 @@
 	            android:layout_width="match_parent"
 	            android:layout_height="32dp"
 	            android:layout="@layout/x_contact_badge"
-	            android:padding="4dp" />
+	            android:padding="4dp"
+	            style="@style/View.Container.Color" />
 	    </LinearLayout>
 	    <LinearLayout
 	        android:id="@+f_reminder_view/panelSelectContact"
@@ -92,7 +93,8 @@
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:layout="@layout/x_contact_badge"
-	            android:padding="4dp" />
+	            android:padding="4dp"
+	            style="@style/View.Container.Color" />
 	    </LinearLayout>
 	    <LinearLayout
 	        android:layout_width="match_parent"
@@ -114,7 +116,8 @@
 	            android:layout_height="wrap_content"
 	            android:fontFamily="sans-serif-light"
 	            android:textAppearance="?android:attr/textAppearanceLarge"
-	            android:textIsSelectable="false" />
+	            android:textIsSelectable="false"
+	            style="@style/View.Container" />
 	    </LinearLayout>
 	    <LinearLayout
 	        android:layout_width="match_parent"
@@ -136,7 +139,8 @@
 	            android:layout_height="wrap_content"
 	            android:fontFamily="sans-serif-light"
 	            android:textAppearance="?android:attr/textAppearanceLarge"
-	            android:textIsSelectable="false" />
+	            android:textIsSelectable="false"
+	            style="@style/View.Container" />
 	    </LinearLayout>
 	</LinearLayout>
 </ScrollView>

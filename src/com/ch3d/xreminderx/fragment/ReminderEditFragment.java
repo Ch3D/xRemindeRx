@@ -360,7 +360,8 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 	{
 		super.onViewCreated(view, savedInstanceState);
 		getActivity().setTitle(getTitleResource());
-		mType.setAdapter(new ArrayAdapter<ReminderType>(getActivity(), android.R.layout.simple_spinner_item,
+		mType.setAdapter(new ArrayAdapter<ReminderType>(getActivity(),
+				R.layout.simple_spinner_item,
 				ReminderType.values()));
 		mColorsAdapter = new ColorsAdapter(getActivity());
 		mColor.setAdapter(mColorsAdapter);
