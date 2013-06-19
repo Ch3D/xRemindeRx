@@ -119,8 +119,16 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 		if(isBlank)
 		{
 			mText.setError(getActivity().getString(R.string.please_enter_event_title));
+			mText.requestFocus();
+			return false;
 		}
-		return !isBlank;
+		if (mReminder.getAlarmTimestamp() > mReminder.getTimestamp()) {
+			Toast.makeText(getActivity(),
+					"Alarm time can't be after Event time", Toast.LENGTH_SHORT)
+					.show();
+			return false;
+		}
+		return true;
 	}
 
 	protected ReminderEntry getReminder()
