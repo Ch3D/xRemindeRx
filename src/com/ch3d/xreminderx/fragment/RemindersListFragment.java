@@ -254,5 +254,7 @@ public class RemindersListFragment extends ListFragment implements
 		listView.setLayoutTransition(new LayoutTransition());
 		listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
 		listView.setMultiChoiceModeListener(mActionModeCallback);
+		listView.addFooterView(View.inflate(getActivity(),
+				R.layout.footer_reminders, null));
 	}
 }
