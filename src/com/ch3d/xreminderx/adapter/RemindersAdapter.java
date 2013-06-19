@@ -7,12 +7,10 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
-import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -25,9 +23,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -35,7 +30,6 @@ import com.ch3d.xreminderx.R;
 import com.ch3d.xreminderx.model.ReminderType;
 import com.ch3d.xreminderx.provider.RemindersContract;
 import com.ch3d.xreminderx.utils.ActivityUtils;
-import com.ch3d.xreminderx.utils.PreferenceHelper;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 
 public class RemindersAdapter extends CursorAdapter implements OnClickListener {
@@ -67,6 +61,7 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 
 	private static final int		VIEW_TYPE_CONTACT	= 1;
 
+	@SuppressLint("UseSparseArrays")
 	HashMap<Integer, Boolean>		mChecked			= new HashMap<Integer, Boolean>();
 
 	private final LayoutInflater	mInflater;
@@ -237,47 +232,6 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 
 			default:
 				break;
-		}
-	}
-
-	private void onRemove(final View v) {
-		final Long idLong = (Long) v.getTag();
-		final ViewGroup parent = (ViewGroup) v.getTag(R.id.parent);
-		final int id = idLong.intValue();
-		if (PreferenceHelper.isShowDisplayPrompt(mContext)) {
-			final View dialogView = mInflater.inflate(
-					R.layout.f_dialog_remove_promt, null);
-			final CheckBox cb = (CheckBox) dialogView
-					.findViewById(R.f_dialog_remove_promt.checkboxPromt);
-			cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-				@Override
-				public void onCheckedChanged(final CompoundButton buttonView,
-						final boolean isChecked) {
-					PreferenceHelper.setShowDisplayPrompt(mContext, !isChecked);
-				}
-			});
-			final AlertDialog.Builder builder = new Builder(mContext);
-			builder.setView(dialogView);
-			builder.setPositiveButton(R.string.remove,
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(final DialogInterface dialog,
-								final int which) {
-							removeReminder(parent, id);
-							dialog.dismiss();
-						}
-					});
-			builder.setNegativeButton(R.string.cancel,
-					new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(final DialogInterface dialog,
-								final int which) {
-							dialog.dismiss();
-						}
-					});
-			builder.show();
-		} else {
-			removeReminder(parent, id);
 		}
 	}
 

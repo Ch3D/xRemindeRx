@@ -21,7 +21,7 @@ public class PreferenceHelper {
 		final SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(mContext);
 		final Editor editor = preferences.edit();
-		editor.putBoolean(Consts.PREFS.SHOW_REMINDER_REMOVE_PROMT, !show);
+		editor.putBoolean(Consts.PREFS.SHOW_REMINDER_REMOVE_PROMT, show);
 		editor.commit();
 	}
 

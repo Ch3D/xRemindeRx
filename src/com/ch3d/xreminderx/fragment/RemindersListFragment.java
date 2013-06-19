@@ -4,12 +4,16 @@ import java.util.Iterator;
 
 import android.animation.LayoutTransition;
 import android.app.ActivityOptions;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.ContentUris;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -23,6 +27,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ListView;
 
 import com.ch3d.xreminderx.R;
@@ -33,6 +40,7 @@ import com.ch3d.xreminderx.adapter.RemindersAdapter.ViewHolder;
 import com.ch3d.xreminderx.loader.RemindersLoader;
 import com.ch3d.xreminderx.provider.RemindersProvider;
 import com.ch3d.xreminderx.utils.ActivityUtils;
+import com.ch3d.xreminderx.utils.PreferenceHelper;
 import com.ch3d.xreminderx.utils.ReminderIntent;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener;
@@ -271,14 +279,69 @@ public class RemindersListFragment extends ListFragment implements
 					@Override
 					public void onDismiss(final ListView listView,
 							final int[] reverseSortedPositions) {
-						for (final int position : reverseSortedPositions) {
-							final ViewGroup view = (ViewGroup) getListView()
-									.getChildAt(position);
-							final ViewHolder tag = (ViewHolder) view.getTag();
-							ReminderUtils.deleteReminder(getActivity(),
-									(int) tag.id);
-						}
+						removeReminders(reverseSortedPositions);
 					}
+
+
 				}));
+	}
+
+	private void removeReminders(
+			final int[] reverseSortedPositions) {
+		final FragmentActivity context = getActivity();
+		if (PreferenceHelper.isShowDisplayPrompt(context)) {
+			final View dialogView = View.inflate(context,
+					R.layout.f_dialog_remove_promt, null);
+			final CheckBox cb = (CheckBox) dialogView
+					.findViewById(R.f_dialog_remove_promt.checkboxPromt);
+			cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(
+						final CompoundButton buttonView,
+						final boolean isChecked) {
+					PreferenceHelper.setShowDisplayPrompt(
+							context, !isChecked);
+				}
+			});
+			final AlertDialog.Builder builder = new Builder(
+					context);
+			builder.setView(dialogView);
+			builder.setPositiveButton(R.string.remove,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(
+								final DialogInterface dialog,
+								final int which) {
+							for (final int position : reverseSortedPositions) {
+								final ViewGroup view = (ViewGroup) getListView()
+										.getChildAt(position);
+								final ViewHolder tag = (ViewHolder) view
+										.getTag();
+								ReminderUtils.deleteReminder(
+										context, (int) tag.id);
+							}
+							dialog.dismiss();
+						}
+					});
+			builder.setNegativeButton(R.string.cancel,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(
+								final DialogInterface dialog,
+								final int which) {
+							dialog.dismiss();
+						}
+					});
+			builder.show();
+		} else {
+			for (final int position : reverseSortedPositions) {
+				final ViewGroup view = (ViewGroup) getListView()
+						.getChildAt(position);
+				final ViewHolder tag = (ViewHolder) view
+						.getTag();
+				ReminderUtils.deleteReminder(context,
+						(int) tag.id);
+			}
+		}
 	}
 }
