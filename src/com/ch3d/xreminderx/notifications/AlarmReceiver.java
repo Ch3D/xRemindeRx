@@ -12,7 +12,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.preference.PreferenceManager;
@@ -25,11 +24,12 @@ import com.ch3d.xreminderx.activity.ReminderDetailsActivity;
 import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.provider.RemindersProvider;
 import com.ch3d.xreminderx.utils.Consts;
+import com.ch3d.xreminderx.utils.DBUtils;
 import com.ch3d.xreminderx.utils.ReminderIntent;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 
 public class AlarmReceiver extends BroadcastReceiver {
-    private void addCallAction(final Context context, final ReminderEntry reminder,
+    private void addActionCall(final Context context, final ReminderEntry reminder,
             final Notification.Builder builder) {
         Cursor c = null;
         try {
@@ -50,10 +50,83 @@ public class AlarmReceiver extends BroadcastReceiver {
                         context.getString(R.string.call), callIntent);
             }
         } finally {
-            if (c != null) {
-                c.close();
-            }
+            DBUtils.close(c);
         }
+    }
+
+    private void addActionDismiss(final Context context, final Uri reminderUri,
+            final Notification.Builder builder) {
+        final Intent dIntent = new Intent(context, AlarmReceiver.class);
+        dIntent.setAction(ReminderIntent.ACTION_NOTIFICATION_DISMISS);
+        dIntent.setData(reminderUri);
+        final PendingIntent deleteIntent = PendingIntent.getBroadcast(
+                context, 0, dIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        builder.setDeleteIntent(deleteIntent);
+        builder.addAction(R.drawable.ic_n_dismiss,
+                context.getString(R.string.dismiss), deleteIntent);
+    }
+
+    private void addActionOnSelected(final Context context, final Uri reminderUri,
+            final Notification.Builder builder) {
+        final Intent cIntent = new Intent(context, AlarmReceiver.class);
+        cIntent.setAction(ReminderIntent.ACTION_NOTIFICATION_SELECT);
+        cIntent.setData(reminderUri);
+        builder.setContentIntent(PendingIntent.getBroadcast(context, 0,
+                cIntent, PendingIntent.FLAG_CANCEL_CURRENT));
+    }
+
+    private void addActionOpenDetails(final Context context, final Notification.Builder builder,
+            final Uri reminderUri) {
+        // start empty activity to stop ringer, cancel notification and
+        // start native contact details
+        // workaround for status bar collapse issue:
+        // 1) directly start native details activity - them you will not
+        // be able to stop ringer
+        // 2) set broadcast intent to stop ringer and then start native
+        // details - activity will be launched
+        // below status bar.
+
+        final Intent detIntent = new Intent(context,
+                ContactDetailsActivity.class);
+        detIntent.setData(reminderUri);
+        detIntent.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+                | Intent.FLAG_ACTIVITY_NO_HISTORY
+                | Intent.FLAG_ACTIVITY_NEW_TASK);
+        final PendingIntent detailsIntent = PendingIntent.getActivity(
+                context, 0, detIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+
+        builder.addAction(R.drawable.ic_n_contact_details,
+                context.getString(R.string.contact), detailsIntent);
+    }
+
+    private void addActionPostpone(final Context context, final Uri reminderUri,
+            final Notification.Builder builder) {
+        final Intent pIntent = new Intent(context, AlarmReceiver.class);
+        pIntent.setAction(ReminderIntent.ACTION_NOTIFICATION_POSTPONE);
+        pIntent.setData(reminderUri);
+        final PendingIntent postIntent = PendingIntent.getBroadcast(
+                context, 0, pIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        builder.addAction(R.drawable.ic_n_postpone,
+                context.getString(R.string.postpone), postIntent);
+    }
+
+    private Notification.Builder initBuilder(final Context context, final ReminderEntry reminder) {
+        final String notificationText = reminder.getText();
+        final Notification.Builder builder = new Builder(context);
+        builder.setShowWhen(true);
+        builder.setSmallIcon(R.drawable.ic_n_event);
+        builder.setLargeIcon(BitmapFactory.decodeResource(
+                context.getResources(), R.drawable.ic_n_event));
+        builder.setOnlyAlertOnce(false);
+        builder.setAutoCancel(false);
+        builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        builder.setTicker(notificationText);
+        builder.setContentTitle(notificationText);
+        builder.setContentText(ReminderUtils.formatDateTime(context,
+                reminder.getTimestamp()));
+        builder.setDefaults(Notification.DEFAULT_ALL);
+        return builder;
     }
 
     private void onDismiss(final Context context, final ReminderEntry reminder) {
@@ -140,155 +213,43 @@ public class AlarmReceiver extends BroadcastReceiver {
             onPostpone(context, reminder);
         } else if (ReminderIntent.ACTION_NOTIFICATION_ONGOING.equals(intent
                 .getAction())) {
-            final String notificationText = reminder.getText();
-            final Notification.Builder builder = new Builder(context);
-            builder.setShowWhen(true);
-            builder.setSmallIcon(R.drawable.ic_n_event);
-            builder.setLargeIcon(BitmapFactory.decodeResource(
-                    context.getResources(), R.drawable.ic_n_event));
-            builder.setOnlyAlertOnce(false);
-            builder.setAutoCancel(false);
+            final Notification.Builder builder = initBuilder(context, reminder);
             builder.setOngoing(true);
-            builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-            builder.setTicker(notificationText);
-            builder.setContentTitle(notificationText);
-            builder.setContentText(ReminderUtils.formatDateTime(context,
-                    reminder.getTimestamp()));
-
-            // click - view details
-            final Intent cIntent = new Intent(context, AlarmReceiver.class);
-            cIntent.setAction(ReminderIntent.ACTION_NOTIFICATION_SELECT);
-            cIntent.setData(reminderUri);
-            builder.setContentIntent(PendingIntent.getBroadcast(context, 0,
-                    cIntent, PendingIntent.FLAG_CANCEL_CURRENT));
+            addActionOnSelected(context, reminderUri, builder);
 
             final boolean hasAddressbookContact = ReminderUtils
                     .hasAddressbookContact(context, reminder);
             if (reminder.isContactRelated() && hasAddressbookContact) {
-                // action show contact details
-                final Intent detIntent = new Intent(context,
-                        ContactDetailsActivity.class);
-                detIntent.setData(reminderUri);
-                detIntent.setAction(intent.getAction());
-                detIntent.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
-                        | Intent.FLAG_ACTIVITY_NO_HISTORY
-                        | Intent.FLAG_ACTIVITY_NEW_TASK);
-                final PendingIntent detailsIntent = PendingIntent.getActivity(
-                        context, 0, detIntent,
-                        PendingIntent.FLAG_CANCEL_CURRENT);
-                // start empty activity to stop ringer, cancel notification and
-                // start native contact details
-                // workaround for status bar collapse issue:
-                // 1) directly start native details activity - them you will not
-                // be able to stop ringer
-                // 2) set broadcast intent to stop ringer and then start native
-                // details - activity will be launched
-                // below status bar.
-                builder.addAction(R.drawable.ic_n_contact_details,
-                        context.getString(R.string.contact), detailsIntent);
+                addActionOpenDetails(context, builder, reminderUri);
+                addActionCall(context, reminder, builder);
 
-                addCallAction(context, reminder, builder);
+                builder.setLargeIcon(ReminderUtils.fetchThumbnail(
+                        context, reminder));
             }
+            nManager.notify(reminder.getId(), builder.build());
+        } else if (ReminderIntent.ACTION_NOTIFICATION_SHOW.equals(intent
+                .getAction())) {
+            final Notification.Builder builder = initBuilder(context, reminder);
+            builder.setWhen(reminder.getAlarmTimestamp());
+            addActionOnSelected(context, reminderUri, builder);
+            addActionPostpone(context, reminderUri, builder);
 
+            final boolean hasAddressbookContact = ReminderUtils
+                    .hasAddressbookContact(context, reminder);
             if (reminder.isContactRelated() && hasAddressbookContact) {
+                addActionOpenDetails(context, builder, reminderUri);
+                addActionCall(context, reminder, builder);
+                builder.setLargeIcon(ReminderUtils.fetchThumbnail(
+                        context, reminder));
                 // final Notification.BigPictureStyle notification = new
                 // Notification.BigPictureStyle(
                 // builder);
-                final Bitmap defImg = BitmapFactory.decodeResource(
-                        context.getResources(), R.drawable.ic_contact_picture);
-                final Bitmap fetchThumbnail = ReminderUtils.fetchThumbnail(
-                        context, reminder, defImg);
-                builder.setLargeIcon(fetchThumbnail);
-                // notification.bigPicture(fetchThumbnail);
-                nManager.notify(reminder.getId(), builder.build());
+                // notification.bigPicture(ReminderUtils.fetchThumbnail(
+                // context, reminder));
             } else {
-                final Notification notification = builder.build();
-                nManager.notify(reminder.getId(), notification);
+                addActionDismiss(context, reminderUri, builder);
             }
-        } else if (ReminderIntent.ACTION_NOTIFICATION_SHOW.equals(intent
-                .getAction())) {
-            final String notificationText = reminder.getText();
-            final Notification.Builder builder = new Builder(context);
-            builder.setShowWhen(true);
-            builder.setSmallIcon(R.drawable.ic_n_event);
-            builder.setLargeIcon(BitmapFactory.decodeResource(
-                    context.getResources(), R.drawable.ic_n_event));
-            builder.setWhen(reminder.getAlarmTimestamp());
-            builder.setOnlyAlertOnce(false);
-            builder.setAutoCancel(true);
-            builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-            builder.setTicker(notificationText);
-            builder.setContentTitle(notificationText);
-            builder.setContentText(ReminderUtils.formatDateTime(context,
-                    reminder.getTimestamp()));
-            builder.setDefaults(Notification.DEFAULT_ALL);
-
-            // click - view details
-            final Intent cIntent = new Intent(context, AlarmReceiver.class);
-            cIntent.setAction(ReminderIntent.ACTION_NOTIFICATION_SELECT);
-            cIntent.setData(reminderUri);
-            builder.setContentIntent(PendingIntent.getBroadcast(context, 0,
-                    cIntent, PendingIntent.FLAG_CANCEL_CURRENT));
-
-            // delete intent
-            final Intent dIntent = new Intent(context, AlarmReceiver.class);
-            dIntent.setAction(ReminderIntent.ACTION_NOTIFICATION_DISMISS);
-            dIntent.setData(reminderUri);
-            final PendingIntent deleteIntent = PendingIntent.getBroadcast(
-                    context, 0, dIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-            builder.setDeleteIntent(deleteIntent);
-
-            final boolean hasAddressbookContact = ReminderUtils
-                    .hasAddressbookContact(context, reminder);
-            if (reminder.isContactRelated() && hasAddressbookContact) {
-                // action show contact details
-                final Intent detIntent = new Intent(context,
-                        ContactDetailsActivity.class);
-                detIntent.setData(reminderUri);
-                detIntent.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
-                        | Intent.FLAG_ACTIVITY_NO_HISTORY
-                        | Intent.FLAG_ACTIVITY_NEW_TASK);
-                final PendingIntent detailsIntent = PendingIntent.getActivity(
-                        context, 0, detIntent,
-                        PendingIntent.FLAG_CANCEL_CURRENT);
-                // start empty activity to stop ringer, cancel notification and
-                // start native contact details
-                // workaround for status bar collapse issue:
-                // 1) directly start native details activity - them you will not
-                // be able to stop ringer
-                // 2) set broadcast intent to stop ringer and then start native
-                // details - activity will be launched
-                // below status bar.
-                builder.addAction(R.drawable.ic_n_contact_details,
-                        context.getString(R.string.contact), detailsIntent);
-            } else {
-                // action dismiss
-                builder.addAction(R.drawable.ic_n_dismiss,
-                        context.getString(R.string.dismiss), deleteIntent);
-            }
-
-            // action postpone
-            final Intent pIntent = new Intent(context, AlarmReceiver.class);
-            pIntent.setAction(ReminderIntent.ACTION_NOTIFICATION_POSTPONE);
-            pIntent.setData(reminderUri);
-            final PendingIntent postIntent = PendingIntent.getBroadcast(
-                    context, 0, pIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-            builder.addAction(R.drawable.ic_n_postpone,
-                    context.getString(R.string.postpone), postIntent);
-
-            if (reminder.isContactRelated() && hasAddressbookContact) {
-                final Notification.BigPictureStyle notification = new Notification.BigPictureStyle(
-                        builder);
-                final Bitmap defImg = BitmapFactory.decodeResource(
-                        context.getResources(), R.drawable.ic_contact_picture);
-                final Bitmap fetchThumbnail = ReminderUtils.fetchThumbnail(
-                        context, reminder, defImg);
-                notification.bigPicture(fetchThumbnail);
-                nManager.notify(reminder.getId(), notification.build());
-            } else {
-                final Notification notification = builder.build();
-                nManager.notify(reminder.getId(), notification);
-            }
+            nManager.notify(reminder.getId(), builder.build());
 
             if (!reminder.isSilent()) {
                 startRinging(context, reminderUri);
