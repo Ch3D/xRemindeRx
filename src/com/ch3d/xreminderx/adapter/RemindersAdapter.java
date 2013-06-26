@@ -19,15 +19,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ch3d.xreminderx.R;
-import com.ch3d.xreminderx.model.ReminderType;
 import com.ch3d.xreminderx.provider.RemindersContract;
 import com.ch3d.xreminderx.utils.ActivityUtils;
 import com.ch3d.xreminderx.utils.ReminderUtils;
+import com.ch3d.xreminderx.utils.StringUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,8 +37,6 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 
         public TextView		text;
 
-        // public Button btnRemove;
-
         public View			color;
 
         public TextView		date;
@@ -47,12 +44,9 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
         public TextView		time;
 
         public ImageView	iconType;
-    }
 
-    static class ViewHolderContact extends ViewHolder {
-        ImageView	imgContact;
+        public ImageView imgContact;
 
-        Button		btnDetails;
     }
 
     private static final int		VIEW_TYPE_COUNT		= 2;
@@ -91,31 +85,20 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
             // view.setBackgroundResource(android.R.drawable.dialog_holo_light_frame);
         }
 
-        final int type = cursor.getInt(RemindersContract.Indexes.TYPE);
-        if (ReminderType.parse(type) == ReminderType.CONTACT) {
+        if (isContactRelated(cursor)) {
             final Uri contactUri = Uri.parse(cursor
                     .getString(RemindersContract.Indexes.CONTACT_URI));
-
-            final ViewHolderContact holder = (ViewHolderContact) view.getTag();
+            final ViewHolder holder = (ViewHolder) view.getTag();
             holder.id = id;
             holder.text.setText(cursor
                     .getString(RemindersContract.Indexes.TEXT));
             holder.color.setBackgroundColor(cursor
                     .getInt(RemindersContract.Indexes.COLOR));
 
-            final String dateTime = ReminderUtils.formatDate(context,
-                    cursor.getLong(RemindersContract.Indexes.TIMESTAMP))
-                    + " "
-                    + ReminderUtils
-                    .formatTime(
-                            context,
-                            cursor.getLong(RemindersContract.Indexes.TIMESTAMP));
+            final String dateTime = ReminderUtils.formatDateTimeShort(context,
+                    cursor.getLong(RemindersContract.Indexes.TIMESTAMP));
             holder.date.setText(dateTime);
 
-            holder.btnDetails.setTag(contactUri);
-            holder.btnDetails.setOnClickListener(this);
-            holder.btnDetails.setEnabled(ReminderUtils.hasAddressbookContact(
-                    mContext, contactUri));
             holder.imgContact.setImageBitmap(ReminderUtils.fetchThumbnail(
                     context, contactUri, mDefaultImg));
             holder.imgContact.setTag(contactUri);
@@ -134,9 +117,6 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
             holder.time.setText(ReminderUtils.formatTime(context,
                     cursor.getLong(RemindersContract.Indexes.TIMESTAMP)));
         }
-        // holder.btnRemove.setTag(id);
-        // holder.btnRemove.setOnClickListener(this);
-        // holder.btnRemove.setEnabled(mChecked.size() == 0);
     }
 
     public Iterator<Integer> getCheckedItemPositions() {
@@ -148,8 +128,7 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
         final Cursor cursor = getCursor();
         final boolean moveToPosition = cursor.moveToPosition(position);
         if (moveToPosition) {
-            final int type = cursor.getInt(RemindersContract.Indexes.TYPE);
-            return ReminderType.parse(type) == ReminderType.CONTACT ? VIEW_TYPE_CONTACT
+            return isContactRelated(cursor) ? VIEW_TYPE_CONTACT
                     : VIEW_TYPE_SIMPLE;
         }
         return VIEW_TYPE_SIMPLE;
@@ -160,14 +139,18 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
         return VIEW_TYPE_COUNT;
     }
 
+    private boolean isContactRelated(final Cursor cursor) {
+        final String contactUri = cursor.getString(RemindersContract.Indexes.CONTACT_URI);
+        return !StringUtils.isBlank(contactUri);
+    }
+
     @Override
     public View newView(final Context context, final Cursor cursor,
             final ViewGroup parent) {
-        final int type = cursor.getInt(RemindersContract.Indexes.TYPE);
-        if (ReminderType.parse(type) == ReminderType.CONTACT) {
+        if (isContactRelated(cursor)) {
             final View convertView = mInflater.inflate(
                     R.layout.x_reminder_item_contact2, parent, false);
-            final ViewHolderContact holder = new ViewHolderContact();
+            final ViewHolder holder = new ViewHolder();
             holder.text = (TextView) convertView
                     .findViewById(R.x_reminder_item_contact.txt_msg);
             holder.date = (TextView) convertView
@@ -176,11 +159,6 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
                     .findViewById(R.x_reminder_item_contact.txt_datetime);
             holder.color = convertView
                     .findViewById(R.x_reminder_item_contact.color);
-            // holder.btnRemove = (Button) convertView
-            // .findViewById(R.x_reminder_item_contact.btn_remove);
-            // holder.btnRemove.setTag(R.id.parent, convertView);
-            holder.btnDetails = (Button) convertView
-                    .findViewById(R.x_reminder_item_contact.btn_details);
             holder.imgContact = (ImageView) convertView
                     .findViewById(R.x_reminder_item_contact.img);
             convertView.setTag(holder);
@@ -198,9 +176,6 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
                     .findViewById(R.x_reminder_item.date);
             holder.time = (TextView) convertView
                     .findViewById(R.x_reminder_item.time);
-            // holder.btnRemove = (Button) convertView
-            // .findViewById(R.x_reminder_item.btn_remove);
-            // holder.btnRemove.setTag(R.id.parent, convertView);
             convertView.setTag(holder);
             return convertView;
         }
@@ -209,12 +184,6 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
     @Override
     public void onClick(final View v) {
         switch (v.getId()) {
-            // case R.x_reminder_item_contact.btn_remove:
-            // case R.x_reminder_item.btn_remove:
-            // onRemove(v);
-            // break;
-
-            case R.x_reminder_item_contact.btn_details:
             case R.x_reminder_item_contact.img:
                 final Uri contactUri = (Uri) v.getTag();
                 final Intent intent = ActivityUtils.getContactDetailsIntent(

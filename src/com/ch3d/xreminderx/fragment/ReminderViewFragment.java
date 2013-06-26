@@ -63,8 +63,7 @@ public class ReminderViewFragment extends Fragment {
             mPanelContact.setVisibility(View.VISIBLE);
             getActivity().findViewById(R.x_contact_badge.btnRemove)
             .setVisibility(View.GONE);
-            getActivity().findViewById(R.x_contact_badge.root)
-            .setOnClickListener(new OnClickListener() {
+            mContactBadgeHolder.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(final View v) {
                     showContactDetails(reminder);
@@ -75,9 +74,9 @@ public class ReminderViewFragment extends Fragment {
             mPanelContact.setVisibility(View.GONE);
             mContactBadgeHolder.setVisibility(View.GONE);
         }
-        mTimestamp.setText(ReminderUtils.formatDateTime(getActivity(),
+        mTimestamp.setText(ReminderUtils.formatDateTimeShort(getActivity(),
                 reminder.getTimestamp()));
-        mAlarmTimstamp.setText(ReminderUtils.formatDateTime(getActivity(),
+        mAlarmTimstamp.setText(ReminderUtils.formatDateTimeShort(getActivity(),
                 reminder.getAlarmTimestamp()));
     }
 

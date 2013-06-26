@@ -1,9 +1,6 @@
 package com.ch3d.xreminderx.fragment;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -21,9 +18,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -37,7 +31,6 @@ import com.ch3d.xreminderx.fragment.dialog.OnReminderDateSetListener;
 import com.ch3d.xreminderx.fragment.dialog.OnReminderTimeSetListener;
 import com.ch3d.xreminderx.fragment.dialog.TimePickerDialogFragment;
 import com.ch3d.xreminderx.model.ReminderEntry;
-import com.ch3d.xreminderx.model.ReminderType;
 import com.ch3d.xreminderx.provider.RemindersContract;
 import com.ch3d.xreminderx.provider.RemindersProvider;
 import com.ch3d.xreminderx.utils.ContactBadgeHolder;
@@ -56,7 +49,7 @@ OnReminderTimeSetListener
 
     private static final int	REQUEST_CODE_SPEECH_RECOGNITION	= 1;
 
-    private static final int	REQUEST_CODE_GET_CONTACT		= 2;
+    public static final int    REQUEST_CODE_GET_CONTACT        = 2;
 
     /**
      * @param data
@@ -91,14 +84,6 @@ OnReminderTimeSetListener
 
     protected ReminderEntry		mReminder;
 
-    private AlarmManager		mAlarmManager;
-
-    private Spinner				mType;
-
-    private Button				mBtnPickContact;
-
-    private View				mPanelSelectContact;
-
     private ContactBadgeHolder	mContactBadgeHolder;
 
     private Button				btnSpeech;
@@ -106,8 +91,6 @@ OnReminderTimeSetListener
     protected CheckBox			mOngoing;
 
     protected CheckBox			mSilent;
-
-    private NotificationManager	mNotificationsManager;
 
     protected Spinner			mColor;
 
@@ -207,15 +190,14 @@ OnReminderTimeSetListener
                 break;
 
             case R.x_contact_badge.btnRemove:
-                mContactBadgeHolder.setVisibility(View.GONE);
-                mReminder.setContactUri(Uri.EMPTY);
+                setContactData(Uri.EMPTY);
                 break;
 
-            case R.f_reminder_edit.btnPickContact:
-                final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
-                startActivityForResult(intent, REQUEST_CODE_GET_CONTACT);
-                break;
+                // case R.f_reminder_edit.btnPickContact:
+                // final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                // intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+                // startActivityForResult(intent, REQUEST_CODE_GET_CONTACT);
+                // break;
 
             case R.f_reminder_edit.btnTsDatePicker:
                 final DatePickerDialogFragment dateFragment = new DatePickerDialogFragment(this);
@@ -251,8 +233,6 @@ OnReminderTimeSetListener
     {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mAlarmManager = (AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
-        mNotificationsManager = (NotificationManager)getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
     @Override
@@ -266,14 +246,11 @@ OnReminderTimeSetListener
     {
         final View view = inflater.inflate(R.layout.f_reminder_edit, container, false);
         mText = (EditText)view.findViewById(R.f_reminder_edit.text);
-        mType = (Spinner)view.findViewById(R.f_reminder_edit.type);
         mColor = (Spinner)view.findViewById(R.f_reminder_edit.color);
         mOngoing = (CheckBox)view.findViewById(R.f_reminder_edit.cbOngoing);
         mSilent = (CheckBox)view.findViewById(R.f_reminder_edit.cbSilent);
         btnSpeech = (Button)view.findViewById(R.f_reminder_edit.btnStartSpeech);
         btnSpeech.setOnClickListener(this);
-        mBtnPickContact = (Button)view.findViewById(R.f_reminder_edit.btnPickContact);
-        mPanelSelectContact = view.findViewById(R.f_reminder_edit.panelSelectContact);
         mContactBadgeHolder = new ContactBadgeHolder(getActivity(),
                 (ViewStub)view.findViewById(R.f_reminder_edit.contact_badge));
         mBtnDatePicker = (Button)view.findViewById(R.f_reminder_edit.btnTsDatePicker);
@@ -358,41 +335,14 @@ OnReminderTimeSetListener
     }
 
     @Override
-    public void onResume()
-    {
-        super.onResume();
-        // ViewUtils.showKeyboard(mText);
-    }
-
-    @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
         getActivity().setTitle(getTitleResource());
-        mType.setAdapter(new ArrayAdapter<ReminderType>(getActivity(),
-                R.layout.simple_spinner_item,
-                ReminderType.values()));
         mColorsAdapter = new ColorsAdapter(getActivity());
         mColor.setAdapter(mColorsAdapter);
-        mBtnPickContact.setOnClickListener(this);
-        mType.setOnItemSelectedListener(new OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(final AdapterView<?> adapterView, final View view, final int position,
-                    final long id)
-            {
-                final ReminderType type = ReminderType.parse(position);
-                mPanelSelectContact.setVisibility(type == ReminderType.CONTACT ? View.VISIBLE : View.GONE);
-                mReminder.setType(type);
-            }
-
-            @Override
-            public void onNothingSelected(final AdapterView<?> arg0)
-            {
-                // Do nothing
-            }
-        });
         mText.setSelectAllOnFocus(true);
+
         mText.requestFocus();
         mText.selectAll();
         mText.addTextChangedListener(new TextWatcher()
@@ -417,6 +367,17 @@ OnReminderTimeSetListener
         });
 
         mReminder = getReminder();
+        mContactBadgeHolder.setVisibility(View.VISIBLE);
+        mContactBadgeHolder.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+                startActivityForResult(intent, REQUEST_CODE_GET_CONTACT);
+            }
+        });
+        setContactData(mReminder.getContactUri());
+
         updateRemiderViewData();
     }
 
@@ -445,7 +406,6 @@ OnReminderTimeSetListener
     protected void updateRemiderViewData()
     {
         mText.setText(mReminder.getText());
-        mType.setSelection(mReminder.getType().getId());
 
         mOngoing.setChecked(mReminder.isOngoing());
         mSilent.setChecked(mReminder.isSilent());
@@ -453,7 +413,6 @@ OnReminderTimeSetListener
         mColor.setSelection(colorPosition);
 
         setContactBadgeData(mReminder.getContactUri(), this);
-        mPanelSelectContact.setVisibility(mReminder.isContactRelated() ? View.VISIBLE : View.GONE);
         mBtnDatePicker.setText(ReminderUtils.formatTimestmapDate(getActivity(), mReminder));
         mBtnTimePicker.setText(ReminderUtils.formatTimestmapTime(getActivity(), mReminder));
 

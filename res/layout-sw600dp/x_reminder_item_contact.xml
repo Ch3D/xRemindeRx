@@ -65,7 +65,7 @@
 		    android:layout_width="match_parent" 
 		    android:layout_height="6dp"
 		    android:background="@drawable/shadow_bottom_top"/>
-	    <LinearLayout 
+	    <!-- <LinearLayout 
 	        android:id="@+x_reminder_item_contact/bottom_menu"
 	        android:background="#ffffff"
 	        android:layout_alignParentBottom="true"
@@ -82,7 +82,7 @@
 	            android:focusable="false"
 	        	android:focusableInTouchMode="false"
 	            style="@android:style/Widget.Holo.Button.Borderless" />
-	        <!-- <View 
+	        <View 
 		        android:id="@+x_reminder_item_contact/delimiter"
 		        android:layout_width="1dp"
 		        android:layout_marginTop="8dp"
@@ -99,7 +99,7 @@
 		        android:layout_height="match_parent"
 		        android:focusable="false"
 	        	android:focusableInTouchMode="false"
-		        style="@android:style/Widget.Holo.Button.Borderless" /> -->
-	    </LinearLayout>
+		        style="@android:style/Widget.Holo.Button.Borderless" />
+	    </LinearLayout> -->
     </RelativeLayout>
 </FrameLayout>

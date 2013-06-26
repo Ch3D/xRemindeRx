@@ -19,7 +19,6 @@
         android:singleLine="true"
         android:ellipsize="end"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/no_contact"
         android:layout_gravity="center_vertical" />
     <Button android:id="@+x_contact_badge/btnRemove"
         android:padding="2dp" 

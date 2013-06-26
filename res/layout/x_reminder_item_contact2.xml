@@ -88,7 +88,7 @@
 		        android:background="#22000000"/> -->
 	    </RelativeLayout>
     </RelativeLayout>
-	<Button 
+	<!-- <Button 
 		android:id="@+x_reminder_item_contact/btn_details"
 		android:drawableLeft="@drawable/ic_action_ic_contact_details"
 		android:text="@string/details"
@@ -99,5 +99,5 @@
 		android:layout_height="match_parent"
 		android:focusable="false"
       	android:focusableInTouchMode="false"
-		style="@android:style/Widget.Holo.Button.Borderless" />
+		style="@android:style/Widget.Holo.Button.Borderless" /> -->
 </FrameLayout>

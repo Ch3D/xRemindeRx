@@ -173,6 +173,17 @@ public class ReminderUtils {
         return com.ch3d.xreminderx.utils.DateUtils.getDate2(context, ts);
     }
 
+    public static String formatDateTimeShort(final Context context, final long ts) {
+        final String dateTime = ReminderUtils.formatDate(context,
+                ts)
+                + " "
+                + ReminderUtils
+                        .formatTime(
+                                context,
+                                ts);
+        return dateTime;
+    }
+
     public static String formatTime(final Context context, final long ts) {
         return DateUtils.formatDateTime(context, ts, FORMAT_TIME);
     }

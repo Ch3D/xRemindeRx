@@ -17,67 +17,77 @@ import com.ch3d.xreminderx.R;
 
 public class ContactBadgeHolder
 {
-	private final Activity	activity;
+    private final Activity	activity;
 
-	private final ViewStub	mContactBadge;
+    private final ViewStub	mContactBadge;
 
-	private final Bitmap	mImgDefaultAvatar;
+    private final Bitmap	mImgDefaultAvatar;
 
-	public ContactBadgeHolder(final Activity activity, final ViewStub view)
-	{
-		this.activity = activity;
-		mImgDefaultAvatar = BitmapFactory.decodeResource(activity.getResources(), R.drawable.ic_contact_picture);
-		mContactBadge = view;
-	}
+    public ContactBadgeHolder(final Activity activity, final ViewStub view)
+    {
+        this.activity = activity;
+        mImgDefaultAvatar = BitmapFactory.decodeResource(activity.getResources(), R.drawable.ic_contact_picture);
+        mContactBadge = view;
+    }
 
-	public void setData(final Uri uri, final OnClickListener removeClickListener)
-	{
-		if(uri != null)
-		{
-			Cursor c = null;
-			try
-			{
-				c = activity.getContentResolver().query(
-						uri,
-						new String[] {ContactsContract.Contacts.PHOTO_ID,
-								ContactsContract.CommonDataKinds.Nickname.DISPLAY_NAME,
-								ContactsContract.Contacts.LOOKUP_KEY}, null, null, null);
+    public void setData(final Uri uri, final OnClickListener removeClickListener)
+    {
+        if(uri != null)
+        {
+            final TextView txtContactName = (TextView) activity
+                    .findViewById(R.x_contact_badge.txtName);
+            final Button btnContactRemove = (Button) activity
+                    .findViewById(R.x_contact_badge.btnRemove);
 
-				if((c != null) && c.moveToFirst())
-				{
-					final int photoId = c.getInt(0);
-					final String contactName = c.getString(1);
-					final String lookupKey = c.getString(2);
+            Cursor c = null;
+            try
+            {
+                c = activity.getContentResolver().query(
+                        uri,
+                        new String[] {ContactsContract.Contacts.PHOTO_ID,
+                                ContactsContract.CommonDataKinds.Nickname.DISPLAY_NAME,
+                                ContactsContract.Contacts.LOOKUP_KEY}, null, null, null);
 
-					setQuickContactData(lookupKey, photoId);
+                if((c != null) && c.moveToFirst())
+                {
+                    final int photoId = c.getInt(0);
+                    final String contactName = c.getString(1);
+                    final String lookupKey = c.getString(2);
 
-					final TextView txtContactName = (TextView)activity.findViewById(R.x_contact_badge.txtName);
-					final Button btnContactRemove = (Button)activity.findViewById(R.x_contact_badge.btnRemove);
-					btnContactRemove.setOnClickListener(removeClickListener);
-					txtContactName.setText(contactName);
-				}
-			}
-			finally
-			{
-				DBUtils.close(c);
-			}
-		}
-	}
+                    setQuickContactData(lookupKey, photoId);
+                    btnContactRemove.setOnClickListener(removeClickListener);
+                    txtContactName.setText(contactName);
+                    btnContactRemove.setVisibility(removeClickListener != null ? View.VISIBLE
+                            : View.GONE);
+                } else {
+                    final ImageView imgContactAvatar = (ImageView) activity
+                            .findViewById(R.x_contact_badge.imgAvatar);
+                    imgContactAvatar.setImageBitmap(mImgDefaultAvatar);
+                    txtContactName.setText(R.string.no_contact);
+                    btnContactRemove.setVisibility(View.GONE);
+                }
+            }
+            finally
+            {
+                DBUtils.close(c);
+            }
+        }
+    }
 
-	private void setQuickContactData(final String lookupKey, final int photoId)
-	{
-		mContactBadge.setVisibility(View.VISIBLE);
-		final ImageView imgContactAvatar = (ImageView)activity.findViewById(R.x_contact_badge.imgAvatar);
-		imgContactAvatar.setImageBitmap(ReminderUtils.fetchThumbnail(activity, photoId, mImgDefaultAvatar));
-		// QuickContactBadge case
-		// imgContactAvatar.setMode(QuickContact.MODE_SMALL);
-		// imgContactAvatar
-		// .assignContactUri(Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey));
-	}
+    public void setOnClickListener(final View.OnClickListener listener) {
+        activity.findViewById(R.x_contact_badge.root)
+        .setOnClickListener(listener);
+    }
 
-	public void setVisibility(final int visibility)
-	{
-		mContactBadge.setVisibility(visibility);
-	}
+    private void setQuickContactData(final String lookupKey, final int photoId)
+    {
+        mContactBadge.setVisibility(View.VISIBLE);
+        final ImageView imgContactAvatar = (ImageView)activity.findViewById(R.x_contact_badge.imgAvatar);
+        imgContactAvatar.setImageBitmap(ReminderUtils.fetchThumbnail(activity, photoId, mImgDefaultAvatar));
+    }
 
+    public void setVisibility(final int visibility)
+    {
+        mContactBadge.setVisibility(visibility);
+    }
 }
