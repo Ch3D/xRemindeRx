@@ -147,10 +147,11 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
     @Override
     public View newView(final Context context, final Cursor cursor,
             final ViewGroup parent) {
+        final View convertView;
+        final ViewHolder holder = new ViewHolder();
         if (isContactRelated(cursor)) {
-            final View convertView = mInflater.inflate(
+            convertView = mInflater.inflate(
                     R.layout.x_reminder_item_contact2, parent, false);
-            final ViewHolder holder = new ViewHolder();
             holder.text = (TextView) convertView
                     .findViewById(R.x_reminder_item_contact.txt_msg);
             holder.date = (TextView) convertView
@@ -161,12 +162,9 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
                     .findViewById(R.x_reminder_item_contact.color);
             holder.imgContact = (ImageView) convertView
                     .findViewById(R.x_reminder_item_contact.img);
-            convertView.setTag(holder);
-            return convertView;
         } else {
-            final View convertView = mInflater.inflate(
+            convertView = mInflater.inflate(
                     R.layout.x_reminder_item, parent, false);
-            final ViewHolder holder = new ViewHolder();
             holder.text = (TextView) convertView
                     .findViewById(R.x_reminder_item.text);
             holder.iconType = (ImageView) convertView
@@ -176,9 +174,9 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
                     .findViewById(R.x_reminder_item.date);
             holder.time = (TextView) convertView
                     .findViewById(R.x_reminder_item.time);
-            convertView.setTag(holder);
-            return convertView;
         }
+        convertView.setTag(holder);
+        return convertView;
     }
 
     @Override
@@ -207,6 +205,12 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
         }
     }
 
+    /**
+     * Used when removing reminder using actionBar/menu and so on.
+     * 
+     * @param convertView - viwe that represents reminder
+     * @param id - reminder id
+     */
     public void removeReminder(final View convertView, final int id) {
         final PropertyValuesHolder[] arrayOfPropertyValuesHolder = new PropertyValuesHolder[2];
         arrayOfPropertyValuesHolder[0] = PropertyValuesHolder.ofFloat(View.X,
