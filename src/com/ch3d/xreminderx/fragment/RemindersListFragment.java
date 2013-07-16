@@ -7,10 +7,12 @@ import android.app.AlertDialog.Builder;
 import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
@@ -150,6 +152,10 @@ LoaderCallbacks<Cursor> {
 
     private RemindersAdapter				mAdapter;
 
+    private SwipeDismissListViewTouchListener mSwipeListener;
+
+    private Handler mHandler;
+
     public RemindersListFragment() {
     }
 
@@ -175,6 +181,7 @@ LoaderCallbacks<Cursor> {
         final View view = super.onCreateView(inflater, container,
                 savedInstanceState);
 
+        mHandler = new Handler();
         final LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(0, getArguments(), this);
         mAdapter = new RemindersAdapter(getActivity(), null, true);
@@ -216,6 +223,20 @@ LoaderCallbacks<Cursor> {
     public void onLoadFinished(final Loader<Cursor> loader, final Cursor cursor) {
         cursor.setNotificationUri(getActivity().getContentResolver(),
                 RemindersProvider.REMINDERS_URI);
+        final ContentObserver contentObserver = new ContentObserver(mHandler) {
+            @Override
+            public boolean deliverSelfNotifications() {
+                return true;
+            }
+
+            @Override
+            public void onChange(final boolean selfChange) {
+                super.onChange(selfChange);
+                mSwipeListener.releaseTransientViews();
+            }
+        };
+        getActivity().getContentResolver().registerContentObserver(RemindersProvider.REMINDERS_URI,
+                true, contentObserver);
         mAdapter.swapCursor(cursor);
         setListAdapter(mAdapter);
     }
@@ -257,6 +278,12 @@ LoaderCallbacks<Cursor> {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        mSwipeListener.releaseTransientViews();
+    }
+
+    @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setEmptyText(getActivity().getString(R.string.you_have_no_reminders));
@@ -269,7 +296,7 @@ LoaderCallbacks<Cursor> {
         listView.addFooterView(View.inflate(getActivity(),
                 R.layout.footer_reminders, null));
 
-        listView.setOnTouchListener(new SwipeDismissListViewTouchListener(
+        mSwipeListener = new SwipeDismissListViewTouchListener(
                 listView, new DismissCallbacks() {
                     @Override
                     public boolean canDismiss(final int position) {
@@ -281,9 +308,8 @@ LoaderCallbacks<Cursor> {
                             final int[] reverseSortedPositions) {
                         removeReminders(reverseSortedPositions);
                     }
-
-
-                }));
+                });
+        listView.setOnTouchListener(mSwipeListener);
     }
 
     private void removeReminders(
@@ -335,7 +361,7 @@ LoaderCallbacks<Cursor> {
             builder.show();
         } else {
             for (final int position : reverseSortedPositions) {
-                final ViewGroup view = (ViewGroup) getListView()
+                final View view = getListView()
                         .getChildAt(position);
                 final ViewHolder tag = (ViewHolder) view
                         .getTag();

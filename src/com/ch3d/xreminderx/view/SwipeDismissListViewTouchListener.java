@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Message;
+import android.support.v4.view.ViewCompat;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -14,9 +15,9 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.HeaderViewListAdapter;
 import android.widget.ListView;
+
+import com.ch3d.xreminderx.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -276,14 +277,15 @@ Callback {
                     mListView.requestDisallowInterceptTouchEvent(true);
 
                     // Cancel ListView's touch (un-highlighting the item)
-                    final MotionEvent cancelEvent = MotionEvent
-                            .obtain(motionEvent);
-                    cancelEvent
-                    .setAction(MotionEvent.ACTION_CANCEL
-                            | (motionEvent.getActionIndex() << MotionEvent.ACTION_POINTER_INDEX_SHIFT));
-                    mListView.onTouchEvent(cancelEvent);
-                    cancelEvent.recycle();
-                    return true;
+                    // final MotionEvent cancelEvent = MotionEvent
+                    // .obtain(motionEvent);
+                    // cancelEvent
+                    // .setAction(MotionEvent.ACTION_CANCEL
+                    // | (motionEvent.getActionIndex() <<
+                    // MotionEvent.ACTION_POINTER_INDEX_SHIFT));
+                    // mListView.onTouchEvent(cancelEvent);
+                    // cancelEvent.recycle();
+                    return false;
                 }
 
                 mVelocityTracker.addMovement(motionEvent);
@@ -325,16 +327,12 @@ Callback {
 
         final ViewGroup.LayoutParams lp = dismissView.getLayoutParams();
         final int originalHeight = dismissView.getHeight();
+        dismissView.setTag(R.id.dismissed_original_height, originalHeight);
 
         final ValueAnimator animator = ValueAnimator.ofInt(originalHeight, 1)
                 .setDuration(mAnimationTime);
 
-        for (final PendingDismissData pendingDismiss : mPendingDismisses) {
-            pendingDismiss.view.setHasTransientState(true);
-        }
-
         animator.addListener(new AnimatorListenerAdapter() {
-
             @Override
             public void onAnimationEnd(final Animator animation) {
                 --mDismissAnimationRefCount;
@@ -342,28 +340,36 @@ Callback {
                     // No active animations, process all pending dismisses.
                     // Sort by descending position
                     Collections.sort(mPendingDismisses);
-
-                    final int[] dismissPositions = new int[mPendingDismisses
-                                                           .size()];
+                    final int[] dismissPositions = new int[mPendingDismisses.size()];
                     for (int i = mPendingDismisses.size() - 1; i >= 0; i--) {
                         dismissPositions[i] = mPendingDismisses.get(i).position;
                     }
                     mCallbacks.onDismiss(mListView, dismissPositions);
-                    final HeaderViewListAdapter adapter = (HeaderViewListAdapter) mListView
-                            .getAdapter();
-                    final BaseAdapter wrappedAdapter = (BaseAdapter) adapter.getWrappedAdapter();
-                    wrappedAdapter.notifyDataSetChanged();
+                    // ViewGroup.LayoutParams lp;
+                    // for (final PendingDismissData pendingDismiss :
+                    // mPendingDismisses) {
+                    // final View view = pendingDismiss.view;
+                    // view.setAlpha(1f);
+                    // view.setTranslationX(0);
+                    // lp = view.getLayoutParams();
+                    // lp.height = originalHeight;
+                    // view.setLayoutParams(lp);
+                    // }
+                    // for (int i = mPendingDismisses.size() - 1; i >= 0; i--) {
+                    // final PendingDismissData pendingDismissData =
+                    // mPendingDismisses.get(i);
+                    // ViewCompat.setHasTransientState(pendingDismissData.view,
+                    // false);
+                    // }
+                    // mPendingDismisses.clear();
+                }
+            }
 
-                    ViewGroup.LayoutParams lp;
-                    for (final PendingDismissData pendingDismiss : mPendingDismisses) {
-                        // Reset view presentation
-                        lp = pendingDismiss.view.getLayoutParams();
-                        lp.height = originalHeight;
-                        pendingDismiss.view.setLayoutParams(lp);
-                        pendingDismiss.view.setHasTransientState(false);
-                    }
-
-                    mPendingDismisses.clear();
+            @Override
+            public void onAnimationStart(final Animator animation) {
+                for (int i = mPendingDismisses.size() - 1; i >= 0; i--) {
+                    final PendingDismissData pendingDismissData = mPendingDismisses.get(i);
+                    ViewCompat.setHasTransientState(pendingDismissData.view, true);
                 }
             }
         });
@@ -371,6 +377,7 @@ Callback {
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(final ValueAnimator valueAnimator) {
+                // TODO: comment
                 lp.height = (Integer) valueAnimator.getAnimatedValue();
                 dismissView.setLayoutParams(lp);
             }
@@ -379,6 +386,24 @@ Callback {
         mPendingDismisses.add(new PendingDismissData(dismissPosition,
                 dismissView));
         animator.start();
+    }
+
+    public void releaseTransientViews() {
+        for (final PendingDismissData pendingDismiss : mPendingDismisses) {
+            final View view = pendingDismiss.view;
+            view.setAlpha(1f);
+            view.setTranslationX(0);
+            final ViewGroup.LayoutParams lp = view.getLayoutParams();
+            lp.height = (Integer) view.getTag(R.id.dismissed_original_height);
+            view.setLayoutParams(lp);
+        }
+        for (int i = mPendingDismisses.size() - 1; i >= 0; i--) {
+            final PendingDismissData pendingDismissData =
+                    mPendingDismisses.get(i);
+            ViewCompat.setHasTransientState(pendingDismissData.view,
+                    false);
+        }
+        mPendingDismisses.clear();
     }
 
     /**
