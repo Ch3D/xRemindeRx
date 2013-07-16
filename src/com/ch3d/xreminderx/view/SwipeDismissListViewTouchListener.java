@@ -73,17 +73,11 @@ Callback {
     private final long						mAnimationTime;
     // Fixed properties
     private final ListView					mListView;
-
     private final DismissCallbacks			mCallbacks;
-    private int								mViewWidth					= 1;									// 1
-    // and
-    // not
-    // 0
-    // to
-    // prevent
-    // dividing
-    // by
-    // zero
+
+    // 1 and not 0 to prevent dividing by zero
+    private int                            mViewWidth                = 1;
+
     // Transient properties
     private final List<PendingDismissData>	mPendingDismisses			= new ArrayList<PendingDismissData>();
     private int								mDismissAnimationRefCount	= 0;
@@ -345,23 +339,6 @@ Callback {
                         dismissPositions[i] = mPendingDismisses.get(i).position;
                     }
                     mCallbacks.onDismiss(mListView, dismissPositions);
-                    // ViewGroup.LayoutParams lp;
-                    // for (final PendingDismissData pendingDismiss :
-                    // mPendingDismisses) {
-                    // final View view = pendingDismiss.view;
-                    // view.setAlpha(1f);
-                    // view.setTranslationX(0);
-                    // lp = view.getLayoutParams();
-                    // lp.height = originalHeight;
-                    // view.setLayoutParams(lp);
-                    // }
-                    // for (int i = mPendingDismisses.size() - 1; i >= 0; i--) {
-                    // final PendingDismissData pendingDismissData =
-                    // mPendingDismisses.get(i);
-                    // ViewCompat.setHasTransientState(pendingDismissData.view,
-                    // false);
-                    // }
-                    // mPendingDismisses.clear();
                 }
             }
 
@@ -377,7 +354,6 @@ Callback {
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(final ValueAnimator valueAnimator) {
-                // TODO: comment
                 lp.height = (Integer) valueAnimator.getAnimatedValue();
                 dismissView.setLayoutParams(lp);
             }
@@ -388,6 +364,10 @@ Callback {
         animator.start();
     }
 
+    /**
+     * Restore removed views state (height and x-position) Call this when
+     * receives notification from ContentObserver or activity/fragment pauses
+     */
     public void releaseTransientViews() {
         for (final PendingDismissData pendingDismiss : mPendingDismisses) {
             final View view = pendingDismiss.view;
