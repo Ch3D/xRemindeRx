@@ -1,3 +1,4 @@
+
 package com.ch3d.xreminderx.fragment;
 
 import android.animation.LayoutTransition;
@@ -18,6 +19,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.util.SparseArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,117 +48,86 @@ import com.ch3d.xreminderx.utils.ReminderUtils;
 import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener;
 import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener.DismissCallbacks;
 
-import java.util.Iterator;
-
 public class RemindersListFragment extends ListFragment implements
-LoaderCallbacks<Cursor> {
-    private ActionMode						mActionMode;
+        LoaderCallbacks<Cursor> {
+    private ActionMode                        mActionMode;
 
-    private final MultiChoiceModeListener	mActionModeCallback	= new MultiChoiceModeListener() {
+    private final MultiChoiceModeListener     mActionModeCallback = new MultiChoiceModeListener() {
 
-        // Called
-        // when the
-        // user
-        // selects a
-        // contextual
-        // menu
-        // item
-        @Override
-        public boolean onActionItemClicked(
-                final ActionMode mode,
-                final MenuItem item) {
-            return onOptionsItemSelected(item);
-        }
+                                                                      @Override
+                                                                      public boolean onActionItemClicked(
+                                                                              final ActionMode mode,
+                                                                              final MenuItem item) {
+                                                                          return onOptionsItemSelected(item);
+                                                                      }
 
-        // Called
-        // when the
-        // action
-        // mode is
-        // created;
-        // startActionMode()
-        // was
-        // called
-        @Override
-        public boolean onCreateActionMode(
-                final ActionMode mode,
-                final Menu menu) {
-            mActionMode = mode;
-            final MenuInflater inflater = mode
-                    .getMenuInflater();
-            inflater.inflate(
-                    R.menu.reminders_list_contextual,
-                    menu);
-            return true;
-        }
+                                                                      @Override
+                                                                      public boolean onCreateActionMode(
+                                                                              final ActionMode mode,
+                                                                              final Menu menu) {
+                                                                          mActionMode = mode;
+                                                                          final MenuInflater inflater = mode
+                                                                                  .getMenuInflater();
+                                                                          inflater.inflate(
+                                                                                  R.menu.reminders_list_contextual,
+                                                                                  menu);
+                                                                          return true;
+                                                                      }
 
-        // Called
-        // when the
-        // user
-        // exits the
-        // action
-        // mode
-        @Override
-        public void onDestroyActionMode(
-                final ActionMode mode) {
-            mAdapter.uncheckItems();
-            mActionMode = null;
-        }
+                                                                      @Override
+                                                                      public void onDestroyActionMode(
+                                                                              final ActionMode mode) {
+                                                                          mAdapter.uncheckItems();
+                                                                          mActionMode = null;
+                                                                      }
 
-        @Override
-        public void onItemCheckedStateChanged(
-                final ActionMode mode,
-                final int position,
-                final long id,
-                final boolean checked) {
-            mAdapter.setChecked(
-                    position,
-                    checked);
-        }
+                                                                      @Override
+                                                                      public void onItemCheckedStateChanged(
+                                                                              final ActionMode mode,
+                                                                              final int position,
+                                                                              final long id,
+                                                                              final boolean checked) {
+                                                                          mAdapter.setChecked(
+                                                                                  position,
+                                                                                  checked);
+                                                                      }
 
-        // Called
-        // each time
-        // the
-        // action
-        // mode is
-        // shown.
-        // Always
-        // called
-        // after
-        // onCreateActionMode,
-        // but
-        // may be
-        // called
-        // multiple
-        // times if
-        // the mode
-        // is
-        // invalidated.
-        @Override
-        public boolean onPrepareActionMode(
-                final ActionMode mode,
-                final Menu menu) {
-            return false; // Return
-            // false
-            // if
-            // nothing
-            // is
-            // done
-        }
-    };
+                                                                      @Override
+                                                                      public boolean onPrepareActionMode(
+                                                                              final ActionMode mode,
+                                                                              final Menu menu) {
+                                                                          return false; // Return
+                                                                          // false
+                                                                          // if
+                                                                          // nothing
+                                                                          // is
+                                                                          // done
+                                                                      }
+                                                                  };
 
-    public static final String				TAG					= "tag_reminders";
+    public static final String                TAG                 = "tag_reminders";
 
-    public static final int					TAG_TODAY			= 0;
+    public static final int                   TAG_TODAY           = 0;
 
-    public static final int					TAG_ALL				= 1;
+    public static final int                   TAG_ALL             = 1;
 
-    private RemindersAdapter				mAdapter;
+    private RemindersAdapter                  mAdapter;
 
     private SwipeDismissListViewTouchListener mSwipeListener;
 
-    private Handler mHandler;
+    private Handler                           mHandler;
 
     public RemindersListFragment() {
+    }
+
+    private ActivityOptions getActivityOptions(final View v, final int position) {
+        final int height = v.getHeight();
+        final int width = v.getWidth();
+        final boolean isFirst = position == 0;
+        final int startY = isFirst ? height >> 2 : (int) (v.getY() - (height >> 1));
+        final ActivityOptions options = ActivityOptions.makeScaleUpAnimation(v,
+                width >> 2, startY, width >> 1, height);
+        return options;
     }
 
     @Override
@@ -200,10 +171,7 @@ LoaderCallbacks<Cursor> {
             intent.setData(ContentUris.withAppendedId(
                     RemindersProvider.REMINDERS_URI, holder.id));
             if (ActivityUtils.isJeallyBean()) {
-                final ActivityOptions options = ActivityOptions
-                        .makeCustomAnimation(getActivity(),
-                                android.R.anim.fade_in, android.R.anim.fade_out);
-                getActivity().startActivity(intent, options.toBundle());
+                getActivity().startActivity(intent, getActivityOptions(v, position).toBundle());
             } else {
                 startActivity(intent);
             }
@@ -252,14 +220,17 @@ LoaderCallbacks<Cursor> {
                 return true;
 
             case R.menu.action_remove:
-                final Iterator<Integer> iterator = mAdapter
-                .getCheckedItemPositions();
-                while (iterator.hasNext()) {
-                    final Integer next = iterator.next();
-                    final View view = getListView().getChildAt(next);
-                    final ViewHolder tag = (ViewHolder) view.getTag();
-                    final long idLong = tag.id;
-                    mAdapter.removeReminder(view, (int) idLong);
+                final SparseArray<Boolean> mChecked = mAdapter.getCheckedItems();
+                final int size = mChecked.size();
+                for (int i = 0; i < size; i++) {
+                    final int key = mChecked.keyAt(i);
+                    final Object obj = mChecked.get(key);
+                    if ((obj instanceof Boolean) && (Boolean) obj) {
+                        final View view = getListView().getChildAt(key);
+                        final ViewHolder tag = (ViewHolder) view.getTag();
+                        final long idLong = tag.id;
+                        mAdapter.removeReminder(view, (int) idLong);
+                    }
                 }
                 mAdapter.uncheckItems();
                 if (mActionMode != null) {
@@ -334,30 +305,30 @@ LoaderCallbacks<Cursor> {
             builder.setView(dialogView);
             builder.setPositiveButton(R.string.remove,
                     new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(
-                        final DialogInterface dialog,
-                        final int which) {
-                    for (final int position : reverseSortedPositions) {
-                        final ViewGroup view = (ViewGroup) getListView()
-                                .getChildAt(position);
-                        final ViewHolder tag = (ViewHolder) view
-                                .getTag();
-                        ReminderUtils.deleteReminder(
-                                context, (int) tag.id);
-                    }
-                    dialog.dismiss();
-                }
-            });
+                        @Override
+                        public void onClick(
+                                final DialogInterface dialog,
+                                final int which) {
+                            for (final int position : reverseSortedPositions) {
+                                final ViewGroup view = (ViewGroup) getListView()
+                                        .getChildAt(position);
+                                final ViewHolder tag = (ViewHolder) view
+                                        .getTag();
+                                ReminderUtils.deleteReminder(
+                                        context, (int) tag.id);
+                            }
+                            dialog.dismiss();
+                        }
+                    });
             builder.setNegativeButton(R.string.cancel,
                     new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(
-                        final DialogInterface dialog,
-                        final int which) {
-                    dialog.dismiss();
-                }
-            });
+                        @Override
+                        public void onClick(
+                                final DialogInterface dialog,
+                                final int which) {
+                            dialog.dismiss();
+                        }
+                    });
             builder.show();
         } else {
             for (final int position : reverseSortedPositions) {

@@ -1,10 +1,10 @@
+
 package com.ch3d.xreminderx.adapter;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Context;
@@ -15,6 +15,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.CursorAdapter;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,39 +29,35 @@ import com.ch3d.xreminderx.utils.ActivityUtils;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 import com.ch3d.xreminderx.utils.StringUtils;
 
-import java.util.HashMap;
-import java.util.Iterator;
-
 public class RemindersAdapter extends CursorAdapter implements OnClickListener {
     public static class ViewHolder {
-        public long			id;
+        public long      id;
 
-        public TextView		text;
+        public TextView  text;
 
-        public View			color;
+        public View      color;
 
-        public TextView		date;
+        public TextView  date;
 
-        public TextView		time;
+        public TextView  time;
 
-        public ImageView	iconType;
+        public ImageView iconType;
 
         public ImageView imgContact;
 
     }
 
-    private static final int		VIEW_TYPE_COUNT		= 2;
+    private static final int           VIEW_TYPE_COUNT   = 2;
 
-    private static final int		VIEW_TYPE_SIMPLE	= 0;
+    private static final int           VIEW_TYPE_SIMPLE  = 0;
 
-    private static final int		VIEW_TYPE_CONTACT	= 1;
+    private static final int           VIEW_TYPE_CONTACT = 1;
 
-    @SuppressLint("UseSparseArrays")
-    HashMap<Integer, Boolean>		mChecked			= new HashMap<Integer, Boolean>();
+    private final SparseArray<Boolean> mChecked          = new SparseArray<Boolean>(10);
 
-    private final LayoutInflater	mInflater;
+    private final LayoutInflater       mInflater;
 
-    private final Bitmap			mDefaultImg;
+    private final Bitmap               mDefaultImg;
 
     public RemindersAdapter(final Activity activity, final Cursor c,
             final boolean autoRequery) {
@@ -119,8 +116,8 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
         }
     }
 
-    public Iterator<Integer> getCheckedItemPositions() {
-        return mChecked.keySet().iterator();
+    public SparseArray<Boolean> getCheckedItems() {
+        return mChecked;
     }
 
     @Override
@@ -213,13 +210,11 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
      */
     public void removeReminder(final View convertView, final int id) {
         final PropertyValuesHolder[] arrayOfPropertyValuesHolder = new PropertyValuesHolder[2];
-        arrayOfPropertyValuesHolder[0] = PropertyValuesHolder.ofFloat(View.X,
-                800);
-        arrayOfPropertyValuesHolder[1] = PropertyValuesHolder.ofFloat(
-                View.ALPHA, 0);
+        arrayOfPropertyValuesHolder[0] = PropertyValuesHolder.ofFloat(View.X, 800);
+        arrayOfPropertyValuesHolder[1] = PropertyValuesHolder.ofFloat(View.ALPHA, 0);
 
-        final ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(
-                convertView, arrayOfPropertyValuesHolder);
+        final ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(convertView,
+                arrayOfPropertyValuesHolder);
         anim.setDuration(300);
         ViewCompat.setHasTransientState(convertView, true);
         anim.addListener(new AnimatorListenerAdapter() {
