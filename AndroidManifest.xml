@@ -89,7 +89,21 @@
 			    <category android:name="android.intent.category.DEFAULT"/>
 			    <data android:mimeType="com.ch3d.xreminderx/reminder" />
 			</intent-filter>
+			<meta-data
+            	android:name="android.app.default_searchable"
+            	android:value="com.ch3d.xreminderx.activity.ReminderSearchResultActivity" />
         </activity>
+        
+        <activity 
+            android:name="com.ch3d.xreminderx.activity.ReminderSearchResultActivity">
+			<intent-filter>
+		        <action android:name="android.intent.action.SEARCH" />
+		        <category android:name="android.intent.category.DEFAULT" />
+		    </intent-filter>
+		    <meta-data
+	            android:name="android.app.searchable"
+	            android:resource="@xml/searchable" />
+		</activity>
         
         <activity
             android:name="com.ch3d.xreminderx.activity.ReminderDetailsActivity"
