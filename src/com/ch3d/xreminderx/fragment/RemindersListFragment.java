@@ -142,11 +142,6 @@ public class RemindersListFragment extends ListFragment implements
     }
 
     @Override
-    public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
-        inflater.inflate(R.menu.reminders_list, menu);
-    }
-
-    @Override
     public View onCreateView(final LayoutInflater inflater,
             final ViewGroup container, final Bundle savedInstanceState) {
         final View view = super.onCreateView(inflater, container,

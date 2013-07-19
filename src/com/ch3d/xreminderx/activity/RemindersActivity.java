@@ -3,6 +3,8 @@ package com.ch3d.xreminderx.activity;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -14,9 +16,11 @@ import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.FragmentActivity;
+import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.SearchView;
 
 import com.ch3d.xreminderx.R;
 import com.ch3d.xreminderx.model.ReminderEntry;
@@ -65,6 +69,7 @@ public class RemindersActivity extends FragmentActivity implements
             default:
                 break;
         }
+
     }
 
     @Override
@@ -86,10 +91,30 @@ public class RemindersActivity extends FragmentActivity implements
     }
 
     @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.reminders_list, menu);
+        // Associate searchable configuration with the SearchView
+        final SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        final SearchView searchView =
+                (SearchView) menu.findItem(R.menu.action_search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+        return true;
+    }
+
+    @Override
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
         // parse intent in case if application is running
         parseNfcIntent(intent);
+    }
+
+    @Override
+    public boolean onSearchRequested() {
+        // TODO Auto-generated method stub
+        System.err.println("!!!!");
+        return super.onSearchRequested();
     }
 
     private void parseNdefMessages(final NdefMessage[] msgs) {
