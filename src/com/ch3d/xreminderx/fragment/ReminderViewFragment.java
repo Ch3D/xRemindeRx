@@ -1,3 +1,4 @@
+
 package com.ch3d.xreminderx.fragment;
 
 import android.content.ContentUris;
@@ -29,25 +30,25 @@ import com.ch3d.xreminderx.utils.ContactBadgeHolder;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 
 public class ReminderViewFragment extends Fragment {
-    public static final String	TAG	= "ReminderDetails";
+    public static final String TAG = "ReminderDetails";
 
-    private TextView			mText;
+    private TextView           mText;
 
-    private TextView			mTimestamp;
+    private TextView           mTimestamp;
 
-    private TextView			mAlarmTimstamp;
+    private TextView           mAlarmTimstamp;
 
-    private ImageView			mIconType;
+    private ImageView          mIconType;
 
-    private ContactBadgeHolder	mContactBadgeHolder;
+    private ContactBadgeHolder mContactBadgeHolder;
 
-    private View				mPanelContact;
+    private View               mPanelContact;
 
-    private TextView			mOngoing;
+    private TextView           mOngoing;
 
-    private TextView			mSilent;
+    private TextView           mSilent;
 
-    private View				mColor;
+    private View               mColor;
 
     private void bindView(final ReminderEntry reminder) {
         mText.setText(reminder.getText());
@@ -62,7 +63,7 @@ public class ReminderViewFragment extends Fragment {
             mContactBadgeHolder.setVisibility(View.VISIBLE);
             mPanelContact.setVisibility(View.VISIBLE);
             getActivity().findViewById(R.x_contact_badge.btnRemove)
-            .setVisibility(View.GONE);
+                    .setVisibility(View.GONE);
             mContactBadgeHolder.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(final View v) {
@@ -114,11 +115,9 @@ public class ReminderViewFragment extends Fragment {
     public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                final Intent parentActivityIntent = new Intent(getActivity(),
-                        RemindersActivity.class);
-                parentActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(parentActivityIntent);
+                final Intent intent = new Intent(getActivity(), RemindersActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
                 getActivity().finish();
                 return true;
 

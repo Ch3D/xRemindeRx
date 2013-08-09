@@ -2,10 +2,8 @@
 package com.ch3d.xreminderx.fragment;
 
 import android.animation.LayoutTransition;
-import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.ContentObserver;
@@ -120,16 +118,6 @@ public class RemindersListFragment extends ListFragment implements
     public RemindersListFragment() {
     }
 
-    private ActivityOptions getActivityOptions(final View v, final int position) {
-        final int height = v.getHeight();
-        final int width = v.getWidth();
-        final boolean isFirst = position == 0;
-        final int startY = isFirst ? height >> 2 : (int) (v.getY() - (height >> 1));
-        final ActivityOptions options = ActivityOptions.makeScaleUpAnimation(v,
-                width >> 2, startY, width >> 1, height);
-        return options;
-    }
-
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,17 +147,7 @@ public class RemindersListFragment extends ListFragment implements
     public void onListItemClick(final ListView l, final View v,
             final int position, final long id) {
         if (mActionMode == null) {
-            final RemindersAdapter.ViewHolder holder = (ViewHolder) v.getTag();
-            final Intent intent = new Intent(getActivity(),
-                    ReminderDetailsActivity.class);
-            intent.setAction(Intent.ACTION_VIEW);
-            intent.setData(ContentUris.withAppendedId(
-                    RemindersProvider.REMINDERS_URI, holder.id));
-            if (ActivityUtils.isJeallyBean()) {
-                getActivity().startActivity(intent, getActivityOptions(v, position).toBundle());
-            } else {
-                startActivity(intent);
-            }
+            ActivityUtils.startDetailsActivity(getActivity(), v, position);
         } else {
             getListView().setItemChecked(position, true);
             getListView().setSelection(position);

@@ -79,6 +79,7 @@
         </activity>
         
         <activity 
+            android:label="@string/search"
             android:name="com.ch3d.xreminderx.activity.ReminderSearchResultActivity">
 			<intent-filter>
 		        <action android:name="android.intent.action.SEARCH" />
