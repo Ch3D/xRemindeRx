@@ -13,6 +13,11 @@ bin/
 gen/
 .settings
 
+#scala
+.cache
+proguard_cache/
+libs/scala_library.min.jar
+
 # Local configuration file (sdk path, etc)
 local.properties
 
