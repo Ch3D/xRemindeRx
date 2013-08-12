@@ -1,6 +1,10 @@
 
 package com.ch3d.xreminderx.fragment;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -19,6 +23,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -38,10 +44,6 @@ import com.ch3d.xreminderx.utils.ContactBadgeHolder;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 import com.ch3d.xreminderx.utils.StringUtils;
 import com.ch3d.xreminderx.utils.ViewUtils;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Locale;
 
 public class ReminderEditFragment extends Fragment implements OnClickListener,
         OnReminderDateSetListener,
@@ -355,6 +357,19 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
         getActivity().setTitle(getTitleResource());
         mColorsAdapter = new ColorsAdapter(getActivity());
         mColor.setAdapter(mColorsAdapter);
+        mColor.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(final AdapterView<?> arg0, final View arg1, final int pos,
+                    final long arg3) {
+                mReminder.setColor((Integer) mColor.getItemAtPosition(pos));
+            }
+
+            @Override
+            public void onNothingSelected(final AdapterView<?> arg0) {
+
+            }
+        });
         mText.setSelectAllOnFocus(true);
 
         mText.requestFocus();
@@ -420,7 +435,8 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 
         mOngoing.setChecked(mReminder.isOngoing());
         mSilent.setChecked(mReminder.isSilent());
-        final int colorPosition = mColorsAdapter.getPosition(mReminder.getColor());
+        final int colorPosition =
+                mColorsAdapter.getPosition(mReminder.getColor());
         mColor.setSelection(colorPosition);
 
         setContactBadgeData(mReminder.getContactUri(), this);
