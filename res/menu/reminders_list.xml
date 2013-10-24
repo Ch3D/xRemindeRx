@@ -5,11 +5,13 @@
         android:showAsAction="ifRoom"
         android:icon="@drawable/ic_new_reminder"
         android:title="@string/new_reminder"/>
+    
 	<item android:id="@+menu/action_search"
           android:title="Search"
           android:icon="@drawable/ic_menu_search"
           android:showAsAction="collapseActionView|ifRoom"
           android:actionViewClass="android.widget.SearchView" />
+	
     <item
         android:id="@+menu/action_settings"
         android:orderInCategory="102"

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -30,6 +31,7 @@ public class ReminderSearchResultActivity extends ListActivity {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         handleIntent(getIntent());
         getListView().setDividerHeight(0);
         getListView().setOnItemClickListener(new OnItemClickListener() {
@@ -44,5 +46,17 @@ public class ReminderSearchResultActivity extends ListActivity {
     @Override
     protected void onNewIntent(final Intent intent) {
         handleIntent(intent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

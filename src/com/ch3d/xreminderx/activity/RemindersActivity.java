@@ -17,6 +17,8 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuItem.OnActionExpandListener;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -33,6 +35,7 @@ import com.ch3d.xreminderx.utils.ViewUtils;
 public class RemindersActivity extends FragmentActivity implements
         android.view.View.OnClickListener {
     private EditText mEditQuickText;
+    private View     mBottomPanel;
 
     private NdefMessage[] getNdefMessages(final Intent intent) {
         NdefMessage[] msgs = null;
@@ -77,13 +80,13 @@ public class RemindersActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
 
         // getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
-
         setContentView(R.layout.x_reminders);
         setTitle(R.string.reminders);
 
         final ImageButton mBtnQuickAdd = (ImageButton) findViewById(android.R.id.button1);
         mBtnQuickAdd.setOnClickListener(this);
         mEditQuickText = (EditText) findViewById(android.R.id.edit);
+        mBottomPanel = findViewById(R.x_reminders.panel_bottom);
 
         // parse intent in case if
         // application is not already running
@@ -96,10 +99,22 @@ public class RemindersActivity extends FragmentActivity implements
         // Associate searchable configuration with the SearchView
         final SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchView searchView =
-                (SearchView) menu.findItem(R.menu.action_search).getActionView();
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
+        final MenuItem menuItem = menu.findItem(R.menu.action_search);
+        menuItem.setOnActionExpandListener(new OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionCollapse(final MenuItem item) {
+                mBottomPanel.setVisibility(View.VISIBLE);
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionExpand(final MenuItem item) {
+                mBottomPanel.setVisibility(View.GONE);
+                return true;
+            }
+        });
+        final SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         return true;
     }
 
