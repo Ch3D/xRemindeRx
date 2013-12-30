@@ -68,4 +68,6 @@
     <string name="color">Color</string>
     <string name="delete">Delete</string>
     <string name="quick_reminder_text">Quick reminder text</string>
+    <string name="enter_xreminder_title">Enter xreminder title</string>
+    <string name="xreminder_added">xReminder added</string>
 </resources>
