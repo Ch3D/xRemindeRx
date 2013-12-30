@@ -17,11 +17,8 @@ public class AddReminderWidgetProvider extends AppWidgetProvider {
         final RemoteViews views = new RemoteViews(context.getPackageName(),
                 com.ch3d.xreminderx.R.layout.widget_add);
         final Intent intent = new Intent(context, AddReminderActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 
-        final PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent,
-                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+        final PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
         views.setOnClickPendingIntent(R.widget_add.btnNew, pendingIntent);
 
         appWidgetManager.updateAppWidget(appWidgetIds[0], views);
