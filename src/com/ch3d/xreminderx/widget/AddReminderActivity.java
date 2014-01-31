@@ -14,6 +14,7 @@ import com.ch3d.xreminderx.model.ReminderFactory;
 import com.ch3d.xreminderx.provider.RemindersProvider;
 
 public class AddReminderActivity extends Activity implements OnClickListener {
+
     private void addReminder() {
         final EditText editTitle = (EditText) findViewById(R.x_add_reminder.edit_title);
         final String titleText = editTitle.getText().toString().trim();

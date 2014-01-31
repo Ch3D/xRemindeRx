@@ -110,13 +110,6 @@ public class RemindersActivity extends FragmentActivity implements
         parseNfcIntent(intent);
     }
 
-    @Override
-    public boolean onSearchRequested() {
-        // TODO Auto-generated method stub
-        System.err.println("!!!!");
-        return super.onSearchRequested();
-    }
-
     private void parseNdefMessages(final NdefMessage[] msgs) {
         if (msgs == null) {
             return;
