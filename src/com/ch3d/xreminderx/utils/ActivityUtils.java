@@ -21,7 +21,8 @@ import com.ch3d.xreminderx.provider.RemindersProvider;
 
 public class ActivityUtils
 {
-    public static float convertPixelsToDp(final float px, final Context context) {
+    public static float convertPixelsToDp(final float px, final Context context)
+    {
         final Resources resources = context.getResources();
         final DisplayMetrics metrics = resources.getDisplayMetrics();
         final float dp = px / (metrics.densityDpi / 160f);
@@ -36,7 +37,8 @@ public class ActivityUtils
         return intent;
     }
 
-    private static ActivityOptions getActivityOptions(final View v, final int position) {
+    private static ActivityOptions getActivityOptions(final View v, final int position)
+    {
         final int height = v.getHeight();
         final int width = v.getWidth();
         final boolean isFirst = position == 0;
@@ -68,7 +70,8 @@ public class ActivityUtils
                 return intent;
             }
             return null;
-        } finally
+        }
+        finally
         {
             DBUtils.close(cursor);
         }
@@ -84,16 +87,20 @@ public class ActivityUtils
         return Build.VERSION.SDK_INT >= 17;
     }
 
-    public static void startDetailsActivity(final Context context, final View v, final int position) {
+    public static void startDetailsActivity(final Context context, final View v, final int position)
+    {
         final RemindersAdapter.ViewHolder holder = (ViewHolder) v.getTag();
         final Intent intent = new Intent(context,
                 ReminderDetailsActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
         intent.setData(ContentUris.withAppendedId(
                 RemindersProvider.REMINDERS_URI, holder.id));
-        if (ActivityUtils.isJeallyBean()) {
+        if (ActivityUtils.isJeallyBean())
+        {
             context.startActivity(intent, getActivityOptions(v, position).toBundle());
-        } else {
+        }
+        else
+        {
             context.startActivity(intent);
         }
     }
