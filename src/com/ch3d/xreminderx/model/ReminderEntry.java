@@ -12,44 +12,45 @@ import com.ch3d.xreminderx.utils.ReminderUtils;
 
 public class ReminderEntry implements Parcelable
 {
-    public static final int DEFAULT_COLOR = Color.WHITE;
+    public static final int                               DEFAULT_COLOR = Color.WHITE;
 
-    public static final Parcelable.Creator<ReminderEntry> CREATOR = new Parcelable.Creator<ReminderEntry>()
-    {
-        @Override
-        public ReminderEntry createFromParcel(
-                final Parcel in)
-        {
-            return ReminderUtils.parse(in);
-        }
+    public static final Parcelable.Creator<ReminderEntry> CREATOR       = new Parcelable.Creator<ReminderEntry>()
+                                                                        {
+                                                                            @Override
+                                                                            public ReminderEntry createFromParcel(
+                                                                                    final Parcel in)
+                                                                            {
+                                                                                return ReminderUtils
+                                                                                        .parse(in);
+                                                                            }
 
-        @Override
-        public ReminderEntry[] newArray(
-                final int size)
-        {
-            return new ReminderEntry[size];
-        }
-    };
+                                                                            @Override
+                                                                            public ReminderEntry[] newArray(
+                                                                                    final int size)
+                                                                            {
+                                                                                return new ReminderEntry[size];
+                                                                            }
+                                                                        };
 
-    private final int id;
+    private final int                                     id;
 
-    private long timestamp;
+    private long                                          timestamp;
 
-    private long alarmTimestamp;
+    private long                                          alarmTimestamp;
 
-    private String text;
+    private String                                        text;
 
-    private Uri contactUri = Uri.EMPTY;
+    private Uri                                           contactUri    = Uri.EMPTY;
 
-    private ReminderType type = ReminderType.SIMPLE;
+    private ReminderType                                  type          = ReminderType.SIMPLE;
 
-    private final int protocolVersion;
+    private final int                                     protocolVersion;
 
-    private int ongoing;
+    private int                                           ongoing;
 
-    private int silent;
+    private int                                           silent;
 
-    private int color = DEFAULT_COLOR;
+    private int                                           color         = DEFAULT_COLOR;
 
     ReminderEntry(final int id)
     {
@@ -138,12 +139,12 @@ public class ReminderEntry implements Parcelable
 
     public boolean isOngoing()
     {
-        return ongoing == 1;
+        return ReminderUtils.intToBoolean(ongoing);
     }
 
     public boolean isSilent()
     {
-        return silent == 1;
+        return ReminderUtils.intToBoolean(silent);
     }
 
     public void postpone(final int time)
@@ -166,14 +167,14 @@ public class ReminderEntry implements Parcelable
         this.contactUri = contactUri;
     }
 
-    public void setOngoing(final int ongoing)
+    public void setOngoing(final boolean ongoing)
     {
-        this.ongoing = ongoing;
+        this.ongoing = ongoing ? 1 : 0;
     }
 
-    public void setSilent(final int silent)
+    public void setSilent(final boolean silent)
     {
-        this.silent = silent;
+        this.silent = silent == true ? 1 : 0;
     }
 
     public void setText(final String text)

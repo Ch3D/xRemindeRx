@@ -33,17 +33,21 @@ import com.ch3d.xreminderx.utils.StringUtils;
 import com.ch3d.xreminderx.utils.ViewUtils;
 
 public class RemindersActivity extends FragmentActivity implements
-        android.view.View.OnClickListener {
+        android.view.View.OnClickListener
+{
     private EditText mEditQuickText;
     private View     mBottomPanel;
 
-    private NdefMessage[] getNdefMessages(final Intent intent) {
+    private NdefMessage[] getNdefMessages(final Intent intent)
+    {
         NdefMessage[] msgs = null;
         final Parcelable[] rawMsgs = intent
                 .getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-        if (rawMsgs != null) {
+        if (rawMsgs != null)
+        {
             msgs = new NdefMessage[rawMsgs.length];
-            for (int i = 0; i < rawMsgs.length; i++) {
+            for (int i = 0; i < rawMsgs.length; i++)
+            {
                 msgs[i] = (NdefMessage) rawMsgs[i];
             }
         }
@@ -51,17 +55,20 @@ public class RemindersActivity extends FragmentActivity implements
     }
 
     @Override
-    public void onClick(final View v) {
-        switch (v.getId()) {
+    public void onClick(final View v)
+    {
+        switch (v.getId())
+        {
             case android.R.id.button1:
                 final String title = mEditQuickText.getText().toString().trim();
-                if (StringUtils.isBlank(title)) {
+                if (StringUtils.isBlank(title))
+                {
                     return;
                 }
                 final ReminderEntry reminder = ReminderFactory.createNull();
                 reminder.setText(title);
-                reminder.setOngoing(0);
-                reminder.setSilent(1);
+                reminder.setOngoing(false);
+                reminder.setSilent(true);
                 reminder.setColor(Color.WHITE);
 
                 mEditQuickText.getText().clear();
@@ -76,7 +83,8 @@ public class RemindersActivity extends FragmentActivity implements
     }
 
     @Override
-    protected void onCreate(final Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         // getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
@@ -94,7 +102,8 @@ public class RemindersActivity extends FragmentActivity implements
     }
 
     @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu)
+    {
         getMenuInflater().inflate(R.menu.reminders_list, menu);
         // Associate searchable configuration with the SearchView
         final SearchManager searchManager =
@@ -102,13 +111,15 @@ public class RemindersActivity extends FragmentActivity implements
         final MenuItem menuItem = menu.findItem(R.menu.action_search);
         menuItem.setOnActionExpandListener(new OnActionExpandListener() {
             @Override
-            public boolean onMenuItemActionCollapse(final MenuItem item) {
+            public boolean onMenuItemActionCollapse(final MenuItem item)
+            {
                 mBottomPanel.setVisibility(View.VISIBLE);
                 return true;
             }
 
             @Override
-            public boolean onMenuItemActionExpand(final MenuItem item) {
+            public boolean onMenuItemActionExpand(final MenuItem item)
+            {
                 mBottomPanel.setVisibility(View.GONE);
                 return true;
             }
@@ -119,18 +130,23 @@ public class RemindersActivity extends FragmentActivity implements
     }
 
     @Override
-    protected void onNewIntent(final Intent intent) {
+    protected void onNewIntent(final Intent intent)
+    {
         super.onNewIntent(intent);
         // parse intent in case if application is running
         parseNfcIntent(intent);
     }
 
-    private void parseNdefMessages(final NdefMessage[] msgs) {
-        if (msgs == null) {
+    private void parseNdefMessages(final NdefMessage[] msgs)
+    {
+        if (msgs == null)
+        {
             return;
         }
-        for (final NdefMessage msg : msgs) {
-            for (final NdefRecord rec : msg.getRecords()) {
+        for (final NdefMessage msg : msgs)
+        {
+            for (final NdefRecord rec : msg.getRecords())
+            {
                 final ReminderEntry reminder = ReminderUtils.parseReminder(rec);
                 final Cursor cursor = getContentResolver().query(
                         RemindersProvider.REMINDERS_URI,
@@ -142,7 +158,8 @@ public class RemindersActivity extends FragmentActivity implements
                                 Long.toString(reminder.getAlarmTimestamp())
                         },
                         null);
-                if (cursor.getCount() > 0) {
+                if (cursor.getCount() > 0)
+                {
                     final AlertDialog.Builder builder = new Builder(this);
                     builder.setTitle(R.string.reminder_is_already_exist);
                     builder.setMessage(reminder.getText());
@@ -151,7 +168,8 @@ public class RemindersActivity extends FragmentActivity implements
                                 @Override
                                 public void onClick(
                                         final DialogInterface dialog,
-                                        final int which) {
+                                        final int which)
+                                {
                                     RemindersProvider.addReminder(
                                             RemindersActivity.this, reminder);
                                     dialog.dismiss();
@@ -162,20 +180,25 @@ public class RemindersActivity extends FragmentActivity implements
                                 @Override
                                 public void onClick(
                                         final DialogInterface dialog,
-                                        final int which) {
+                                        final int which)
+                                {
                                     dialog.dismiss();
                                 }
                             });
                     builder.show();
-                } else {
+                }
+                else
+                {
                     RemindersProvider.addReminder(this, reminder, true);
                 }
             }
         }
     }
 
-    private void parseNfcIntent(final Intent intent) {
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+    private void parseNfcIntent(final Intent intent)
+    {
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction()))
+        {
             final NdefMessage[] msgs = getNdefMessages(intent);
             parseNdefMessages(msgs);
         }

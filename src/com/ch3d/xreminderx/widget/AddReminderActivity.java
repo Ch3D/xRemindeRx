@@ -13,14 +13,18 @@ import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.model.ReminderFactory;
 import com.ch3d.xreminderx.provider.RemindersProvider;
 
-public class AddReminderActivity extends Activity implements OnClickListener {
+public class AddReminderActivity extends Activity implements OnClickListener
+{
 
-    private void addReminder() {
+    private void addReminder()
+    {
         final EditText editTitle = (EditText) findViewById(R.x_add_reminder.edit_title);
         final String titleText = editTitle.getText().toString().trim();
-        if (titleText.length() > 0) {
+        if (titleText.length() > 0)
+        {
             final ReminderEntry entry = ReminderFactory.createNull();
             entry.setText(titleText);
+            entry.setSilent(true);
             RemindersProvider.addReminder(this, entry, true);
             Toast.makeText(this, R.string.xreminder_added, Toast.LENGTH_SHORT).show();
         }
@@ -28,8 +32,10 @@ public class AddReminderActivity extends Activity implements OnClickListener {
     }
 
     @Override
-    public void onClick(final View v) {
-        switch (v.getId()) {
+    public void onClick(final View v)
+    {
+        switch (v.getId())
+        {
             case R.x_add_reminder.btn_ok:
                 addReminder();
                 break;
@@ -43,7 +49,8 @@ public class AddReminderActivity extends Activity implements OnClickListener {
     }
 
     @Override
-    protected void onCreate(final Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.x_add_reminder);
         findViewById(R.x_add_reminder.btn_ok).setOnClickListener(this);

@@ -108,7 +108,8 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
             mText.requestFocus();
             return false;
         }
-        if (mReminder.getAlarmTimestamp() > mReminder.getTimestamp()) {
+        if (mReminder.getAlarmTimestamp() > mReminder.getTimestamp())
+        {
             Toast.makeText(getActivity(),
                     "Alarm time can't be after Event time", Toast.LENGTH_SHORT)
                     .show();
@@ -293,8 +294,8 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
                 }
 
                 mReminder.setText(mText.getText().toString());
-                mReminder.setOngoing(mOngoing.isChecked() ? 1 : 0);
-                mReminder.setSilent(mSilent.isChecked() ? 1 : 0);
+                mReminder.setOngoing(mOngoing.isChecked());
+                mReminder.setSilent(mSilent.isChecked());
                 mReminder.setColor((Integer) mColor.getSelectedItem());
 
                 RemindersProvider.updateReminder(getActivity(), mReminder, true);
@@ -361,12 +362,14 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 
             @Override
             public void onItemSelected(final AdapterView<?> arg0, final View arg1, final int pos,
-                    final long arg3) {
+                    final long arg3)
+            {
                 mReminder.setColor((Integer) mColor.getItemAtPosition(pos));
             }
 
             @Override
-            public void onNothingSelected(final AdapterView<?> arg0) {
+            public void onNothingSelected(final AdapterView<?> arg0)
+            {
 
             }
         });
@@ -401,7 +404,8 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
         mContactBadgeHolder.setVisibility(View.VISIBLE);
         mContactBadgeHolder.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(final View v) {
+            public void onClick(final View v)
+            {
                 final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
                 startActivityForResult(intent, REQUEST_CODE_GET_CONTACT);
