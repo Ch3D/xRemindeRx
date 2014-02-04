@@ -359,25 +359,16 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
         mColorsAdapter = new ColorsAdapter(getActivity());
         mColor.setAdapter(mColorsAdapter);
         mColor.setOnItemSelectedListener(new OnItemSelectedListener() {
-
             @Override
             public void onItemSelected(final AdapterView<?> arg0, final View arg1, final int pos,
-<<<<<<< HEAD
-                    final long arg3) {
-=======
                     final long arg3)
             {
->>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
                 mReminder.setColor((Integer) mColor.getItemAtPosition(pos));
             }
 
             @Override
-<<<<<<< HEAD
-            public void onNothingSelected(final AdapterView<?> arg0) {
-=======
             public void onNothingSelected(final AdapterView<?> arg0)
             {
->>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
 
             }
         });

@@ -10,10 +10,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.ContactsContract;
-<<<<<<< HEAD
-=======
 import android.util.DisplayMetrics;
->>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
 import android.view.View;
 
 import com.ch3d.xreminderx.activity.ReminderDetailsActivity;
@@ -24,8 +21,6 @@ import com.ch3d.xreminderx.provider.RemindersProvider;
 
 public class ActivityUtils
 {
-<<<<<<< HEAD
-=======
     public static float convertPixelsToDp(final float px, final Context context)
     {
         final Resources resources = context.getResources();
@@ -34,7 +29,6 @@ public class ActivityUtils
         return dp;
     }
 
->>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
     public static Intent createReminderViewIntent(final Context context, final long id)
     {
         final Intent intent = new Intent(context, ReminderDetailsActivity.class);
@@ -43,12 +37,8 @@ public class ActivityUtils
         return intent;
     }
 
-<<<<<<< HEAD
-    private static ActivityOptions getActivityOptions(final View v, final int position) {
-=======
     private static ActivityOptions getActivityOptions(final View v, final int position)
     {
->>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
         final int height = v.getHeight();
         final int width = v.getWidth();
         final boolean isFirst = position == 0;
@@ -80,12 +70,7 @@ public class ActivityUtils
                 return intent;
             }
             return null;
-<<<<<<< HEAD
         } finally
-=======
-        }
-        finally
->>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
         {
             DBUtils.close(cursor);
         }
@@ -101,30 +86,20 @@ public class ActivityUtils
         return Build.VERSION.SDK_INT >= 17;
     }
 
-<<<<<<< HEAD
-    public static void startDetailsActivity(final Context context, final View v, final int position) {
-=======
     public static void startDetailsActivity(final Context context, final View v, final int position)
     {
->>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
         final RemindersAdapter.ViewHolder holder = (ViewHolder) v.getTag();
         final Intent intent = new Intent(context,
                 ReminderDetailsActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
         intent.setData(ContentUris.withAppendedId(
                 RemindersProvider.REMINDERS_URI, holder.id));
-<<<<<<< HEAD
-        if (ActivityUtils.isJeallyBean()) {
-            context.startActivity(intent, getActivityOptions(v, position).toBundle());
-        } else {
-=======
         if (ActivityUtils.isJeallyBean())
         {
             context.startActivity(intent, getActivityOptions(v, position).toBundle());
         }
         else
         {
->>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
             context.startActivity(intent);
         }
     }

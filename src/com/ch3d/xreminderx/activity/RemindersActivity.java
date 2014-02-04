@@ -102,12 +102,8 @@ public class RemindersActivity extends FragmentActivity implements
     }
 
     @Override
-<<<<<<< HEAD
-    public boolean onCreateOptionsMenu(final Menu menu) {
-=======
     public boolean onCreateOptionsMenu(final Menu menu)
     {
->>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
         getMenuInflater().inflate(R.menu.reminders_list, menu);
         // Associate searchable configuration with the SearchView
         final SearchManager searchManager =
@@ -115,23 +111,13 @@ public class RemindersActivity extends FragmentActivity implements
         final MenuItem menuItem = menu.findItem(R.menu.action_search);
         menuItem.setOnActionExpandListener(new OnActionExpandListener() {
             @Override
-<<<<<<< HEAD
             public boolean onMenuItemActionCollapse(final MenuItem item) {
-=======
-            public boolean onMenuItemActionCollapse(final MenuItem item)
-            {
->>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
                 mBottomPanel.setVisibility(View.VISIBLE);
                 return true;
             }
 
             @Override
-<<<<<<< HEAD
             public boolean onMenuItemActionExpand(final MenuItem item) {
-=======
-            public boolean onMenuItemActionExpand(final MenuItem item)
-            {
->>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
                 mBottomPanel.setVisibility(View.GONE);
                 return true;
             }
@@ -142,12 +128,8 @@ public class RemindersActivity extends FragmentActivity implements
     }
 
     @Override
-<<<<<<< HEAD
-    protected void onNewIntent(final Intent intent) {
-=======
     protected void onNewIntent(final Intent intent)
     {
->>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
         super.onNewIntent(intent);
         // parse intent in case if application is running
         parseNfcIntent(intent);
