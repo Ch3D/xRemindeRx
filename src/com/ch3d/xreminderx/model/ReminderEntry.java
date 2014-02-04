@@ -139,12 +139,20 @@ public class ReminderEntry implements Parcelable
 
     public boolean isOngoing()
     {
+<<<<<<< HEAD
         return ongoing == 1;
+=======
+        return ReminderUtils.intToBoolean(ongoing);
+>>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
     }
 
     public boolean isSilent()
     {
+<<<<<<< HEAD
         return silent == 1;
+=======
+        return ReminderUtils.intToBoolean(silent);
+>>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
     }
 
     public void postpone(final int time)
@@ -167,6 +175,7 @@ public class ReminderEntry implements Parcelable
         this.contactUri = contactUri;
     }
 
+<<<<<<< HEAD
     public void setOngoing(final int ongoing)
     {
         this.ongoing = ongoing;
@@ -175,6 +184,16 @@ public class ReminderEntry implements Parcelable
     public void setSilent(final int silent)
     {
         this.silent = silent;
+=======
+    public void setOngoing(final boolean ongoing)
+    {
+        this.ongoing = ongoing ? 1 : 0;
+    }
+
+    public void setSilent(final boolean silent)
+    {
+        this.silent = silent == true ? 1 : 0;
+>>>>>>> 07d04a088ac0fb96e871d060734c06dc8d589e50
     }
 
     public void setText(final String text)
