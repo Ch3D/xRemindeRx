@@ -91,7 +91,7 @@ public class ActivityUtils
         final RemindersAdapter.ViewHolder holder = (ViewHolder) v.getTag();
         final Intent intent = new Intent(context,
                 ReminderDetailsActivity.class);
-        intent.setAction(Intent.ACTION_VIEW);
+        intent.setAction(Intent.ACTION_EDIT);
         intent.setData(ContentUris.withAppendedId(
                 RemindersProvider.REMINDERS_URI, holder.id));
         if (ActivityUtils.isJeallyBean())

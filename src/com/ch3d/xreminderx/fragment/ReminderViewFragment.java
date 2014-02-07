@@ -21,6 +21,8 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.TextView;
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 
 import com.ch3d.xreminderx.R;
 import com.ch3d.xreminderx.activity.RemindersActivity;
@@ -32,23 +34,31 @@ import com.ch3d.xreminderx.utils.ReminderUtils;
 public class ReminderViewFragment extends Fragment {
     public static final String TAG = "ReminderDetails";
 
-    private TextView           mText;
+    @InjectView(R.f_reminder_view.text)
+    protected TextView         mText;
 
-    private TextView           mTimestamp;
+    @InjectView(R.f_reminder_view.timestamp)
+    protected TextView         mTimestamp;
 
-    private TextView           mAlarmTimstamp;
+    @InjectView(R.f_reminder_view.alarmTimestamp)
+    protected TextView         mAlarmTimstamp;
 
-    private ImageView          mIconType;
+    @InjectView(R.f_reminder_view.icon_type)
+    protected ImageView        mIconType;
 
     private ContactBadgeHolder mContactBadgeHolder;
 
-    private View               mPanelContact;
+    @InjectView(R.f_reminder_view.panelSelectContact)
+    protected View             mPanelContact;
 
-    private TextView           mOngoing;
+    @InjectView(R.f_reminder_view.txtOngoing)
+    protected TextView         mOngoing;
 
-    private TextView           mSilent;
+    @InjectView(R.f_reminder_view.txtSilent)
+    protected TextView         mSilent;
 
-    private View               mColor;
+    @InjectView(R.f_reminder_view.color)
+    protected View             mColor;
 
     private void bindView(final ReminderEntry reminder) {
         mText.setText(reminder.getText());
@@ -97,17 +107,9 @@ public class ReminderViewFragment extends Fragment {
             final ViewGroup container, final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.f_reminder_view, container,
                 false);
-        mText = (TextView) view.findViewById(R.f_reminder_view.text);
-        mOngoing = (TextView) view.findViewById(R.f_reminder_view.txtOngoing);
-        mSilent = (TextView) view.findViewById(R.f_reminder_view.txtSilent);
-        mColor = view.findViewById(R.f_reminder_view.color);
-        mIconType = (ImageView) view.findViewById(R.f_reminder_view.icon_type);
-        mTimestamp = (TextView) view.findViewById(R.f_reminder_view.timestamp);
+        ButterKnife.inject(this, view);
         mContactBadgeHolder = new ContactBadgeHolder(getActivity(),
                 (ViewStub) view.findViewById(R.f_reminder_view.contact_badge));
-        mPanelContact = view.findViewById(R.f_reminder_view.panelSelectContact);
-        mAlarmTimstamp = (TextView) view
-                .findViewById(R.f_reminder_view.alarmTimestamp);
         return view;
     }
 

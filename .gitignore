@@ -24,3 +24,7 @@ local.properties
 # Eclipse project files
 #.classpath
 #.project
+
+#di
+.apt_generated
+.factorypath

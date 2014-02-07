@@ -21,8 +21,10 @@ import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.SearchView;
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
 
 import com.ch3d.xreminderx.R;
 import com.ch3d.xreminderx.model.ReminderEntry;
@@ -35,8 +37,11 @@ import com.ch3d.xreminderx.utils.ViewUtils;
 public class RemindersActivity extends FragmentActivity implements
         android.view.View.OnClickListener
 {
-    private EditText mEditQuickText;
-    private View     mBottomPanel;
+    @InjectView(android.R.id.edit)
+    protected EditText mEditQuickText;
+
+    @InjectView(R.x_reminders.panel_bottom)
+    protected View     mBottomPanel;
 
     private NdefMessage[] getNdefMessages(final Intent intent)
     {
@@ -55,31 +60,23 @@ public class RemindersActivity extends FragmentActivity implements
     }
 
     @Override
+    @OnClick(android.R.id.button1)
     public void onClick(final View v)
     {
-        switch (v.getId())
+        final String title = mEditQuickText.getText().toString().trim();
+        if (StringUtils.isBlank(title))
         {
-            case android.R.id.button1:
-                final String title = mEditQuickText.getText().toString().trim();
-                if (StringUtils.isBlank(title))
-                {
-                    return;
-                }
-                final ReminderEntry reminder = ReminderFactory.createNull();
-                reminder.setText(title);
-                reminder.setOngoing(false);
-                reminder.setSilent(true);
-                reminder.setColor(Color.WHITE);
-
-                mEditQuickText.getText().clear();
-                ViewUtils.hideKeyboard(mEditQuickText);
-                RemindersProvider.addReminder(this, reminder, true);
-                break;
-
-            default:
-                break;
+            return;
         }
+        final ReminderEntry reminder = ReminderFactory.createNull();
+        reminder.setText(title);
+        reminder.setOngoing(false);
+        reminder.setSilent(true);
+        reminder.setColor(Color.WHITE);
 
+        mEditQuickText.getText().clear();
+        ViewUtils.hideKeyboard(mEditQuickText);
+        RemindersProvider.addReminder(this, reminder, true);
     }
 
     @Override
@@ -89,12 +86,8 @@ public class RemindersActivity extends FragmentActivity implements
 
         // getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.x_reminders);
+        ButterKnife.inject(this);
         setTitle(R.string.reminders);
-
-        final ImageButton mBtnQuickAdd = (ImageButton) findViewById(android.R.id.button1);
-        mBtnQuickAdd.setOnClickListener(this);
-        mEditQuickText = (EditText) findViewById(android.R.id.edit);
-        mBottomPanel = findViewById(R.x_reminders.panel_bottom);
 
         // parse intent in case if
         // application is not already running

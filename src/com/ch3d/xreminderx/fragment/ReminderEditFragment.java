@@ -30,6 +30,10 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
+import butterknife.Optional;
 
 import com.ch3d.xreminderx.R;
 import com.ch3d.xreminderx.adapter.ColorsAdapter;
@@ -75,26 +79,35 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
         return result;
     }
 
+    @InjectView(R.f_reminder_edit.text)
     protected EditText         mText;
 
-    private Button             mBtnDatePicker;
+    @InjectView(R.f_reminder_edit.btnTsDatePicker)
+    protected Button           mBtnDatePicker;
 
-    private Button             mBtnTimePicker;
+    @InjectView(R.f_reminder_edit.btnTsTimePicker)
+    protected Button           mBtnTimePicker;
 
-    private Button             mBtnAlarmDatePicker;
+    @InjectView(R.f_reminder_edit.btnTsAlarmDatePicker)
+    protected Button           mBtnAlarmDatePicker;
 
-    private Button             mBtnAlarmTimePicker;
+    @InjectView(R.f_reminder_edit.btnTsAlarmTimePicker)
+    protected Button           mBtnAlarmTimePicker;
 
     protected ReminderEntry    mReminder;
 
     private ContactBadgeHolder mContactBadgeHolder;
 
-    private Button             btnSpeech;
+    @InjectView(R.f_reminder_edit.btnStartSpeech)
+    protected Button           btnSpeech;
 
+    @InjectView(R.f_reminder_edit.cbOngoing)
     protected CheckBox         mOngoing;
 
+    @InjectView(R.f_reminder_edit.cbSilent)
     protected CheckBox         mSilent;
 
+    @InjectView(R.f_reminder_edit.color)
     protected Spinner          mColor;
 
     private ColorsAdapter      mColorsAdapter;
@@ -182,6 +195,12 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
     }
 
     @Override
+    @Optional
+    @OnClick({
+            R.f_reminder_edit.btnStartSpeech, R.x_contact_badge.btnRemove,
+            R.f_reminder_edit.btnTsDatePicker, R.f_reminder_edit.btnTsTimePicker,
+            R.f_reminder_edit.btnTsAlarmDatePicker, R.f_reminder_edit.btnTsAlarmTimePicker
+    })
     public void onClick(final View v)
     {
         final Bundle bundle = new Bundle();
@@ -259,22 +278,9 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
             final Bundle savedInstanceState)
     {
         final View view = inflater.inflate(R.layout.f_reminder_edit, container, false);
-        mText = (EditText) view.findViewById(R.f_reminder_edit.text);
-        mColor = (Spinner) view.findViewById(R.f_reminder_edit.color);
-        mOngoing = (CheckBox) view.findViewById(R.f_reminder_edit.cbOngoing);
-        mSilent = (CheckBox) view.findViewById(R.f_reminder_edit.cbSilent);
-        btnSpeech = (Button) view.findViewById(R.f_reminder_edit.btnStartSpeech);
-        btnSpeech.setOnClickListener(this);
         mContactBadgeHolder = new ContactBadgeHolder(getActivity(),
                 (ViewStub) view.findViewById(R.f_reminder_edit.contact_badge));
-        mBtnDatePicker = (Button) view.findViewById(R.f_reminder_edit.btnTsDatePicker);
-        mBtnDatePicker.setOnClickListener(this);
-        mBtnTimePicker = (Button) view.findViewById(R.f_reminder_edit.btnTsTimePicker);
-        mBtnTimePicker.setOnClickListener(this);
-        mBtnAlarmDatePicker = (Button) view.findViewById(R.f_reminder_edit.btnTsAlarmDatePicker);
-        mBtnAlarmDatePicker.setOnClickListener(this);
-        mBtnAlarmTimePicker = (Button) view.findViewById(R.f_reminder_edit.btnTsAlarmTimePicker);
-        mBtnAlarmTimePicker.setOnClickListener(this);
+        ButterKnife.inject(this, view);
         return view;
     }
 
