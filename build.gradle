@@ -1,15 +1,27 @@
 buildscript {
     repositories {
         mavenCentral()
+	maven { url 'http://repo1.maven.org/maven2' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.4'
+        classpath 'com.android.tools.build:gradle:0.7.+'
     }
 }
+
 apply plugin: 'android'
 
+    repositories {
+        mavenCentral()
+    }
+
 dependencies {
+	compile 'com.squareup.dagger:dagger:1.2.0'
+	compile 'com.squareup.dagger:dagger-compiler:1.2.0'
+	compile 'com.jakewharton:butterknife:4.0.1'
+	compile 'com.squareup:javawriter:2.4.0'
+	compile 'com.android.support:support-v4:19.0.1'
 }
+
 
 android {
     compileSdkVersion 17

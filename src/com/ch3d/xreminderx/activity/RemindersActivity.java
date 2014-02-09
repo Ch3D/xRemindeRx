@@ -1,10 +1,11 @@
 
 package com.ch3d.xreminderx.activity;
 
+import javax.inject.Inject;
+
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.SearchManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -15,7 +16,6 @@ import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
@@ -27,6 +27,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 
 import com.ch3d.xreminderx.R;
+import com.ch3d.xreminderx.app.BaseFragmentActivity;
 import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.model.ReminderFactory;
 import com.ch3d.xreminderx.provider.RemindersProvider;
@@ -34,14 +35,19 @@ import com.ch3d.xreminderx.utils.ReminderUtils;
 import com.ch3d.xreminderx.utils.StringUtils;
 import com.ch3d.xreminderx.utils.ViewUtils;
 
-public class RemindersActivity extends FragmentActivity implements
+import dagger.Lazy;
+
+public class RemindersActivity extends BaseFragmentActivity implements
         android.view.View.OnClickListener
 {
     @InjectView(android.R.id.edit)
-    protected EditText mEditQuickText;
+    protected EditText  mEditQuickText;
 
     @InjectView(R.x_reminders.panel_bottom)
-    protected View     mBottomPanel;
+    protected View      mBottomPanel;
+
+    @Inject
+    Lazy<SearchManager> searchManager;
 
     private NdefMessage[] getNdefMessages(final Intent intent)
     {
@@ -99,8 +105,8 @@ public class RemindersActivity extends FragmentActivity implements
     {
         getMenuInflater().inflate(R.menu.reminders_list, menu);
         // Associate searchable configuration with the SearchView
-        final SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        // final SearchManager searchManager =
+        // (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final MenuItem menuItem = menu.findItem(R.menu.action_search);
         menuItem.setOnActionExpandListener(new OnActionExpandListener() {
             @Override
@@ -116,7 +122,7 @@ public class RemindersActivity extends FragmentActivity implements
             }
         });
         final SearchView searchView = (SearchView) menuItem.getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setSearchableInfo(searchManager.get().getSearchableInfo(getComponentName()));
         return true;
     }
 

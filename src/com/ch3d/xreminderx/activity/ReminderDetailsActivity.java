@@ -3,16 +3,16 @@ package com.ch3d.xreminderx.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 
 import com.ch3d.xreminderx.R;
+import com.ch3d.xreminderx.app.BaseFragmentActivity;
 import com.ch3d.xreminderx.fragment.ReminderCreateFragment;
 import com.ch3d.xreminderx.fragment.ReminderEditFragment;
 import com.ch3d.xreminderx.fragment.ReminderViewFragment;
 import com.ch3d.xreminderx.utils.ReminderIntent;
 
-public class ReminderDetailsActivity extends FragmentActivity
+public class ReminderDetailsActivity extends BaseFragmentActivity
 {
     @Override
     public void finish()
