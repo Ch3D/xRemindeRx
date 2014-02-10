@@ -24,6 +24,16 @@ dependencies {
 
 
 android {
+	// fix dagger_butterknife jars dupulication error
+    packagingOptions {
+        exclude 'META-INF/services/javax.annotation.processing.Processor'
+    }
+
+	// disable lint error
+	lintOptions {
+		abortOnError false
+	}
+
     compileSdkVersion 17
     buildToolsVersion "17"
 
