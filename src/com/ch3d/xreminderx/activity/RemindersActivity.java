@@ -104,9 +104,6 @@ public class RemindersActivity extends BaseFragmentActivity implements
     public boolean onCreateOptionsMenu(final Menu menu)
     {
         getMenuInflater().inflate(R.menu.reminders_list, menu);
-        // Associate searchable configuration with the SearchView
-        // final SearchManager searchManager =
-        // (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         final MenuItem menuItem = menu.findItem(R.menu.action_search);
         menuItem.setOnActionExpandListener(new OnActionExpandListener() {
             @Override

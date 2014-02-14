@@ -9,6 +9,7 @@ import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
@@ -115,12 +116,13 @@ public class ReminderViewFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
+        final FragmentActivity context = getActivity();
         switch (item.getItemId()) {
             case android.R.id.home:
-                final Intent intent = new Intent(getActivity(), RemindersActivity.class);
+                final Intent intent = new Intent(context, RemindersActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
-                getActivity().finish();
+                context.finish();
                 return true;
 
             case R.menu.action_edit:
@@ -139,10 +141,10 @@ public class ReminderViewFragment extends Fragment {
                 return true;
 
             case R.menu.action_delete:
-                final long parseId = ContentUris.parseId(getActivity()
+                final long parseId = ContentUris.parseId(context
                         .getIntent().getData());
-                ReminderUtils.deleteReminder(getActivity(), (int) parseId);
-                getActivity().onBackPressed();
+                ReminderUtils.deleteReminder(context, (int) parseId);
+                context.finish();
                 return true;
 
             default:

@@ -17,6 +17,7 @@
 		    android:layout_weight="1"
 		    android:layout_height="match_parent"
 		    android:hint="@string/quick_reminder_text"
+		    android:inputType="textCapSentences"
 		    android:textColorHint="?android:attr/textColorSecondaryInverse"
 		    android:textColor="?android:attr/textColorPrimaryInverse"
 		    android:textAppearance="?android:attr/textAppearanceMedium" />

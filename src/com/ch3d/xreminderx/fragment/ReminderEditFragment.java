@@ -441,6 +441,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
     protected void updateRemiderViewData()
     {
         mText.setText(mReminder.getText());
+        ViewUtils.moveCursorRight(mText);
 
         mOngoing.setChecked(mReminder.isOngoing());
         mSilent.setChecked(mReminder.isSilent());
