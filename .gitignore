@@ -33,3 +33,5 @@ local.properties
 .gradle
 a.out
 build
+gradle.properties
+xreminderx-release-key.keystore

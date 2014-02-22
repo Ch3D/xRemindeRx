@@ -1,7 +1,7 @@
 buildscript {
     repositories {
         mavenCentral()
-	maven { url 'http://repo1.maven.org/maven2' }
+		maven { url 'http://repo1.maven.org/maven2' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.7.+'
@@ -19,7 +19,7 @@ dependencies {
 	compile 'com.squareup.dagger:dagger-compiler:1.2.0'
 	compile 'com.jakewharton:butterknife:4.0.1'
 	compile 'com.squareup:javawriter:2.4.0'
-	compile 'com.android.support:support-v4:19.0.1'
+	compile 'com.android.support:support-v4:18.0.+'
 }
 
 
@@ -36,14 +36,32 @@ android {
 
 	// signing
 	signingConfigs {
-    	release {
-	        storeFile file(System.getenv("KEYSTORE"))
-	        storePassword System.getenv("KEYSTORE_PASSWORD")
-	        keyAlias System.getenv("KEY_ALIAS")
-	        keyPassword System.getenv("KEY_PASSWORD")
+  		release {
 	    }
 	}
 
+	buildTypes {
+        release {
+            signingConfig signingConfigs.release
+			runProguard false
+        }
+		debug {
+			packageNameSuffix '.debug'
+		}
+    }
+
+ 	if (project.hasProperty('key_alias')
+			&& project.hasProperty('key_alias_password')
+			&& project.hasProperty('key_store')
+			&& project.hasProperty('key_store_password')) {
+    	android.signingConfigs.release.keyAlias = key_alias
+		android.signingConfigs.release.keyPassword = key_alias_password
+		android.signingConfigs.release.storeFile = file(key_store)
+		android.signingConfigs.release.storePassword = key_store_password
+	} else {
+		buildTypes.release.signingConfig = null
+	}
+    
     compileSdkVersion 17
     buildToolsVersion "17"
 
@@ -51,6 +69,7 @@ android {
         minSdkVersion 14
         targetSdkVersion 17
     }
+
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
