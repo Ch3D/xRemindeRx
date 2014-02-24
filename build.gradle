@@ -1,3 +1,5 @@
+import com.android.builder.DefaultManifestParser
+
 buildscript {
     repositories {
         mavenCentral()
@@ -69,6 +71,21 @@ android {
         minSdkVersion 14
         targetSdkVersion 17
     }
+
+	android.applicationVariants.all { variant ->
+		def manifestParser = new DefaultManifestParser()
+		def ver = manifestParser.getVersionName(android.sourceSets.main.manifest.srcFile)
+
+		apk = variant.packageApplication.outputFile;
+
+		newName = apk.name.replace(".apk", "-v" + ver + ".apk");
+//		newName = newName.replace("-" + variant.buildType.name, "");
+
+		variant.packageApplication.outputFile = new File(apk.parentFile, newName);
+		if (variant.zipAlign) {
+			variant.zipAlign.outputFile = new File(apk.parentFile, newName.replace("-unaligned", ""));
+		}
+	}
 
     sourceSets {
         main {
