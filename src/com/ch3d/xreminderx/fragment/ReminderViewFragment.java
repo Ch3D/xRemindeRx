@@ -31,8 +31,10 @@ import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.utils.ActivityUtils;
 import com.ch3d.xreminderx.utils.ContactBadgeHolder;
 import com.ch3d.xreminderx.utils.ReminderUtils;
+import com.ch3d.xreminderx.utils.ViewUtils;
 
-public class ReminderViewFragment extends Fragment {
+public class ReminderViewFragment extends Fragment
+{
     public static final String TAG = "ReminderDetails";
 
     @InjectView(R.f_reminder_view.text)
@@ -61,51 +63,71 @@ public class ReminderViewFragment extends Fragment {
     @InjectView(R.f_reminder_view.color)
     protected View             mColor;
 
-    private void bindView(final ReminderEntry reminder) {
-        mText.setText(reminder.getText());
-        mIconType.setImageLevel(reminder.getType().getId());
-
-        mOngoing.setVisibility(reminder.isOngoing() ? View.VISIBLE : View.GONE);
-        mSilent.setVisibility(reminder.isSilent() ? View.VISIBLE : View.GONE);
-
-        mColor.setBackgroundColor(reminder.getColor());
-
-        if (reminder.isContactRelated()) {
+    private void bindContactData(final ReminderEntry reminder, final boolean isContactRelated)
+    {
+        if (isContactRelated)
+        {
             mContactBadgeHolder.setVisibility(View.VISIBLE);
-            mPanelContact.setVisibility(View.VISIBLE);
             getActivity().findViewById(R.x_contact_badge.btnRemove)
                     .setVisibility(View.GONE);
             mContactBadgeHolder.setOnClickListener(new OnClickListener() {
                 @Override
-                public void onClick(final View v) {
+                public void onClick(final View v)
+                {
                     showContactDetails(reminder);
                 }
             });
             setContactBagdeData(reminder.getContactUri(), null);
-        } else {
-            mPanelContact.setVisibility(View.GONE);
+        }
+        else
+        {
             mContactBadgeHolder.setVisibility(View.GONE);
         }
-        mTimestamp.setText(ReminderUtils.formatDateTimeShort(getActivity(),
+    }
+
+    private void bindView(final ReminderEntry reminder)
+    {
+        ViewUtils.setAnimatedText(mText, reminder.getText());
+        ViewUtils.setAnimatedText(mTimestamp, ReminderUtils.formatDateTimeShort(getActivity(),
                 reminder.getTimestamp()));
-        mAlarmTimstamp.setText(ReminderUtils.formatDateTimeShort(getActivity(),
+        ViewUtils.setAnimatedText(mAlarmTimstamp, ReminderUtils.formatDateTimeShort(getActivity(),
                 reminder.getAlarmTimestamp()));
+
+        mIconType.setImageLevel(reminder.getType().getId());
+        mColor.setBackgroundColor(reminder.getColor());
+        ViewUtils.setVisible(mOngoing, reminder.isOngoing());
+        ViewUtils.setVisible(mSilent, reminder.isSilent());
+
+        final boolean isContactRelated = reminder.isContactRelated();
+        ViewUtils.setVisible(mPanelContact, isContactRelated);
+        bindContactData(reminder, isContactRelated);
+    }
+
+    private ReminderEntry getReminder()
+    {
+        final Cursor cursor = getActivity().getContentResolver().query(
+                getActivity().getIntent().getData(), null, null, null, null);
+        final ReminderEntry reminder = ReminderUtils.parse(cursor);
+        return reminder;
     }
 
     @Override
-    public void onCreate(final Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Override
-    public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
+    public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater)
+    {
         inflater.inflate(R.menu.reminder_view, menu);
     }
 
     @Override
     public View onCreateView(final LayoutInflater inflater,
-            final ViewGroup container, final Bundle savedInstanceState) {
+            final ViewGroup container, final Bundle savedInstanceState)
+    {
         final View view = inflater.inflate(R.layout.f_reminder_view, container,
                 false);
         ButterKnife.inject(this, view);
@@ -115,9 +137,11 @@ public class ReminderViewFragment extends Fragment {
     }
 
     @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item)
+    {
         final FragmentActivity context = getActivity();
-        switch (item.getItemId()) {
+        switch (item.getItemId())
+        {
             case android.R.id.home:
                 final Intent intent = new Intent(context, RemindersActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -153,17 +177,17 @@ public class ReminderViewFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(final View view, final Bundle savedInstanceState) {
+    public void onViewCreated(final View view, final Bundle savedInstanceState)
+    {
         super.onViewCreated(view, savedInstanceState);
         getActivity().setTitle(R.string.view_reminder);
-        final Cursor cursor = getActivity().getContentResolver().query(
-                getActivity().getIntent().getData(), null, null, null, null);
-        final ReminderEntry reminder = ReminderUtils.parse(cursor);
+        final ReminderEntry reminder = getReminder();
         bindView(reminder);
 
         final NfcAdapter nfcAdapter = NfcAdapter
                 .getDefaultAdapter(getActivity());
-        if (nfcAdapter != null) {
+        if (nfcAdapter != null)
+        {
             final NdefMessage msg = new NdefMessage(
                     ReminderUtils.createNdefRecord(getActivity(), reminder));
             nfcAdapter.setNdefPushMessage(msg, getActivity());
@@ -172,14 +196,17 @@ public class ReminderViewFragment extends Fragment {
     }
 
     private void setContactBagdeData(final Uri uri,
-            final OnClickListener removeClickListener) {
+            final OnClickListener removeClickListener)
+    {
         mContactBadgeHolder.setData(uri, removeClickListener);
     }
 
-    private void showContactDetails(final ReminderEntry reminder) {
+    private void showContactDetails(final ReminderEntry reminder)
+    {
         final Intent detailsIntent = ActivityUtils.getContactDetailsIntent(
                 getActivity(), reminder);
-        if (detailsIntent != null) {
+        if (detailsIntent != null)
+        {
             getActivity().startActivity(detailsIntent);
         }
     }

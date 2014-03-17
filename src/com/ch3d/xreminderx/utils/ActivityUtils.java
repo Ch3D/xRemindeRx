@@ -70,7 +70,8 @@ public class ActivityUtils
                 return intent;
             }
             return null;
-        } finally
+        }
+        finally
         {
             DBUtils.close(cursor);
         }
