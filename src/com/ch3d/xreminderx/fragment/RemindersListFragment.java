@@ -47,7 +47,8 @@ import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener;
 import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener.DismissCallbacks;
 
 public class RemindersListFragment extends ListFragment implements
-        LoaderCallbacks<Cursor> {
+        LoaderCallbacks<Cursor>
+{
     private ActionMode                        mActionMode;
 
     private final MultiChoiceModeListener     mActionModeCallback = new MultiChoiceModeListener() {
@@ -55,14 +56,16 @@ public class RemindersListFragment extends ListFragment implements
                                                                       @Override
                                                                       public boolean onActionItemClicked(
                                                                               final ActionMode mode,
-                                                                              final MenuItem item) {
+                                                                              final MenuItem item)
+                                                                      {
                                                                           return onOptionsItemSelected(item);
                                                                       }
 
                                                                       @Override
                                                                       public boolean onCreateActionMode(
                                                                               final ActionMode mode,
-                                                                              final Menu menu) {
+                                                                              final Menu menu)
+                                                                      {
                                                                           mActionMode = mode;
                                                                           final MenuInflater inflater = mode
                                                                                   .getMenuInflater();
@@ -74,7 +77,8 @@ public class RemindersListFragment extends ListFragment implements
 
                                                                       @Override
                                                                       public void onDestroyActionMode(
-                                                                              final ActionMode mode) {
+                                                                              final ActionMode mode)
+                                                                      {
                                                                           mAdapter.uncheckItems();
                                                                           mActionMode = null;
                                                                       }
@@ -84,7 +88,8 @@ public class RemindersListFragment extends ListFragment implements
                                                                               final ActionMode mode,
                                                                               final int position,
                                                                               final long id,
-                                                                              final boolean checked) {
+                                                                              final boolean checked)
+                                                                      {
                                                                           mAdapter.setChecked(
                                                                                   position,
                                                                                   checked);
@@ -93,7 +98,8 @@ public class RemindersListFragment extends ListFragment implements
                                                                       @Override
                                                                       public boolean onPrepareActionMode(
                                                                               final ActionMode mode,
-                                                                              final Menu menu) {
+                                                                              final Menu menu)
+                                                                      {
                                                                           return false; // Return
                                                                           // false
                                                                           // if
@@ -115,23 +121,27 @@ public class RemindersListFragment extends ListFragment implements
 
     private Handler                           mHandler;
 
-    public RemindersListFragment() {
+    public RemindersListFragment()
+    {
     }
 
     @Override
-    public void onCreate(final Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(final int arg0, final Bundle bundle) {
+    public Loader<Cursor> onCreateLoader(final int arg0, final Bundle bundle)
+    {
         return new RemindersLoader(getActivity(), bundle);
     }
 
     @Override
     public View onCreateView(final LayoutInflater inflater,
-            final ViewGroup container, final Bundle savedInstanceState) {
+            final ViewGroup container, final Bundle savedInstanceState)
+    {
         final View view = super.onCreateView(inflater, container,
                 savedInstanceState);
 
@@ -145,10 +155,14 @@ public class RemindersListFragment extends ListFragment implements
 
     @Override
     public void onListItemClick(final ListView l, final View v,
-            final int position, final long id) {
-        if (mActionMode == null) {
+            final int position, final long id)
+    {
+        if (mActionMode == null)
+        {
             ActivityUtils.startDetailsActivity(getActivity(), v, position);
-        } else {
+        }
+        else
+        {
             getListView().setItemChecked(position, true);
             getListView().setSelection(position);
             v.setSelected(true);
@@ -156,22 +170,26 @@ public class RemindersListFragment extends ListFragment implements
     }
 
     @Override
-    public void onLoaderReset(final Loader<Cursor> arg0) {
+    public void onLoaderReset(final Loader<Cursor> arg0)
+    {
         mAdapter.swapCursor(null);
     }
 
     @Override
-    public void onLoadFinished(final Loader<Cursor> loader, final Cursor cursor) {
+    public void onLoadFinished(final Loader<Cursor> loader, final Cursor cursor)
+    {
         cursor.setNotificationUri(getActivity().getContentResolver(),
                 RemindersProvider.REMINDERS_URI);
         final ContentObserver contentObserver = new ContentObserver(mHandler) {
             @Override
-            public boolean deliverSelfNotifications() {
+            public boolean deliverSelfNotifications()
+            {
                 return true;
             }
 
             @Override
-            public void onChange(final boolean selfChange) {
+            public void onChange(final boolean selfChange)
+            {
                 super.onChange(selfChange);
                 mSwipeListener.releaseTransientViews();
             }
@@ -183,8 +201,10 @@ public class RemindersListFragment extends ListFragment implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
+    public boolean onOptionsItemSelected(final MenuItem item)
+    {
+        switch (item.getItemId())
+        {
             case R.menu.action_new_reminder:
                 final Intent intent = new Intent(getActivity(),
                         ReminderDetailsActivity.class);
@@ -195,10 +215,12 @@ public class RemindersListFragment extends ListFragment implements
             case R.menu.action_remove:
                 final SparseArray<Boolean> mChecked = mAdapter.getCheckedItems();
                 final int size = mChecked.size();
-                for (int i = 0; i < size; i++) {
+                for (int i = 0; i < size; i++)
+                {
                     final int key = mChecked.keyAt(i);
                     final Object obj = mChecked.get(key);
-                    if ((obj instanceof Boolean) && (Boolean) obj) {
+                    if ((obj instanceof Boolean) && (Boolean) obj)
+                    {
                         final View view = getListView().getChildAt(key);
                         final ViewHolder tag = (ViewHolder) view.getTag();
                         final long idLong = tag.id;
@@ -206,7 +228,8 @@ public class RemindersListFragment extends ListFragment implements
                     }
                 }
                 mAdapter.uncheckItems();
-                if (mActionMode != null) {
+                if (mActionMode != null)
+                {
                     mActionMode.finish();
                 }
                 return true;
@@ -222,13 +245,15 @@ public class RemindersListFragment extends ListFragment implements
     }
 
     @Override
-    public void onPause() {
+    public void onPause()
+    {
         super.onPause();
         mSwipeListener.releaseTransientViews();
     }
 
     @Override
-    public void onViewCreated(final View view, final Bundle savedInstanceState) {
+    public void onViewCreated(final View view, final Bundle savedInstanceState)
+    {
         super.onViewCreated(view, savedInstanceState);
         setEmptyText(getActivity().getString(R.string.you_have_no_reminders));
         final ListView listView = getListView();
@@ -238,18 +263,20 @@ public class RemindersListFragment extends ListFragment implements
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         listView.setMultiChoiceModeListener(mActionModeCallback);
         listView.addFooterView(View.inflate(getActivity(),
-                R.layout.footer_reminders, null));
+                R.layout.footer_reminders, null), null, false);
 
         mSwipeListener = new SwipeDismissListViewTouchListener(
                 listView, new DismissCallbacks() {
                     @Override
-                    public boolean canDismiss(final int position) {
+                    public boolean canDismiss(final int position)
+                    {
                         return mActionMode == null;
                     }
 
                     @Override
                     public void onDismiss(final ListView listView,
-                            final int[] reverseSortedPositions) {
+                            final int[] reverseSortedPositions)
+                    {
                         removeReminders(reverseSortedPositions);
                     }
                 });
@@ -257,9 +284,11 @@ public class RemindersListFragment extends ListFragment implements
     }
 
     private void removeReminders(
-            final int[] reverseSortedPositions) {
+            final int[] reverseSortedPositions)
+    {
         final FragmentActivity context = getActivity();
-        if (PreferenceHelper.isShowDisplayPrompt(context)) {
+        if (PreferenceHelper.isShowDisplayPrompt(context))
+        {
             final View dialogView = View.inflate(context,
                     R.layout.f_dialog_remove_promt, null);
             final CheckBox cb = (CheckBox) dialogView
@@ -268,7 +297,8 @@ public class RemindersListFragment extends ListFragment implements
                 @Override
                 public void onCheckedChanged(
                         final CompoundButton buttonView,
-                        final boolean isChecked) {
+                        final boolean isChecked)
+                {
                     PreferenceHelper.setShowDisplayPrompt(
                             context, !isChecked);
                 }
@@ -281,8 +311,10 @@ public class RemindersListFragment extends ListFragment implements
                         @Override
                         public void onClick(
                                 final DialogInterface dialog,
-                                final int which) {
-                            for (final int position : reverseSortedPositions) {
+                                final int which)
+                        {
+                            for (final int position : reverseSortedPositions)
+                            {
                                 final ViewGroup view = (ViewGroup) getListView()
                                         .getChildAt(position);
                                 final ViewHolder tag = (ViewHolder) view
@@ -298,13 +330,17 @@ public class RemindersListFragment extends ListFragment implements
                         @Override
                         public void onClick(
                                 final DialogInterface dialog,
-                                final int which) {
+                                final int which)
+                        {
                             dialog.dismiss();
                         }
                     });
             builder.show();
-        } else {
-            for (final int position : reverseSortedPositions) {
+        }
+        else
+        {
+            for (final int position : reverseSortedPositions)
+            {
                 final View view = getListView()
                         .getChildAt(position);
                 final ViewHolder tag = (ViewHolder) view
