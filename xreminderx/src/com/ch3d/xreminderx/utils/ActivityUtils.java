@@ -70,8 +70,7 @@ public class ActivityUtils
                 return intent;
             }
             return null;
-        }
-        finally
+        } finally
         {
             DBUtils.close(cursor);
         }
@@ -92,7 +91,8 @@ public class ActivityUtils
         final RemindersAdapter.ViewHolder holder = (ViewHolder) v.getTag();
         final Intent intent = new Intent(context,
                 ReminderDetailsActivity.class);
-        intent.setAction(Intent.ACTION_EDIT);
+        // intent.setAction(Intent.ACTION_EDIT);
+        intent.setAction(Intent.ACTION_VIEW);
         intent.setData(ContentUris.withAppendedId(
                 RemindersProvider.REMINDERS_URI, holder.id));
         if (ActivityUtils.isJeallyBean())

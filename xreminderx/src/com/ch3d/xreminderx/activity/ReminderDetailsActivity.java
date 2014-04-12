@@ -1,9 +1,8 @@
 
 package com.ch3d.xreminderx.activity;
 
-import java.util.Random;
-
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 
@@ -12,7 +11,9 @@ import com.ch3d.xreminderx.app.BaseFragmentActivity;
 import com.ch3d.xreminderx.fragment.ReminderCreateFragment;
 import com.ch3d.xreminderx.fragment.ReminderEditFragment;
 import com.ch3d.xreminderx.fragment.ReminderViewFragment;
+import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.utils.ReminderIntent;
+import com.ch3d.xreminderx.utils.ReminderUtils;
 
 public class ReminderDetailsActivity extends BaseFragmentActivity
 {
@@ -23,14 +24,18 @@ public class ReminderDetailsActivity extends BaseFragmentActivity
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 
+    private ReminderEntry getReminder() {
+        final Cursor query = getContentResolver().query(
+                getIntent().getData(), null, null,
+                null, null);
+        return ReminderUtils.parse(query);
+    }
+
     @Override
     protected void onCreate(final Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        Random r = new Random();
-        setTheme(r.nextBoolean() ?
-                R.style.Theme_XRX_Green :
-                R.style.Theme_XRX_Blue);
+        setTheme(ReminderUtils.getReminderTheme(this, getReminder().getColor()));
         setContentView(R.layout.x_reminder_details);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         final Intent intent = getIntent();

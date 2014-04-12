@@ -278,6 +278,10 @@ public class ReminderUtils
         return ReminderColor.getResId(color);
     }
 
+    public static int getReminderTheme(final Context context, final int color) {
+        return ReminderColor.getThemeId(color);
+    }
+
     public static boolean hasAddressbookContact(final Context context,
             final ReminderEntry entry)
     {
