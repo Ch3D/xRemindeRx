@@ -36,3 +36,4 @@ build
 gradle.properties
 xreminderx-release-key.keystore
 libraries/xreminderx.theming/build/
+libraries/xreminderx.theming/.gradle/1.9/
