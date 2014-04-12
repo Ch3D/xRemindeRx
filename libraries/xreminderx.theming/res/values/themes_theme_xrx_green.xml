@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="Theme_XRX_Green" parent="@style/_Theme_XRX_Green"/>
+
+  <style name="_Theme_XRX_Green" parent="android:Theme.Holo.Light">
+
+    <item name="android:editTextBackground">@drawable/theme_xrx_green_edit_text_holo_light</item>
+    
+    <item name="android:homeAsUpIndicator">@drawable/ic_ab_back_holo_dark</item>
+    
+    <item name="android:actionBarStyle">@style/ActionBar_XRX_Green</item>
+
+    <item name="android:textColorHighlight">#9999cc00</item>
+    <item name="android:textSelectHandleLeft">@drawable/theme_xrx_green_text_select_handle_left</item>
+    <item name="android:textSelectHandleRight">@drawable/theme_xrx_green_text_select_handle_right</item>
+    <item name="android:textSelectHandle">@drawable/theme_xrx_green_text_select_handle_middle</item>
+
+    <item name="android:listChoiceIndicatorMultiple">@drawable/theme_xrx_green_btn_check_holo_light</item>
+
+    <item name="android:listChoiceIndicatorSingle">@drawable/theme_xrx_green_btn_radio_holo_light</item>
+
+    <item name="android:buttonStyle">@style/ButtonTheme_XRX_Green</item>
+
+    <item name="android:imageButtonStyle">@style/ImageButtonTheme_XRX_Green</item>
+
+    <item name="android:dropDownSpinnerStyle">@style/SpinnerTheme_XRX_Green</item>
+
+    <item name="android:progressBarStyleHorizontal">@style/ProgressBarTheme_XRX_Green</item>
+
+    <item name="android:seekBarStyle">@style/SeekBarTheme_XRX_Green</item>
+
+    <item name="android:buttonStyleToggle">@style/ToggleTheme_XRX_Green</item>
+
+    <item name="android:listChoiceBackgroundIndicator">@drawable/theme_xrx_green_list_selector_holo_light</item>
+
+    <item name="android:activatedBackgroundIndicator">@drawable/theme_xrx_green_activated_background_holo_light</item>
+
+  </style>
+
+</resources>
