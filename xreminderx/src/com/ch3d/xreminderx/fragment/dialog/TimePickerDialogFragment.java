@@ -1,3 +1,4 @@
+
 package com.ch3d.xreminderx.fragment.dialog;
 
 import java.util.Calendar;
@@ -13,27 +14,31 @@ import com.ch3d.xreminderx.provider.RemindersContract;
 
 public class TimePickerDialogFragment extends DialogFragment implements OnTimeSetListener
 {
-	private final OnReminderTimeSetListener	listener;
+    private final OnReminderTimeSetListener listener;
 
-	public TimePickerDialogFragment(final OnReminderTimeSetListener listener)
-	{
-		this.listener = listener;
-	}
+    public TimePickerDialogFragment() {
+        listener = null;
+    }
 
-	@Override
-	public Dialog onCreateDialog(final Bundle savedInstanceState)
-	{
-		final Calendar c = Calendar.getInstance();
-		final Bundle arguments = getArguments();
-		c.setTimeInMillis(arguments.getLong(RemindersContract.Columns.TIMESTAMP));
-		final int hour = c.get(Calendar.HOUR_OF_DAY);
-		final int minute = c.get(Calendar.MINUTE);
-		return new TimePickerDialog(getActivity(), this, hour, minute, true);
-	}
+    public TimePickerDialogFragment(final OnReminderTimeSetListener listener)
+    {
+        this.listener = listener;
+    }
 
-	@Override
-	public void onTimeSet(final TimePicker view, final int hourOfDay, final int minute)
-	{
-		listener.onReminderTimeSet(getTag(), hourOfDay, minute);
-	}
+    @Override
+    public Dialog onCreateDialog(final Bundle savedInstanceState)
+    {
+        final Calendar c = Calendar.getInstance();
+        final Bundle arguments = getArguments();
+        c.setTimeInMillis(arguments.getLong(RemindersContract.Columns.TIMESTAMP));
+        final int hour = c.get(Calendar.HOUR_OF_DAY);
+        final int minute = c.get(Calendar.MINUTE);
+        return new TimePickerDialog(getActivity(), this, hour, minute, true);
+    }
+
+    @Override
+    public void onTimeSet(final TimePicker view, final int hourOfDay, final int minute)
+    {
+        listener.onReminderTimeSet(getTag(), hourOfDay, minute);
+    }
 }

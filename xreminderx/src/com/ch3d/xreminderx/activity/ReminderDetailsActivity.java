@@ -3,6 +3,7 @@ package com.ch3d.xreminderx.activity;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 
@@ -17,6 +18,12 @@ import com.ch3d.xreminderx.utils.ReminderUtils;
 
 public class ReminderDetailsActivity extends BaseFragmentActivity
 {
+    private void applyColorTheme() {
+        ReminderEntry reminder = getReminder();
+        setTheme(reminder != null ? ReminderUtils.getReminderTheme(this, reminder.getColor())
+                : R.style.Theme_XRX_Green);
+    }
+
     @Override
     public void finish()
     {
@@ -25,8 +32,13 @@ public class ReminderDetailsActivity extends BaseFragmentActivity
     }
 
     private ReminderEntry getReminder() {
+        final Uri data = getIntent().getData();
+        if (data == null) {
+            return null;
+        }
+
         final Cursor query = getContentResolver().query(
-                getIntent().getData(), null, null,
+                data, null, null,
                 null, null);
         return ReminderUtils.parse(query);
     }
@@ -35,7 +47,7 @@ public class ReminderDetailsActivity extends BaseFragmentActivity
     protected void onCreate(final Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setTheme(ReminderUtils.getReminderTheme(this, getReminder().getColor()));
+        applyColorTheme();
         setContentView(R.layout.x_reminder_details);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         final Intent intent = getIntent();

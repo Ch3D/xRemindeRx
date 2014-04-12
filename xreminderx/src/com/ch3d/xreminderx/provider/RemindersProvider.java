@@ -123,8 +123,9 @@ public class RemindersProvider extends ContentProvider {
                 return mDbHelper.queryToday();
 
             case SEARCH:
-                return mDbHelper.query(uri, projection, "text LIKE '%" + uri.getLastPathSegment()
-                        + "%'", selectionArgs, sortOrder);
+                return mDbHelper.query(uri, projection,
+                        "text LIKE '%" + uri.getLastPathSegment()
+                                + "%'", selectionArgs, sortOrder);
 
             case REMINDERS:
                 return mDbHelper.queryReminder(ContentUris.parseId(uri));

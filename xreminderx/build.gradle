@@ -82,7 +82,7 @@ android {
     buildToolsVersion "17"
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 19
 
 		// testing
@@ -90,11 +90,6 @@ android {
 		testInstrumentationRunner "android.test.InstrumentationTestRunner"
 		// testHandlingProfiling true
 		// testFunctionalTest true
-    }
-
-	compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_5
-        targetCompatibility JavaVersion.VERSION_1_5
     }
 
 	testOptions {
