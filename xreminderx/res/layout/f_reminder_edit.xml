@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+            <Button
+                android:id="@+f_reminder_edit/btnStartSpeech"
+                android:background="?android:attr/listChoiceBackgroundIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:drawableBottom="@android:drawable/ic_btn_speak_now"
+                android:paddingBottom="16dp" />
+            <EditText
+                android:id="@+f_reminder_edit/text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@+f_reminder_edit/btnStartSpeech"
+                android:hint="@string/event_title"
+                android:inputType="textCapSentences|textMultiLine|textPersonName"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="@dimen/font_size_event_title" >
+                <requestFocus />
+            </EditText>
+            <CheckBox android:id="@+f_reminder_edit/cbSilent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+f_reminder_edit/text"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:fontFamily="sans-serif-light"
+                android:text="@string/silent" />
+            <CheckBox android:id="@+f_reminder_edit/cbOngoing"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_toRightOf="@+f_reminder_edit/cbSilent"
+                android:layout_alignBaseline="@+f_reminder_edit/cbSilent"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:fontFamily="sans-serif-light"
+                android:text="@string/ongoing" />
+        </RelativeLayout>
+		<LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/activity_horizontal_margin" >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/color"
+                style="@style/Text.Header" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/header_delimiter_height"
+                style="@style/View.Delimiter.Horizontal" />
+            <Spinner
+                android:id="@+f_reminder_edit/color"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                style="@style/View.Container.Color" />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+f_reminder_edit/panelSelectContact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/activity_horizontal_margin" >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/contact"
+                style="@style/Text.Header" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/header_delimiter_height"
+                style="@style/View.Delimiter.Horizontal" />
+            <ViewStub
+                android:id="@+f_reminder_edit/contact_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout="@layout/x_contact_badge"
+                android:padding="4dp"
+                style="@style/View.Container.Color" />
+<!--             <Button
+                android:id="@+f_reminder_edit/btnPickContact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
+                android:text="@string/select_contact" 
+                style="@style/View.Container.Color" /> -->
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/activity_horizontal_margin" >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/event_time"
+                style="@style/Text.Header" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/header_delimiter_height"
+                style="@style/View.Delimiter.Horizontal" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="6"
+                style="@style/View.Container" >
+                <Button
+                    android:id="@+f_reminder_edit/btnTsDatePicker"
+                    style="?android:attr/dropDownSpinnerStyle"
+                    android:focusable="true"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4" />
+                <Button
+                    android:id="@+f_reminder_edit/btnTsTimePicker"
+                    style="?android:attr/dropDownSpinnerStyle"
+                    android:focusable="true"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2" />
+            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/alarm_time"
+                style="@style/Text.Header" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/header_delimiter_height"
+                style="@style/View.Delimiter.Horizontal" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                style="@style/View.Container">
+                <Button
+                    android:id="@+f_reminder_edit/btnTsAlarmDatePicker"
+                    style="?android:attr/dropDownSpinnerStyle"
+                    android:focusable="true"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4" />
+                <Button
+                    android:id="@+f_reminder_edit/btnTsAlarmTimePicker"
+                    style="?android:attr/dropDownSpinnerStyle"
+                    android:focusable="true"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
