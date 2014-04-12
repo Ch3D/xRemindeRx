@@ -1,8 +1,6 @@
 
 package com.ch3d.xreminderx.activity;
 
-import hugo.weaving.DebugLog;
-
 import javax.inject.Inject;
 
 import android.app.AlertDialog;
@@ -69,7 +67,6 @@ public class RemindersActivity extends BaseFragmentActivity implements
 
     @Override
     @OnClick(android.R.id.button1)
-    @DebugLog
     public void onClick(final View v)
     {
         final String title = mEditQuickText.getText().toString().trim();

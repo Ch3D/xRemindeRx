@@ -1,8 +1,6 @@
 
 package com.ch3d.xreminderx.activity;
 
-import hugo.weaving.DebugLog;
-
 import java.util.Random;
 
 import android.content.Intent;
@@ -26,7 +24,6 @@ public class ReminderDetailsActivity extends BaseFragmentActivity
     }
 
     @Override
-    @DebugLog
     protected void onCreate(final Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
