@@ -36,9 +36,9 @@ public class AlarmReceiver extends BroadcastReceiver {
             c = context.getContentResolver()
                     .query(reminder.getContactUri(),
                             new String[] {
-                        ContactsContract.CommonDataKinds.Phone.NUMBER
-                    },
-                    null, null, null);
+                                ContactsContract.CommonDataKinds.Phone.NUMBER
+                            },
+                            null, null, null);
 
             if ((c != null) && c.moveToFirst()) {
                 final Intent caIntent = new Intent(Intent.ACTION_CALL,
@@ -169,7 +169,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         // update reminder
         final int postponeTime = PreferenceManager.getDefaultSharedPreferences(
                 context).getInt(Consts.PREFS.SHOW_REMINDER_POSTPONE_TIME,
-                        Consts.POSTPONE_TIME_DEFAULT);
+                Consts.POSTPONE_TIME_DEFAULT);
         reminder.postpone(postponeTime);
         RemindersProvider.updateReminder(context, reminder);
 
@@ -258,14 +258,11 @@ public class AlarmReceiver extends BroadcastReceiver {
     }
 
     private void onSelect(final Context context, final Uri data) {
-        final Intent cIntent = new Intent(context,
-                ReminderDetailsActivity.class);
-        cIntent.setAction(Intent.ACTION_VIEW);
-        cIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                | Intent.FLAG_ACTIVITY_CLEAR_TOP
-                | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        cIntent.setData(data);
+        final Intent cIntent = ReminderDetailsActivity.newIntent(context, Intent.ACTION_VIEW,
+                Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+                        | Intent.FLAG_ACTIVITY_SINGLE_TOP, data);
         context.startActivity(cIntent);
         context.stopService(new Intent(context, RingerService.class));
     }

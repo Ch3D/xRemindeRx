@@ -54,11 +54,13 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
         OnReminderDateSetListener,
         OnReminderTimeSetListener
 {
-    public static final String TAG                             = "ReminderEdit";
+    private static final String REMINDER_FRAGMENT_DATA          = "ReminderEditFragment.data";
 
-    private static final int   REQUEST_CODE_SPEECH_RECOGNITION = 1;
+    public static final String  TAG                             = "ReminderEdit";
 
-    public static final int    REQUEST_CODE_GET_CONTACT        = 2;
+    private static final int    REQUEST_CODE_SPEECH_RECOGNITION = 1;
+
+    public static final int     REQUEST_CODE_GET_CONTACT        = 2;
 
     /**
      * @param data array of data
@@ -78,6 +80,14 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
             }
         }
         return result;
+    }
+
+    public static ReminderEditFragment newInstance(final Uri data) {
+        ReminderEditFragment fragment = new ReminderEditFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(REMINDER_FRAGMENT_DATA, data.toString());
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
     @InjectView(R.f_reminder_edit.text)
@@ -134,8 +144,9 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 
     protected ReminderEntry getReminder()
     {
+        final Uri data = Uri.parse(getArguments().getString(REMINDER_FRAGMENT_DATA));
         final Cursor query = getActivity().getContentResolver().query(
-                getActivity().getIntent().getData(), null, null,
+                data, null, null,
                 null, null);
         return ReminderUtils.parse(query);
     }

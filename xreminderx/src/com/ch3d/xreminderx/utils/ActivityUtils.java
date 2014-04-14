@@ -29,14 +29,6 @@ public class ActivityUtils
         return dp;
     }
 
-    public static Intent createReminderViewIntent(final Context context, final long id)
-    {
-        final Intent intent = new Intent(context, ReminderDetailsActivity.class);
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setData(ContentUris.withAppendedId(RemindersProvider.REMINDERS_URI, id));
-        return intent;
-    }
-
     private static ActivityOptions getActivityOptions(final View v, final int position)
     {
         final int height = v.getHeight();
@@ -89,12 +81,9 @@ public class ActivityUtils
     public static void startDetailsActivity(final Context context, final View v, final int position)
     {
         final RemindersAdapter.ViewHolder holder = (ViewHolder) v.getTag();
-        final Intent intent = new Intent(context,
-                ReminderDetailsActivity.class);
-        // intent.setAction(Intent.ACTION_EDIT);
-        intent.setAction(Intent.ACTION_VIEW);
-        intent.setData(ContentUris.withAppendedId(
-                RemindersProvider.REMINDERS_URI, holder.id));
+        final Intent intent = ReminderDetailsActivity.newIntent(context, Intent.ACTION_VIEW,
+                ContentUris.withAppendedId(
+                        RemindersProvider.REMINDERS_URI, holder.id));
         if (ActivityUtils.isJeallyBean())
         {
             context.startActivity(intent, getActivityOptions(v, position).toBundle());

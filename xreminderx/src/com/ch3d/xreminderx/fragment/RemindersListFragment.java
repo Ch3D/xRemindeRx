@@ -206,10 +206,8 @@ public class RemindersListFragment extends ListFragment implements
         switch (item.getItemId())
         {
             case R.menu.action_new_reminder:
-                final Intent intent = new Intent(getActivity(),
-                        ReminderDetailsActivity.class);
-                intent.setAction(ReminderIntent.ACTION_NEW);
-                startActivity(intent);
+                startActivity(ReminderDetailsActivity.newIntent(getActivity(),
+                        ReminderIntent.ACTION_NEW));
                 return true;
 
             case R.menu.action_remove:

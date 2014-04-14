@@ -1,6 +1,7 @@
 
 package com.ch3d.xreminderx.activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -18,6 +19,24 @@ import com.ch3d.xreminderx.utils.ReminderUtils;
 
 public class ReminderDetailsActivity extends BaseFragmentActivity
 {
+    public static Intent newIntent(final Context c, final String action) {
+        final Intent intent = new Intent(c, ReminderDetailsActivity.class);
+        intent.setAction(action);
+        return intent;
+    }
+
+    public static Intent newIntent(final Context c, final String action, final int flags, Uri data) {
+        final Intent intent = newIntent(c, action, data);
+        intent.addFlags(flags);
+        return intent;
+    }
+
+    public static Intent newIntent(final Context c, final String action, Uri data) {
+        final Intent intent = newIntent(c, action);
+        intent.setData(data);
+        return intent;
+    }
+
     private void applyColorTheme() {
         ReminderEntry reminder = getReminder();
         setTheme(reminder != null ? ReminderUtils.getReminderTheme(this, reminder.getColor())
@@ -65,8 +84,8 @@ public class ReminderDetailsActivity extends BaseFragmentActivity
             else if (Intent.ACTION_EDIT.equals(action))
             {
                 final FragmentTransaction trx = getSupportFragmentManager().beginTransaction();
-                final ReminderEditFragment editFragment = new ReminderEditFragment();
-                trx.add(R.x_reminder_details.root, editFragment, ReminderViewFragment.TAG);
+                trx.add(R.x_reminder_details.root, ReminderEditFragment
+                        .newInstance(getIntent().getData()), ReminderViewFragment.TAG);
                 trx.commit();
             }
             else if (ReminderIntent.ACTION_NEW.equals(action))
