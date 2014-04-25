@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:float="http://schemas.android.com/apk/res-auto"
     android:id="@+x_reminders/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -12,11 +13,14 @@
    	    android:layout_gravity="bottom"
    	    android:layout_width="match_parent"
    	    android:layout_height="48dp">
-		<EditText android:id="@android:id/edit"
+		<com.wrapp.floatlabelededittext.FloatLabeledEditText 
+		    android:id="@android:id/edit"
 		    android:layout_width="0dp"
 		    android:layout_weight="1"
 		    android:layout_height="match_parent"
-		    android:hint="@string/quick_reminder_text"
+		    float:fletFloatingHint="@string/quick_reminder_text"
+		    float:fletHintTextColor="?android:attr/textColorSecondaryInverse"
+		    float:fletTextColor="?android:attr/textColorPrimaryInverse"
 		    android:inputType="textCapSentences"
 		    android:textColorHint="?android:attr/textColorSecondaryInverse"
 		    android:textColor="?android:attr/textColorPrimaryInverse"

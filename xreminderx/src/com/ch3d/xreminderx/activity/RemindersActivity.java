@@ -20,7 +20,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.SearchView;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -34,6 +33,7 @@ import com.ch3d.xreminderx.provider.RemindersProvider;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 import com.ch3d.xreminderx.utils.StringUtils;
 import com.ch3d.xreminderx.utils.ViewUtils;
+import com.wrapp.floatlabelededittext.FloatLabeledEditText;
 
 import dagger.Lazy;
 
@@ -41,13 +41,13 @@ public class RemindersActivity extends BaseFragmentActivity implements
         android.view.View.OnClickListener
 {
     @InjectView(android.R.id.edit)
-    protected EditText  mEditQuickText;
+    protected FloatLabeledEditText mEditQuickText;
 
     @InjectView(R.x_reminders.panel_bottom)
-    protected View      mBottomPanel;
+    protected View                 mBottomPanel;
 
     @Inject
-    Lazy<SearchManager> searchManager;
+    Lazy<SearchManager>            searchManager;
 
     private NdefMessage[] getNdefMessages(final Intent intent)
     {
@@ -81,7 +81,7 @@ public class RemindersActivity extends BaseFragmentActivity implements
         reminder.setColor(Color.WHITE);
 
         mEditQuickText.getText().clear();
-        ViewUtils.hideKeyboard(mEditQuickText);
+        ViewUtils.hideKeyboard(mEditQuickText.getEditText());
         RemindersProvider.addReminder(this, reminder, true);
     }
 

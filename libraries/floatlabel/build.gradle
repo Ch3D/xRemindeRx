@@ -1,0 +1,35 @@
+import com.android.builder.DefaultManifestParser
+
+buildscript {
+    repositories {
+        mavenCentral()
+		maven { url 'http://repo1.maven.org/maven2' }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.7.+'
+    }
+}
+
+apply plugin: 'android-library'
+
+/*dependencies {
+  compile 'com.nineoldandroids:library:2.4.0'
+}*/
+
+    repositories {
+        mavenCentral()
+    }
+
+
+android {
+  compileSdkVersion 14
+  buildToolsVersion '19.0.1'
+
+  sourceSets {
+    main {
+      manifest.srcFile 'AndroidManifest.xml'
+      java.srcDirs = ['src']
+      res.srcDirs = ['res']
+    }
+  }
+}

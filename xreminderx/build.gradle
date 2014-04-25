@@ -23,6 +23,7 @@ dependencies {
 	compile 'com.squareup:javawriter:2.4.0'
 	compile 'com.android.support:support-v4:18.0.+'
 	compile project(':libraries:xreminderx.theming')
+	compile project(':libraries:floatlabel')
 }
 
 android {
@@ -30,6 +31,13 @@ android {
     packagingOptions {
         exclude 'META-INF/services/javax.annotation.processing.Processor'
     }
+
+	buildTypes {
+		debug {
+			packageNameSuffix ".debug"			
+		}
+	}
+
 
 	/* disable lint error */
 	lintOptions {
@@ -67,6 +75,7 @@ android {
                     keyPassword releaseProps['keyPassword']
                 }
             }
+
             buildTypes {
                 debug {
                     signingConfig signingConfigs.debug

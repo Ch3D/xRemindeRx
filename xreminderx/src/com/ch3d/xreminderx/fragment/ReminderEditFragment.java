@@ -27,7 +27,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 import butterknife.ButterKnife;
@@ -49,6 +48,7 @@ import com.ch3d.xreminderx.utils.ContactBadgeHolder;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 import com.ch3d.xreminderx.utils.StringUtils;
 import com.ch3d.xreminderx.utils.ViewUtils;
+import com.wrapp.floatlabelededittext.FloatLabeledEditText;
 
 public class ReminderEditFragment extends Fragment implements OnClickListener,
         OnReminderDateSetListener,
@@ -91,37 +91,37 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
     }
 
     @InjectView(R.f_reminder_edit.text)
-    protected EditText         mText;
+    protected FloatLabeledEditText mText;
 
     @InjectView(R.f_reminder_edit.btnTsDatePicker)
-    protected Button           mBtnDatePicker;
+    protected Button               mBtnDatePicker;
 
     @InjectView(R.f_reminder_edit.btnTsTimePicker)
-    protected Button           mBtnTimePicker;
+    protected Button               mBtnTimePicker;
 
     @InjectView(R.f_reminder_edit.btnTsAlarmDatePicker)
-    protected Button           mBtnAlarmDatePicker;
+    protected Button               mBtnAlarmDatePicker;
 
     @InjectView(R.f_reminder_edit.btnTsAlarmTimePicker)
-    protected Button           mBtnAlarmTimePicker;
+    protected Button               mBtnAlarmTimePicker;
 
-    protected ReminderEntry    mReminder;
+    protected ReminderEntry        mReminder;
 
-    private ContactBadgeHolder mContactBadgeHolder;
+    private ContactBadgeHolder     mContactBadgeHolder;
 
     @InjectView(R.f_reminder_edit.btnStartSpeech)
-    protected Button           btnSpeech;
+    protected Button               btnSpeech;
 
     @InjectView(R.f_reminder_edit.cbOngoing)
-    protected CheckBox         mOngoing;
+    protected CheckBox             mOngoing;
 
     @InjectView(R.f_reminder_edit.cbSilent)
-    protected CheckBox         mSilent;
+    protected CheckBox             mSilent;
 
     @InjectView(R.f_reminder_edit.color)
-    protected Spinner          mColor;
+    protected Spinner              mColor;
 
-    private ColorsAdapter      mColorsAdapter;
+    private ColorsAdapter          mColorsAdapter;
 
     protected boolean checkValid()
     {
@@ -332,7 +332,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
     public void onPause()
     {
         super.onPause();
-        ViewUtils.hideKeyboard(mText);
+        ViewUtils.hideKeyboard(mText.getEditText());
     }
 
     @Override
@@ -392,11 +392,11 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 
             }
         });
-        mText.setSelectAllOnFocus(true);
+        mText.getEditText().setSelectAllOnFocus(true);
 
         mText.requestFocus();
         mText.selectAll();
-        mText.addTextChangedListener(new TextWatcher()
+        mText.getEditText().addTextChangedListener(new TextWatcher()
         {
             @Override
             public void afterTextChanged(final Editable s)
@@ -455,7 +455,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
     protected void updateRemiderViewData()
     {
         mText.setText(mReminder.getText());
-        ViewUtils.moveCursorRight(mText);
+        ViewUtils.moveCursorRight(mText.getEditText());
 
         mOngoing.setChecked(mReminder.isOngoing());
         mSilent.setChecked(mReminder.isSilent());

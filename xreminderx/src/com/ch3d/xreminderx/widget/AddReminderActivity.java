@@ -12,12 +12,14 @@ import com.ch3d.xreminderx.R;
 import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.model.ReminderFactory;
 import com.ch3d.xreminderx.provider.RemindersProvider;
+import com.wrapp.floatlabelededittext.FloatLabeledEditText;
 
 public class AddReminderActivity extends Activity implements OnClickListener
 {
     private void addReminder()
     {
-        final EditText editTitle = (EditText) findViewById(R.x_add_reminder.edit_title);
+        final EditText editTitle = ((FloatLabeledEditText) findViewById(R.x_add_reminder.edit_title))
+                .getEditText();
         final String titleText = editTitle.getText().toString().trim();
         if (titleText.length() > 0)
         {
