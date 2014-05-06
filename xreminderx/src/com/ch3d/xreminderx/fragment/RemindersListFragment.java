@@ -343,8 +343,10 @@ public class RemindersListFragment extends ListFragment implements
                         .getChildAt(position);
                 final ViewHolder tag = (ViewHolder) view
                         .getTag();
-                ReminderUtils.deleteReminder(context,
-                        (int) tag.id);
+                if (tag != null) {
+                    ReminderUtils.deleteReminder(context,
+                            (int) tag.id);
+                }
             }
         }
     }
