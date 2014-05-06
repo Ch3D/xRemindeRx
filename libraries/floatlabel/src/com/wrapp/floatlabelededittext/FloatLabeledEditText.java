@@ -263,7 +263,7 @@ public class FloatLabeledEditText extends LinearLayout
 		hintTextView.setTextColor(hintColor != null ? hintColor : ColorStateList.valueOf(Color.BLACK));
 		editText.setTextColor(textColor != null ? textColor : ColorStateList.valueOf(Color.BLACK));
 
-		hintTextView.setVisibility(View.INVISIBLE);
+		hintTextView.setVisibility(GONE);
 		editText.addTextChangedListener(onTextChanged);
 		editText.setOnFocusChangeListener(onFocusChanged);
 	}
@@ -332,7 +332,10 @@ public class FloatLabeledEditText extends LinearLayout
 	 */
 	public void requestFieldFocus()
 	{
-		editText.requestFocus();
+		if(editText != null)
+		{
+			editText.requestFocus();
+		}
 	}
 
 	/**
@@ -488,7 +491,7 @@ public class FloatLabeledEditText extends LinearLayout
 				public void onAnimationEnd(final Animator animation)
 				{
 					super.onAnimationEnd(animation);
-					hintTextView.setVisibility(show ? VISIBLE : INVISIBLE);
+					hintTextView.setVisibility(show ? VISIBLE : GONE);
 				}
 
 				@Override
