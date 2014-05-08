@@ -22,6 +22,8 @@ dependencies {
 	compile 'com.jakewharton:butterknife:4.0.1'
 	compile 'com.squareup:javawriter:2.4.0'
 	compile 'com.android.support:support-v4:18.0.+'
+	compile 'com.parse:parse:1.5.0+'
+	// compile files('libs/Parse-1.5.0.jar')
 	compile project(':libraries:xreminderx.theming')
 	compile project(':libraries:floatlabel')
 }

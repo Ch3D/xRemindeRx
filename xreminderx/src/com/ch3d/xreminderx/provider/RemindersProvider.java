@@ -165,9 +165,6 @@ public class RemindersProvider extends ContentProvider
     public int update(final Uri uri, final ContentValues values, final String selection,
             final String[] selectionArgs)
     {
-        // final Boolean skip = values.containsKey(RemoteProvider.SKIP)
-        // && values.getAsBoolean(RemoteProvider.SKIP);
-        // values.remove(RemoteProvider.SKIP);
         final int rowsAffected = mDbHelper.updateReminder(uri, values, selection, selectionArgs);
         if ((rowsAffected > 0)/* && !skip */)
         {

@@ -16,8 +16,8 @@ import com.parse.Parse;
 import dagger.ObjectGraph;
 
 public class ReminderApplication extends Application {
-    private ObjectGraph  graph;
-    private List<Object> injectList = new ArrayList<>();
+    private ObjectGraph graph;
+    private final List<Object> injectList = new ArrayList<Object>();
 
     protected List<Object> getModules() {
         return Arrays.asList(new AndroidModule(this), new ActivityModule(), new ServiceModule(),
@@ -38,7 +38,7 @@ public class ReminderApplication extends Application {
         Parse.initialize(this, "64LrLB3jNDJQq8sSApLLHUWbjv2wmiACyemSLfN3",
                 "u1rLwcDJzwZuNYa06M0ODtsMqmNbYU9MPKwnjG3E");
         graph = ObjectGraph.create(getModules().toArray());
-        for (Object obj : injectList) {
+        for (final Object obj : injectList) {
             graph.inject(obj);
         }
         injectList.clear();

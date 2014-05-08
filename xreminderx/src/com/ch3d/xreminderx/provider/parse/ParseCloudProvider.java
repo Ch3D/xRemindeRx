@@ -44,7 +44,6 @@ public class ParseCloudProvider implements RemoteProvider {
             @Override
             public void done(final ParseException arg0) {
                 values.put(RemindersContract.Columns.PID, parseObject.getObjectId());
-                // values.put(SKIP, true);
                 context.getContentResolver().update(ContentUris.withAppendedId(uri, id), values,
                         null, null);
             }
