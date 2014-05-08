@@ -27,11 +27,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-// import com.nineoldandroids.animation.Animator;
-// import com.nineoldandroids.animation.AnimatorListenerAdapter;
-// import com.nineoldandroids.animation.AnimatorSet;
-// import com.nineoldandroids.animation.ObjectAnimator;
-
 public class FloatLabeledEditText extends LinearLayout
 {
 
@@ -263,7 +258,7 @@ public class FloatLabeledEditText extends LinearLayout
 		hintTextView.setTextColor(hintColor != null ? hintColor : ColorStateList.valueOf(Color.BLACK));
 		editText.setTextColor(textColor != null ? textColor : ColorStateList.valueOf(Color.BLACK));
 
-		hintTextView.setVisibility(GONE);
+		hintTextView.setVisibility(INVISIBLE);
 		editText.addTextChangedListener(onTextChanged);
 		editText.setOnFocusChangeListener(onFocusChanged);
 	}
@@ -491,7 +486,7 @@ public class FloatLabeledEditText extends LinearLayout
 				public void onAnimationEnd(final Animator animation)
 				{
 					super.onAnimationEnd(animation);
-					hintTextView.setVisibility(show ? VISIBLE : GONE);
+					hintTextView.setVisibility(show ? VISIBLE : INVISIBLE);
 				}
 
 				@Override

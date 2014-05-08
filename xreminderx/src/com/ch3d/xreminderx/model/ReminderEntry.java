@@ -9,6 +9,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.ch3d.xreminderx.utils.ReminderUtils;
+import com.ch3d.xreminderx.utils.StringUtils;
 
 public class ReminderEntry implements Parcelable
 {
@@ -49,6 +50,13 @@ public class ReminderEntry implements Parcelable
     private int                                           ongoing;
 
     private int                                           silent;
+
+    private int                                           version;
+
+    /**
+     * parse_id
+     */
+    private String                                        pid           = StringUtils.EMPTY_STRING;
 
     private int                                           color         = DEFAULT_COLOR;
 
@@ -127,6 +135,10 @@ public class ReminderEntry implements Parcelable
         return type;
     }
 
+    public int getVersion() {
+        return version;
+    }
+
     public boolean isContactRelated()
     {
         return (getContactUri() != null) && !getContactUri().equals(Uri.EMPTY);
@@ -202,6 +214,10 @@ public class ReminderEntry implements Parcelable
         this.type = type;
     }
 
+    void setVersion(int version) {
+        this.version = version;
+    }
+
     @Override
     public String toString()
     {
@@ -212,5 +228,13 @@ public class ReminderEntry implements Parcelable
     public void writeToParcel(final Parcel dest, final int protocol)
     {
         ReminderUtils.writeToParcel(protocol, this, dest);
+    }
+
+    public String getPid() {
+        return pid;
+    }
+
+    public void setPid(String pid) {
+        this.pid = pid;
     }
 }

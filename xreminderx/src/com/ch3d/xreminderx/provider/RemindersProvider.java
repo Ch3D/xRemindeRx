@@ -1,6 +1,8 @@
 
 package com.ch3d.xreminderx.provider;
 
+import javax.inject.Inject;
+
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -9,113 +11,139 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.ch3d.xreminderx.app.ReminderApplication;
 import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.utils.ReminderUtils;
+import com.ch3d.xreminderx.utils.StringUtils;
 
-public class RemindersProvider extends ContentProvider {
-    private static final String     PATH_REMINDERS   = "reminders";
+import dagger.Lazy;
 
-    private static final String     PATH_SEARCH      = "search";
+public class RemindersProvider extends ContentProvider
+{
+    private static final String PATH_REMINDERS = "reminders";
 
-    private static final String     AUTHORITY        = "com.ch3d.xreminderx.provider";
+    private static final String PATH_SEARCH = "search";
 
-    public static final Uri         URI              = Uri.parse("content://"
-                                                             + AUTHORITY);
+    private static final String AUTHORITY = "com.ch3d.xreminderx.provider";
 
-    public static final Uri         REMINDERS_URI    = Uri.withAppendedPath(URI,
-                                                             PATH_REMINDERS);
+    public static final Uri URI = Uri.parse("content://" + AUTHORITY);
 
-    public static final Uri         REMINDERS_SEARCH = Uri.withAppendedPath(URI,
-                                                             PATH_SEARCH);
+    public static final Uri REMINDERS_URI = Uri.withAppendedPath(URI, PATH_REMINDERS);
 
-    private static final UriMatcher sUriMatcher      = new UriMatcher(
-                                                             UriMatcher.NO_MATCH);
+    public static final Uri REMINDERS_SEARCH = Uri.withAppendedPath(URI, PATH_SEARCH);
 
-    private static final int        TODAY            = 1;
+    private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
-    private static final int        ALL              = 2;
+    private static final int TODAY = 1;
 
-    private static final int        REMINDERS        = 3;
+    private static final int ALL = 2;
 
-    private static final int        SEARCH           = 4;
+    private static final int REMINDERS = 3;
 
-    private ReminderDBHelper        mDbHelper;
+    private static final int SEARCH = 4;
 
-    static {
+    @Inject
+    Lazy<RemoteProvider> mRemoteProvider;
+
+    private ReminderDBHelper mDbHelper;
+
+    static
+    {
         sUriMatcher.addURI(AUTHORITY, PATH_REMINDERS + "/all", ALL);
         sUriMatcher.addURI(AUTHORITY, PATH_REMINDERS + "/today", TODAY);
         sUriMatcher.addURI(AUTHORITY, PATH_REMINDERS + "/#", REMINDERS);
         sUriMatcher.addURI(AUTHORITY, PATH_SEARCH + "/*", SEARCH);
     }
 
-    public static Uri addReminder(final Context context,
-            final ReminderEntry reminder) {
+    public static Uri addReminder(final Context context, final ReminderEntry reminder)
+    {
         return addReminder(context, reminder, false);
     }
 
-    public static Uri addReminder(final Context context,
-            final ReminderEntry reminder, final boolean setUpAlarm) {
-        final Uri result = context.getContentResolver().insert(
-                RemindersProvider.REMINDERS_URI,
+    public static Uri addReminder(final Context context, final ReminderEntry reminder,
+            final boolean setUpAlarm)
+    {
+        final Uri result = context.getContentResolver().insert(RemindersProvider.REMINDERS_URI,
                 ReminderUtils.getContentValues(reminder));
-        context.getContentResolver().notifyChange(
-                RemindersProvider.REMINDERS_URI, null);
-        if (setUpAlarm) {
-            ReminderUtils.setAlarm(context, ContentUris.parseId(result),
-                    reminder);
+        context.getContentResolver().notifyChange(RemindersProvider.REMINDERS_URI, null);
+        if (setUpAlarm)
+        {
+            ReminderUtils.setAlarm(context, ContentUris.parseId(result), reminder);
         }
         return result;
     }
 
-    public static int updateReminder(final Context context,
-            final ReminderEntry reminder) {
+    public static int updateReminder(final Context context, final ReminderEntry reminder)
+    {
         return updateReminder(context, reminder, false);
     }
 
-    public static int updateReminder(final Context context,
-            final ReminderEntry reminder, final boolean notify) {
+    public static int updateReminder(final Context context, final ReminderEntry reminder,
+            final boolean notify)
+    {
         final ContentValues values = ReminderUtils.getContentValues(reminder);
-        final Uri uri = ContentUris.withAppendedId(
-                RemindersProvider.REMINDERS_URI, reminder.getId());
-        final int result = context.getContentResolver().update(uri, values,
-                null, null);
-        if (notify) {
-            context.getContentResolver().notifyChange(
-                    RemindersProvider.REMINDERS_URI, null);
+        final Uri uri = ContentUris.withAppendedId(RemindersProvider.REMINDERS_URI,
+                reminder.getId());
+        final int result = context.getContentResolver().update(uri, values, null, null);
+        if (notify)
+        {
+            context.getContentResolver().notifyChange(RemindersProvider.REMINDERS_URI, null);
         }
         return result;
     }
 
     @Override
-    public int delete(final Uri uri, final String selection,
-            final String[] selectionArgs) {
-        return mDbHelper.deleteReminder(selection, selectionArgs);
+    public int delete(final Uri uri, final String selection, final String[] selectionArgs)
+    {
+        int rowsAffected = 0;
+
+        final Cursor query = query(uri, null, null, null, null);
+        final ReminderEntry reminder = ReminderUtils.parse(query);
+
+        if (reminder != null)
+        {
+            rowsAffected = mDbHelper.deleteReminder(selection, selectionArgs);
+            if (rowsAffected > 0)
+            {
+                mRemoteProvider.get().deleteRemote(reminder);
+            }
+        }
+        return rowsAffected;
     }
 
     @Override
-    public String getType(final Uri uri) {
-        // TODO Auto-generated method stub
+    public String getType(final Uri uri)
+    {
         return null;
     }
 
     @Override
-    public Uri insert(final Uri uri, final ContentValues values) {
+    public Uri insert(final Uri uri, final ContentValues values)
+    {
         final long id = mDbHelper.getWritableDatabase().insert(PATH_REMINDERS,
-                null, values);
+                StringUtils.EMPTY_STRING, values);
+        if (id > 0)
+        {
+            mRemoteProvider.get().insertRemote(getContext(), id, uri, values);
+        }
         return ContentUris.withAppendedId(REMINDERS_URI, id);
     }
 
     @Override
-    public boolean onCreate() {
+    public boolean onCreate()
+    {
         mDbHelper = new ReminderDBHelper(getContext());
-        return false;
+        ((ReminderApplication) getContext().getApplicationContext()).inject(this);
+        return true;
     }
 
     @Override
-    public Cursor query(final Uri uri, final String[] projection,
-            final String selection, final String[] selectionArgs,
-            final String sortOrder) {
-        switch (sUriMatcher.match(uri)) {
+    public Cursor query(final Uri uri, final String[] projection, final String selection,
+            final String[] selectionArgs,
+            final String sortOrder)
+    {
+        switch (sUriMatcher.match(uri))
+        {
             case ALL:
                 return mDbHelper.queryAll();
 
@@ -123,21 +151,29 @@ public class RemindersProvider extends ContentProvider {
                 return mDbHelper.queryToday();
 
             case SEARCH:
-                return mDbHelper.query(uri, projection,
-                        "text LIKE '%" + uri.getLastPathSegment()
-                                + "%'", selectionArgs, sortOrder);
+                return mDbHelper.query(uri, projection, "text LIKE '%" + uri.getLastPathSegment()
+                        + "%'",
+                        selectionArgs, sortOrder);
 
             case REMINDERS:
                 return mDbHelper.queryReminder(ContentUris.parseId(uri));
         }
-        return mDbHelper.query(uri, projection, selection, selectionArgs,
-                sortOrder);
+        return mDbHelper.query(uri, projection, selection, selectionArgs, sortOrder);
     }
 
     @Override
-    public int update(final Uri uri, final ContentValues values,
-            final String selection, final String[] selectionArgs) {
-        return mDbHelper.updateReminder(uri, values, selection, selectionArgs);
+    public int update(final Uri uri, final ContentValues values, final String selection,
+            final String[] selectionArgs)
+    {
+        // final Boolean skip = values.containsKey(RemoteProvider.SKIP)
+        // && values.getAsBoolean(RemoteProvider.SKIP);
+        // values.remove(RemoteProvider.SKIP);
+        final int rowsAffected = mDbHelper.updateReminder(uri, values, selection, selectionArgs);
+        if ((rowsAffected > 0)/* && !skip */)
+        {
+            mRemoteProvider.get().remoteUpdate(uri, values);
+        }
+        return rowsAffected;
     }
 
 }

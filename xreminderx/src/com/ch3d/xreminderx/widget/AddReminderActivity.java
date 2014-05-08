@@ -23,7 +23,7 @@ public class AddReminderActivity extends Activity implements OnClickListener
         final String titleText = editTitle.getText().toString().trim();
         if (titleText.length() > 0)
         {
-            final ReminderEntry entry = ReminderFactory.createNull();
+            final ReminderEntry entry = ReminderFactory.createNew();
             entry.setText(titleText);
             entry.setSilent(true);
             RemindersProvider.addReminder(this, entry, true);

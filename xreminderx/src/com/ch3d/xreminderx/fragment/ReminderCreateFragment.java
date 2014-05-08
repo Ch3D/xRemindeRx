@@ -15,7 +15,7 @@ public class ReminderCreateFragment extends ReminderEditFragment
     @Override
     protected ReminderEntry getReminder()
     {
-        final ReminderEntry reminder = ReminderFactory.createNull();
+        final ReminderEntry reminder = ReminderFactory.createNew();
         return reminder;
     }
 

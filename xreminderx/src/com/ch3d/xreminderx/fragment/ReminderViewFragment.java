@@ -38,30 +38,30 @@ public class ReminderViewFragment extends Fragment
     public static final String TAG = "ReminderDetails";
 
     @InjectView(R.f_reminder_view.text)
-    protected TextView         mText;
+    protected TextView mText;
 
     @InjectView(R.f_reminder_view.timestamp)
-    protected TextView         mTimestamp;
+    protected TextView mTimestamp;
 
     @InjectView(R.f_reminder_view.alarmTimestamp)
-    protected TextView         mAlarmTimstamp;
+    protected TextView mAlarmTimstamp;
 
     @InjectView(R.f_reminder_view.icon_type)
-    protected ImageView        mIconType;
+    protected ImageView mIconType;
 
     private ContactBadgeHolder mContactBadgeHolder;
 
     @InjectView(R.f_reminder_view.panelSelectContact)
-    protected View             mPanelContact;
+    protected View mPanelContact;
 
     @InjectView(R.f_reminder_view.txtOngoing)
-    protected TextView         mOngoing;
+    protected TextView mOngoing;
 
     @InjectView(R.f_reminder_view.txtSilent)
-    protected TextView         mSilent;
+    protected TextView mSilent;
 
     @InjectView(R.f_reminder_view.color)
-    protected View             mColor;
+    protected View mColor;
 
     private void bindContactData(final ReminderEntry reminder, final boolean isContactRelated)
     {
@@ -158,7 +158,8 @@ public class ReminderViewFragment extends Fragment
                 final Fragment viewFragment = manager
                         .findFragmentByTag(ReminderViewFragment.TAG);
                 trx.detach(viewFragment);
-                trx.add(R.x_reminder_details.root, new ReminderEditFragment(),
+                trx.add(R.x_reminder_details.root,
+                        ReminderEditFragment.newInstance(getActivity().getIntent().getData()),
                         ReminderEditFragment.TAG);
                 trx.addToBackStack(ReminderEditFragment.TAG);
                 trx.commit();
@@ -183,6 +184,7 @@ public class ReminderViewFragment extends Fragment
         getActivity().setTitle(R.string.view_reminder);
         final ReminderEntry reminder = getReminder();
         bindView(reminder);
+        System.err.println("VIEW >>>> " + reminder.getPid());
 
         final NfcAdapter nfcAdapter = NfcAdapter
                 .getDefaultAdapter(getActivity());

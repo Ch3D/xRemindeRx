@@ -31,6 +31,24 @@ public class ReminderFactory
         return reminder;
     }
 
+    public static final ReminderEntry create(final int protocolVersion,
+            final int id, final int type, final long ts, final long alarmTs,
+            final String text, final String contactUri, final boolean ongoing,
+            final boolean silent, final int color, final int version)
+    {
+        final ReminderEntry reminder = create(protocolVersion, id, type, ts, alarmTs, text,
+                contactUri, ongoing, silent);
+        reminder.setColor(color);
+        reminder.setVersion(version);
+        return reminder;
+    }
+
+    public static final ReminderEntry createNew() {
+        final ReminderEntry reminder = createNull();
+        reminder.setVersion(1);
+        return reminder;
+    }
+
     public static final ReminderEntry createNull()
     {
         final Calendar c = Calendar.getInstance();

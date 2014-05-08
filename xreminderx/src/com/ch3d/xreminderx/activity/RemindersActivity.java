@@ -11,6 +11,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -74,7 +75,7 @@ public class RemindersActivity extends BaseFragmentActivity implements
         {
             return;
         }
-        final ReminderEntry reminder = ReminderFactory.createNull();
+        final ReminderEntry reminder = ReminderFactory.createNew();
         reminder.setText(title);
         reminder.setOngoing(false);
         reminder.setSilent(true);
@@ -82,7 +83,7 @@ public class RemindersActivity extends BaseFragmentActivity implements
 
         mEditQuickText.getText().clear();
         ViewUtils.hideKeyboard(mEditQuickText.getEditText());
-        RemindersProvider.addReminder(this, reminder, true);
+        Uri reminderUri = RemindersProvider.addReminder(this, reminder, true);
     }
 
     @Override

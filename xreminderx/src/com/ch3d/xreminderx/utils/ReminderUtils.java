@@ -28,6 +28,7 @@ import com.ch3d.xreminderx.model.ReminderType;
 import com.ch3d.xreminderx.notifications.AlarmReceiver;
 import com.ch3d.xreminderx.provider.RemindersContract;
 import com.ch3d.xreminderx.provider.RemindersProvider;
+import com.parse.ParseObject;
 
 /**
  * Protocol #1<br/>
@@ -49,20 +50,20 @@ public class ReminderUtils
 
     private static final String NDEF_TYPE_REMINDER = "com.ch3d.xreminderx/reminder";
 
-    public static final int     FORMAT_TIME        = DateUtils.FORMAT_SHOW_TIME;
+    public static final int FORMAT_TIME = DateUtils.FORMAT_SHOW_TIME;
 
-    public static final int     FORMAT_DATE        = DateUtils.FORMAT_SHOW_DATE
-                                                           | DateUtils.FORMAT_SHOW_WEEKDAY
-                                                           | DateUtils.FORMAT_SHOW_YEAR
-                                                           | DateUtils.FORMAT_ABBREV_WEEKDAY
-                                                           | DateUtils.FORMAT_ABBREV_MONTH;
+    public static final int FORMAT_DATE = DateUtils.FORMAT_SHOW_DATE
+            | DateUtils.FORMAT_SHOW_WEEKDAY
+            | DateUtils.FORMAT_SHOW_YEAR
+            | DateUtils.FORMAT_ABBREV_WEEKDAY
+            | DateUtils.FORMAT_ABBREV_MONTH;
 
-    public static final int     FORMAT_DATETIME    = DateUtils.FORMAT_SHOW_TIME
-                                                           | DateUtils.FORMAT_SHOW_DATE
-                                                           | DateUtils.FORMAT_SHOW_WEEKDAY
-                                                           | DateUtils.FORMAT_SHOW_YEAR
-                                                           | DateUtils.FORMAT_ABBREV_WEEKDAY
-                                                           | DateUtils.FORMAT_ABBREV_MONTH;
+    public static final int FORMAT_DATETIME = DateUtils.FORMAT_SHOW_TIME
+            | DateUtils.FORMAT_SHOW_DATE
+            | DateUtils.FORMAT_SHOW_WEEKDAY
+            | DateUtils.FORMAT_SHOW_YEAR
+            | DateUtils.FORMAT_ABBREV_WEEKDAY
+            | DateUtils.FORMAT_ABBREV_MONTH;
 
     public static void cancelAlarm(final int id, final Context context)
     {
@@ -93,6 +94,35 @@ public class ReminderUtils
         final NdefRecord mimeRecord = new NdefRecord(NdefRecord.TNF_MIME_MEDIA,
                 type, id, payload);
         return mimeRecord;
+    }
+
+    public static ParseObject createParseObject(final long rId, final ContentValues values) {
+        final ParseObject obj = new ParseObject("reminders");
+        obj.put(RemindersContract.Columns.ID, rId);
+        final String parseObjectId = values.getAsString(RemindersContract.Columns.PID);
+        if (!StringUtils.isBlank(parseObjectId)) {
+            obj.setObjectId(parseObjectId);
+            obj.put(RemindersContract.Columns.PID, parseObjectId);
+        }
+        obj.put(RemindersContract.Columns.VERSION,
+                values.getAsInteger(RemindersContract.Columns.VERSION));
+        obj.put(RemindersContract.Columns.PROTOCOL,
+                values.getAsInteger(RemindersContract.Columns.PROTOCOL));
+        obj.put(RemindersContract.Columns.ALARM_TIMESTAMP,
+                values.getAsLong(RemindersContract.Columns.ALARM_TIMESTAMP));
+        obj.put(RemindersContract.Columns.COLOR,
+                values.getAsInteger(RemindersContract.Columns.COLOR));
+        obj.put(RemindersContract.Columns.CONTACT_URI,
+                values.getAsString(RemindersContract.Columns.CONTACT_URI));
+        obj.put(RemindersContract.Columns.IS_ONGOING,
+                values.getAsBoolean(RemindersContract.Columns.IS_ONGOING));
+        obj.put(RemindersContract.Columns.IS_SILENT,
+                values.getAsBoolean(RemindersContract.Columns.IS_SILENT));
+        obj.put(RemindersContract.Columns.TEXT, values.getAsString(RemindersContract.Columns.TEXT));
+        obj.put(RemindersContract.Columns.TIMESTAMP,
+                values.getAsLong(RemindersContract.Columns.TIMESTAMP));
+        obj.put(RemindersContract.Columns.TYPE, values.getAsInteger(RemindersContract.Columns.TYPE));
+        return obj;
     }
 
     public static void deleteReminder(final Context context, final int id)
@@ -247,6 +277,8 @@ public class ReminderUtils
         values.put(RemindersContract.Columns.IS_SILENT, entry.isSilent() ? 1
                 : 0);
         values.put(RemindersContract.Columns.COLOR, entry.getColor());
+        values.put(RemindersContract.Columns.VERSION, entry.getVersion());
+        values.put(RemindersContract.Columns.PID, entry.getPid());
         return values;
     }
 
@@ -331,8 +363,10 @@ public class ReminderUtils
                 cursor.getString(RemindersContract.Indexes.TEXT),
                 cursor.getString(RemindersContract.Indexes.CONTACT_URI),
                 intToBoolean(cursor.getInt(RemindersContract.Indexes.IS_ONGOING)),
-                intToBoolean(cursor.getInt(RemindersContract.Indexes.IS_SILENT)));
-        entry.setColor(cursor.getInt(RemindersContract.Indexes.COLOR));
+                intToBoolean(cursor.getInt(RemindersContract.Indexes.IS_SILENT)),
+                cursor.getInt(RemindersContract.Indexes.COLOR),
+                cursor.getInt(RemindersContract.Indexes.VERSION));
+        entry.setPid(cursor.getString(RemindersContract.Indexes.PID));
         cursor.close();
         return entry;
     }
