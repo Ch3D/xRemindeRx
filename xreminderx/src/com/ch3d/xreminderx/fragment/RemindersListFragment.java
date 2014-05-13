@@ -45,6 +45,7 @@ import com.ch3d.xreminderx.utils.ActivityUtils;
 import com.ch3d.xreminderx.utils.PreferenceHelper;
 import com.ch3d.xreminderx.utils.ReminderIntent;
 import com.ch3d.xreminderx.utils.ReminderUtils;
+import com.ch3d.xreminderx.utils.ViewUtils;
 import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener;
 import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener.DismissCallbacks;
 
@@ -276,7 +277,8 @@ public class RemindersListFragment extends ListFragment implements
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         listView.setMultiChoiceModeListener(mActionModeCallback);
         listView.setFooterDividersEnabled(false);
-        listView.setPadding(16, 0, 16, 0);
+        final int margin = ViewUtils.dipToPixels(getActivity(), 16);
+        listView.setPadding(margin, 0, margin, 0);
         listView.addFooterView(View.inflate(getActivity(),
                 R.layout.footer_reminders, null), null, false);
 
