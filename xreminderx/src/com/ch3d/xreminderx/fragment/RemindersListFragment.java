@@ -8,15 +8,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.util.SparseArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -49,77 +51,79 @@ import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener.DismissCallbac
 public class RemindersListFragment extends ListFragment implements
         LoaderCallbacks<Cursor>
 {
-    private ActionMode                        mActionMode;
+    private ActionMode mActionMode;
 
-    private final MultiChoiceModeListener     mActionModeCallback = new MultiChoiceModeListener() {
+    private final MultiChoiceModeListener mActionModeCallback = new MultiChoiceModeListener() {
 
-                                                                      @Override
-                                                                      public boolean onActionItemClicked(
-                                                                              final ActionMode mode,
-                                                                              final MenuItem item)
-                                                                      {
-                                                                          return onOptionsItemSelected(item);
-                                                                      }
+        @Override
+        public boolean onActionItemClicked(
+                final ActionMode mode,
+                final MenuItem item)
+        {
+            return onOptionsItemSelected(item);
+        }
 
-                                                                      @Override
-                                                                      public boolean onCreateActionMode(
-                                                                              final ActionMode mode,
-                                                                              final Menu menu)
-                                                                      {
-                                                                          mActionMode = mode;
-                                                                          final MenuInflater inflater = mode
-                                                                                  .getMenuInflater();
-                                                                          inflater.inflate(
-                                                                                  R.menu.reminders_list_contextual,
-                                                                                  menu);
-                                                                          return true;
-                                                                      }
+        @Override
+        public boolean onCreateActionMode(
+                final ActionMode mode,
+                final Menu menu)
+        {
+            mActionMode = mode;
+            final MenuInflater inflater = mode
+                    .getMenuInflater();
+            inflater.inflate(
+                    R.menu.reminders_list_contextual,
+                    menu);
+            return true;
+        }
 
-                                                                      @Override
-                                                                      public void onDestroyActionMode(
-                                                                              final ActionMode mode)
-                                                                      {
-                                                                          mAdapter.uncheckItems();
-                                                                          mActionMode = null;
-                                                                      }
+        @Override
+        public void onDestroyActionMode(
+                final ActionMode mode)
+        {
+            mAdapter.uncheckItems();
+            mActionMode = null;
+        }
 
-                                                                      @Override
-                                                                      public void onItemCheckedStateChanged(
-                                                                              final ActionMode mode,
-                                                                              final int position,
-                                                                              final long id,
-                                                                              final boolean checked)
-                                                                      {
-                                                                          mAdapter.setChecked(
-                                                                                  position,
-                                                                                  checked);
-                                                                      }
+        @Override
+        public void onItemCheckedStateChanged(
+                final ActionMode mode,
+                final int position,
+                final long id,
+                final boolean checked)
+        {
+            mAdapter.setChecked(
+                    position,
+                    checked);
+        }
 
-                                                                      @Override
-                                                                      public boolean onPrepareActionMode(
-                                                                              final ActionMode mode,
-                                                                              final Menu menu)
-                                                                      {
-                                                                          return false; // Return
-                                                                          // false
-                                                                          // if
-                                                                          // nothing
-                                                                          // is
-                                                                          // done
-                                                                      }
-                                                                  };
+        @Override
+        public boolean onPrepareActionMode(
+                final ActionMode mode,
+                final Menu menu)
+        {
+            return false; // Return
+            // false
+            // if
+            // nothing
+            // is
+            // done
+        }
+    };
 
-    public static final String                TAG                 = "tag_reminders";
+    public static final String TAG = "tag_reminders";
 
-    public static final int                   TAG_TODAY           = 0;
+    public static final int TAG_TODAY = 0;
 
-    public static final int                   TAG_ALL             = 1;
+    public static final int TAG_ALL = 1;
 
-    private RemindersAdapter                  mAdapter;
+    private RemindersAdapter mAdapter;
 
     private SwipeDismissListViewTouchListener mSwipeListener;
 
-    private Handler                           mHandler;
+    private Handler mHandler;
+
+    private SwipeRefreshLayout mSwipeLayout;
 
     public RemindersListFragment()
     {
@@ -142,8 +146,9 @@ public class RemindersListFragment extends ListFragment implements
     public View onCreateView(final LayoutInflater inflater,
             final ViewGroup container, final Bundle savedInstanceState)
     {
-        final View view = super.onCreateView(inflater, container,
-                savedInstanceState);
+        final View view = inflater.inflate(R.layout.f_swipe_refresh_list, container, false);
+        // final View view = super.onCreateView(inflater, container,
+        // savedInstanceState);
 
         mHandler = new Handler();
         final LoaderManager loaderManager = getLoaderManager();
@@ -253,13 +258,25 @@ public class RemindersListFragment extends ListFragment implements
     public void onViewCreated(final View view, final Bundle savedInstanceState)
     {
         super.onViewCreated(view, savedInstanceState);
-        setEmptyText(getActivity().getString(R.string.you_have_no_reminders));
+        // setEmptyText(getActivity().getString(R.string.you_have_no_reminders));
         final ListView listView = getListView();
+        mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
+        mSwipeLayout.setColorScheme(android.R.color.holo_blue_light,
+                android.R.color.holo_green_light, android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+        mSwipeLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                performCloudSync();
+            }
+        });
 
-        listView.setDivider(new ColorDrawable(Color.TRANSPARENT));
+        // listView.setDivider(new ColorDrawable(Color.TRANSPARENT));
         listView.setLayoutTransition(new LayoutTransition());
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         listView.setMultiChoiceModeListener(mActionModeCallback);
+        listView.setFooterDividersEnabled(false);
+        listView.setPadding(16, 0, 16, 0);
         listView.addFooterView(View.inflate(getActivity(),
                 R.layout.footer_reminders, null), null, false);
 
@@ -279,6 +296,27 @@ public class RemindersListFragment extends ListFragment implements
                     }
                 });
         listView.setOnTouchListener(mSwipeListener);
+    }
+
+    protected void performCloudSync() {
+        new AsyncTask<Void, Integer, Void>() {
+
+            @Override
+            protected Void doInBackground(final Void... params) {
+                SystemClock.sleep(2000);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(final Void result) {
+                mSwipeLayout.setRefreshing(false);
+            }
+
+            @Override
+            protected void onPreExecute() {
+                mSwipeLayout.setRefreshing(true);
+            };
+        }.execute();
     }
 
     private void removeReminders(

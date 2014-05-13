@@ -17,6 +17,8 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
         <item name="android:spinnerItemStyle">@style/SpinnerItem</item>
+        <item name="android:listViewStyle">@style/ListView</item>
+        <item name="android:absListViewStyle">@style/ListView</item>
     </style>
 
     <style name="Text.Header" parent="@android:style/Widget.TextView">
@@ -33,6 +35,11 @@
     <style name="SpinnerItem" parent="@android:style/Widget.Holo.TextView.SpinnerItem">
         <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
         <item name="android:gravity">center</item>
+	</style>
+	
+    <style name="ListView" parent="@android:Widget.ListView">
+        <item name="android:padding">48dp</item>
+        <item name="android:layout_marginLeft">48dp</item>
 	</style>
     
     <style name="View"/>

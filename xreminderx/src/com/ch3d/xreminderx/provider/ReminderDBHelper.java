@@ -13,24 +13,24 @@ import com.ch3d.xreminderx.R;
 
 public class ReminderDBHelper extends SQLiteOpenHelper
 {
-    private static final String TABLE_NAME      = "reminders";
+    private static final String TABLE_NAME = "reminders";
 
-    private static final String DATABASE_NAME   = TABLE_NAME;
+    private static final String DATABASE_NAME = TABLE_NAME;
 
     private static final String SQL_CREATE_MAIN = "CREATE TABLE IF NOT EXISTS "
-                                                        + TABLE_NAME
-                                                        + "("
-                                                        + "_id INTEGER PRIMARY KEY, "
-                                                        + "protocol INTEGER, "
-                                                        + "type INTEGER, "
-                                                        + "ts TIMESTAMP NOT NULL DEFAULT current_timestamp, "
-                                                        + "alarm_ts BIGINT, "
-                                                        + "text VARCHAR(255), "
-                                                        + "contactUri VARCHAR(255), "
-                                                        + "ongoing INTEGER, "
-                                                        + "silent INTEGER, " + "color INTEGER, "
-                                                        + "version INTEGER, "
-                                                        + "pid VARCHAR(255) " + ");";
+            + TABLE_NAME
+            + "("
+            + "_id INTEGER PRIMARY KEY, "
+            + "protocol INTEGER, "
+            + "type INTEGER, "
+            + "ts TIMESTAMP NOT NULL DEFAULT current_timestamp, "
+            + "alarm_ts BIGINT, "
+            + "text VARCHAR(255), "
+            + "contactUri VARCHAR(255), "
+            + "ongoing INTEGER, "
+            + "silent INTEGER, " + "color INTEGER, "
+            + "version INTEGER, "
+            + "pid VARCHAR(255) " + ");";
 
     public ReminderDBHelper(final Context context)
     {
@@ -41,6 +41,12 @@ public class ReminderDBHelper extends SQLiteOpenHelper
     public int deleteReminder(final String selection, final String[] selectionArgs)
     {
         return getWritableDatabase().delete(TABLE_NAME, selection, selectionArgs);
+    }
+
+    public int deleteReminderForId(final long parseId) {
+        return getWritableDatabase().delete(TABLE_NAME, "_id = ?", new String[] {
+            Long.toString(parseId)
+        });
     }
 
     @Override

@@ -102,7 +102,11 @@ public class RemindersProvider extends ContentProvider
 
         if (reminder != null)
         {
-            rowsAffected = mDbHelper.deleteReminder(selection, selectionArgs);
+            if (StringUtils.isBlank(selection) || (selectionArgs.length == 0)) {
+                rowsAffected = mDbHelper.deleteReminderForId(ContentUris.parseId(uri));
+            } else {
+                rowsAffected = mDbHelper.deleteReminder(selection, selectionArgs);
+            }
             if (rowsAffected > 0)
             {
                 mRemoteProvider.get().deleteRemote(reminder);
@@ -168,7 +172,7 @@ public class RemindersProvider extends ContentProvider
         final int rowsAffected = mDbHelper.updateReminder(uri, values, selection, selectionArgs);
         if ((rowsAffected > 0)/* && !skip */)
         {
-            mRemoteProvider.get().remoteUpdate(uri, values);
+            mRemoteProvider.get().updateRemote(uri, values);
         }
         return rowsAffected;
     }

@@ -30,13 +30,13 @@ import com.ch3d.xreminderx.utils.StringUtils;
 
 public class RemindersAdapter extends CursorAdapter implements OnClickListener {
     public static class ViewHolder {
-        public View      root;
+        public View root;
 
-        public long      id;
+        public long id;
 
-        public TextView  text;
+        public TextView text;
 
-        public TextView  date;
+        public TextView date;
 
         public ImageView iconType;
 
@@ -44,17 +44,17 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
 
     }
 
-    private static final int           VIEW_TYPE_COUNT   = 2;
+    private static final int VIEW_TYPE_COUNT = 2;
 
-    private static final int           VIEW_TYPE_SIMPLE  = 0;
+    private static final int VIEW_TYPE_SIMPLE = 0;
 
-    private static final int           VIEW_TYPE_CONTACT = 1;
+    private static final int VIEW_TYPE_CONTACT = 1;
 
-    private final SparseArray<Boolean> mChecked          = new SparseArray<Boolean>(10);
+    private final SparseArray<Boolean> mChecked = new SparseArray<Boolean>(10);
 
-    private final LayoutInflater       mInflater;
+    private final LayoutInflater mInflater;
 
-    private final Bitmap               mDefaultImg;
+    private final Bitmap mDefaultImg;
 
     public RemindersAdapter(final Context context, final Cursor c,
             final boolean autoRequery) {
@@ -102,8 +102,8 @@ public class RemindersAdapter extends CursorAdapter implements OnClickListener {
             holder.id = id;
             holder.text.setText(cursor
                     .getString(RemindersContract.Indexes.TEXT));
-            holder.root.setBackgroundResource(ReminderUtils.getReminderItemBackground(context,
-                    cursor.getInt(RemindersContract.Indexes.COLOR)));
+            // holder.root.setBackgroundResource(ReminderUtils.getReminderItemBackground(context,
+            // cursor.getInt(RemindersContract.Indexes.COLOR)));
             // holder.color.setBackgroundColor(cursor
             // .getInt(RemindersContract.Indexes.COLOR));
             holder.iconType.setImageLevel(cursor

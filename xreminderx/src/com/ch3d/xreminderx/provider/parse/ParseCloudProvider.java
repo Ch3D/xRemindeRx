@@ -18,8 +18,10 @@ import com.parse.ParseQuery;
 import com.parse.SaveCallback;
 
 public class ParseCloudProvider implements RemoteProvider {
-    private static final String PARSE_CLASS_REMINDERS = "reminders";
+
     private static final String LOG_TAG = ParseCloudProvider.class.getSimpleName();
+
+    private static final String PARSE_CLASS_REMINDERS = "reminders";
 
     @Override
     public void deleteRemote(final ReminderEntry reminder) {
@@ -27,10 +29,10 @@ public class ParseCloudProvider implements RemoteProvider {
                 new GetCallback<ParseObject>() {
                     @Override
                     public void done(final ParseObject obj, final ParseException exc) {
-                        if (exc != null) {
-                            Log.e(LOG_TAG, "deleteRemote", exc);
-                        } else {
+                        if (exc == null) {
                             obj.deleteEventually();
+                        } else {
+                            Log.e(LOG_TAG, "deleteRemote", exc);
                         }
                     }
                 });
@@ -40,9 +42,9 @@ public class ParseCloudProvider implements RemoteProvider {
     public void insertRemote(final Context context, final long id, final Uri uri,
             final ContentValues values) {
         final ParseObject parseObject = ReminderUtils.createParseObject(id, values);
-        parseObject.saveInBackground(new SaveCallback() {
+        parseObject.saveEventually(new SaveCallback() {
             @Override
-            public void done(final ParseException arg0) {
+            public void done(final ParseException exc) {
                 values.put(RemindersContract.Columns.PID, parseObject.getObjectId());
                 context.getContentResolver().update(ContentUris.withAppendedId(uri, id), values,
                         null, null);
@@ -51,7 +53,7 @@ public class ParseCloudProvider implements RemoteProvider {
     }
 
     @Override
-    public void remoteUpdate(final Uri uri, final ContentValues values) {
+    public void updateRemote(final Uri uri, final ContentValues values) {
         ReminderUtils.createParseObject(ContentUris.parseId(uri), values).saveEventually();
     }
 }

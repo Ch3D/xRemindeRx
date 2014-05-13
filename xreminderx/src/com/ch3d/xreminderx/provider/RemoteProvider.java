@@ -12,5 +12,5 @@ public interface RemoteProvider {
 
     void insertRemote(Context context, long id, Uri uri, ContentValues values);
 
-    void remoteUpdate(Uri uri, ContentValues values);
+    void updateRemote(Uri uri, ContentValues values);
 }

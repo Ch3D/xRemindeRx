@@ -127,10 +127,9 @@ public class ReminderUtils
 
     public static void deleteReminder(final Context context, final int id)
     {
-        context.getContentResolver().delete(RemindersProvider.REMINDERS_URI,
-                "_id = ?", new String[] {
-                    Long.toString(id)
-                });
+        context.getContentResolver().delete(
+                ContentUris.withAppendedId(RemindersProvider.REMINDERS_URI, id),
+                null, null);
         context.getContentResolver().notifyChange(
                 RemindersProvider.REMINDERS_URI, null);
 
