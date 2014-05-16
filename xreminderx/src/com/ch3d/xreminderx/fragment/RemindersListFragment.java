@@ -148,8 +148,6 @@ public class RemindersListFragment extends ListFragment implements
             final ViewGroup container, final Bundle savedInstanceState)
     {
         final View view = inflater.inflate(R.layout.f_swipe_refresh_list, container, false);
-        // final View view = super.onCreateView(inflater, container,
-        // savedInstanceState);
 
         mHandler = new Handler();
         final LoaderManager loaderManager = getLoaderManager();

@@ -1,3 +1,4 @@
+
 package com.ch3d.xreminderx.fragment;
 
 import android.os.Bundle;
@@ -7,10 +8,10 @@ import com.ch3d.xreminderx.R;
 
 public class SettingsFragment extends PreferenceFragment
 {
-	@Override
-	public void onCreate(final Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.layout.f_settings);
-	}
+    @Override
+    public void onCreate(final Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        addPreferencesFromResource(R.layout.f_settings);
+    }
 }

@@ -12,6 +12,16 @@
           android:showAsAction="collapseActionView|ifRoom"
           android:actionViewClass="android.widget.SearchView" />
 	
+	<item android:id="@+menu/action_gplus_signin"
+          android:title="Sign In using G+"
+          android:showAsAction="never"
+          android:actionViewClass="android.widget.SearchView" />
+	
+	<item android:id="@+menu/action_gplus_signout"
+          android:title="Sign Out"
+          android:showAsAction="never"
+          android:actionViewClass="android.widget.SearchView" />
+	
     <item
         android:id="@+menu/action_settings"
         android:orderInCategory="102"

@@ -11,7 +11,6 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -34,21 +33,30 @@ import com.ch3d.xreminderx.provider.RemindersProvider;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 import com.ch3d.xreminderx.utils.StringUtils;
 import com.ch3d.xreminderx.utils.ViewUtils;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.plus.Plus;
 import com.wrapp.floatlabelededittext.FloatLabeledEditText;
 
 import dagger.Lazy;
 
 public class RemindersActivity extends BaseFragmentActivity implements
-        android.view.View.OnClickListener
+        android.view.View.OnClickListener, ConnectionCallbacks, OnConnectionFailedListener
 {
+    private static final int REQUEST_CODE_LOGIN = 0x01;
+
     @InjectView(android.R.id.edit)
     protected FloatLabeledEditText mEditQuickText;
 
     @InjectView(R.x_reminders.panel_bottom)
-    protected View                 mBottomPanel;
+    protected View mBottomPanel;
 
     @Inject
-    Lazy<SearchManager>            searchManager;
+    Lazy<SearchManager> searchManager;
+
+    private GoogleApiClient mPlusClient;
 
     private NdefMessage[] getNdefMessages(final Intent intent)
     {
@@ -64,6 +72,13 @@ public class RemindersActivity extends BaseFragmentActivity implements
             }
         }
         return msgs;
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        if ((requestCode == REQUEST_CODE_LOGIN) && (resultCode == RESULT_OK)) {
+            mPlusClient.connect();
+        }
     }
 
     @Override
@@ -83,13 +98,34 @@ public class RemindersActivity extends BaseFragmentActivity implements
 
         mEditQuickText.getText().clear();
         ViewUtils.hideKeyboard(mEditQuickText.getEditText());
-        Uri reminderUri = RemindersProvider.addReminder(this, reminder, true);
+        RemindersProvider.addReminder(this, reminder, true);
+    }
+
+    @Override
+    public void onConnected(final Bundle arg0) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(final ConnectionResult arg0) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(final int arg0) {
+
     }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        mPlusClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this).addApi(Plus.API, null)
+                .addScope(Plus.SCOPE_PLUS_LOGIN).addScope(Plus.SCOPE_PLUS_PROFILE).build();
+        mPlusClient.connect();
 
         // getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.x_reminders);
@@ -130,6 +166,29 @@ public class RemindersActivity extends BaseFragmentActivity implements
         super.onNewIntent(intent);
         // parse intent in case if application is running
         parseNfcIntent(intent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        if (item.getItemId() == R.menu.action_gplus_signin) {
+            startActivityForResult(new Intent(this, GooglePlusSignInActivity.class),
+                    REQUEST_CODE_LOGIN);
+            return true;
+        } else if (item.getItemId() == R.menu.action_gplus_signout) {
+            Plus.AccountApi.revokeAccessAndDisconnect(mPlusClient);
+            mPlusClient.disconnect();
+            mPlusClient.connect();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(final Menu menu) {
+        final boolean connected = mPlusClient.isConnected();
+        menu.findItem(R.menu.action_gplus_signin).setVisible(!connected);
+        menu.findItem(R.menu.action_gplus_signout).setVisible(connected);
+        return true;
     }
 
     private void parseNdefMessages(final NdefMessage[] msgs)
