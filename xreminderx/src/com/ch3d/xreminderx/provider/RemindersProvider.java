@@ -96,8 +96,8 @@ public class RemindersProvider extends ContentProvider
     }
 
     private void addAccount(final ContentValues values) {
-        values.put(RemindersContract.Columns.ACCOUNT,
-                Plus.AccountApi.getAccountName(getGoogleApi()));
+        final String accountName = Plus.AccountApi.getAccountName(getGoogleApi());
+        values.put(RemindersContract.Columns.ACCOUNT, ReminderUtils.sha1Hash(accountName));
     }
 
     @Override

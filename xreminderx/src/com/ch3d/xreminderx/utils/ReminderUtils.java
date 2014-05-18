@@ -1,7 +1,10 @@
 
 package com.ch3d.xreminderx.utils;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import android.app.AlarmManager;
 import android.app.NotificationManager;
@@ -64,6 +67,20 @@ public class ReminderUtils
             | DateUtils.FORMAT_SHOW_YEAR
             | DateUtils.FORMAT_ABBREV_WEEKDAY
             | DateUtils.FORMAT_ABBREV_MONTH;
+
+    final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
+
+    public static String bytesToHex(final byte[] bytes)
+    {
+        final char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++)
+        {
+            final int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[(j * 2) + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
 
     public static void cancelAlarm(final int id, final Context context)
     {
@@ -435,6 +452,28 @@ public class ReminderUtils
                 context, id);
         mAlarmManager.set(AlarmManager.RTC_WAKEUP, entry.getAlarmTimestamp(),
                 intent);
+    }
+
+    public static String sha1Hash(final String toHash)
+    {
+        String hash = null;
+        try
+        {
+            final MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            byte[] bytes = toHash.getBytes("UTF-8");
+            digest.update(bytes, 0, bytes.length);
+            bytes = digest.digest();
+
+            // This is ~55x faster than looping and String.formating()
+            hash = bytesToHex(bytes);
+        } catch (final NoSuchAlgorithmException e)
+        {
+            e.printStackTrace();
+        } catch (final UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        }
+        return hash;
     }
 
     public static void writeToParcel(final int protocol,
