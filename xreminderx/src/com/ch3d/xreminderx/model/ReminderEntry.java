@@ -13,52 +13,54 @@ import com.ch3d.xreminderx.utils.StringUtils;
 
 public class ReminderEntry implements Parcelable
 {
-    public static final int                               DEFAULT_COLOR = Color.WHITE;
+    public static final int DEFAULT_COLOR = Color.WHITE;
 
-    public static final Parcelable.Creator<ReminderEntry> CREATOR       = new Parcelable.Creator<ReminderEntry>()
-                                                                        {
-                                                                            @Override
-                                                                            public ReminderEntry createFromParcel(
-                                                                                    final Parcel in)
-                                                                            {
-                                                                                return ReminderUtils
-                                                                                        .parse(in);
-                                                                            }
+    public static final Parcelable.Creator<ReminderEntry> CREATOR = new Parcelable.Creator<ReminderEntry>()
+    {
+        @Override
+        public ReminderEntry createFromParcel(
+                final Parcel in)
+        {
+            return ReminderUtils
+                    .parse(in);
+        }
 
-                                                                            @Override
-                                                                            public ReminderEntry[] newArray(
-                                                                                    final int size)
-                                                                            {
-                                                                                return new ReminderEntry[size];
-                                                                            }
-                                                                        };
+        @Override
+        public ReminderEntry[] newArray(
+                final int size)
+        {
+            return new ReminderEntry[size];
+        }
+    };
 
-    private final int                                     id;
+    private final int id;
 
-    private long                                          timestamp;
+    private long timestamp;
 
-    private long                                          alarmTimestamp;
+    private long alarmTimestamp;
 
-    private String                                        text;
+    private String text;
 
-    private Uri                                           contactUri    = Uri.EMPTY;
+    private String account;
 
-    private ReminderType                                  type          = ReminderType.SIMPLE;
+    private Uri contactUri = Uri.EMPTY;
 
-    private final int                                     protocolVersion;
+    private ReminderType type = ReminderType.SIMPLE;
 
-    private int                                           ongoing;
+    private final int protocolVersion;
 
-    private int                                           silent;
+    private int ongoing;
 
-    private int                                           version;
+    private int silent;
+
+    private int version;
 
     /**
-     * parse_id
+     * id on remote/cloud storage
      */
-    private String                                        pid           = StringUtils.EMPTY_STRING;
+    private String pid = StringUtils.EMPTY_STRING;
 
-    private int                                           color         = DEFAULT_COLOR;
+    private int color = DEFAULT_COLOR;
 
     ReminderEntry(final int id)
     {
@@ -85,6 +87,10 @@ public class ReminderEntry implements Parcelable
         return 0;
     }
 
+    public String getAccount() {
+        return account;
+    }
+
     public long getAlarmTimestamp()
     {
         return alarmTimestamp;
@@ -108,6 +114,10 @@ public class ReminderEntry implements Parcelable
     public int getOutgoing()
     {
         return ongoing;
+    }
+
+    public String getPid() {
+        return pid;
     }
 
     public int getProtocolVersion()
@@ -139,6 +149,10 @@ public class ReminderEntry implements Parcelable
         return version;
     }
 
+    public boolean hasAccountOrRemoteId() {
+        return !StringUtils.isBlank(account) || !StringUtils.isBlank(pid);
+    }
+
     public boolean isContactRelated()
     {
         return (getContactUri() != null) && !getContactUri().equals(Uri.EMPTY);
@@ -162,6 +176,10 @@ public class ReminderEntry implements Parcelable
     public void postpone(final int time)
     {
         setAlarmTimestamp(Calendar.getInstance().getTimeInMillis() + time);
+    }
+
+    public void setAccount(final String account) {
+        this.account = account;
     }
 
     public void setAlarmTimestamp(final long alarmTimestamp)
@@ -189,6 +207,10 @@ public class ReminderEntry implements Parcelable
         this.ongoing = ongoing;
     }
 
+    public void setPid(final String pid) {
+        this.pid = pid;
+    }
+
     public void setSilent(final boolean silent)
     {
         this.silent = silent ? 1 : 0;
@@ -214,7 +236,7 @@ public class ReminderEntry implements Parcelable
         this.type = type;
     }
 
-    void setVersion(int version) {
+    void setVersion(final int version) {
         this.version = version;
     }
 
@@ -228,13 +250,5 @@ public class ReminderEntry implements Parcelable
     public void writeToParcel(final Parcel dest, final int protocol)
     {
         ReminderUtils.writeToParcel(protocol, this, dest);
-    }
-
-    public String getPid() {
-        return pid;
-    }
-
-    public void setPid(String pid) {
-        this.pid = pid;
     }
 }

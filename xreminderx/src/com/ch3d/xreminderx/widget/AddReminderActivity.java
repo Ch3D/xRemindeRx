@@ -6,12 +6,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.ch3d.xreminderx.R;
 import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.model.ReminderFactory;
 import com.ch3d.xreminderx.provider.RemindersProvider;
+import com.ch3d.xreminderx.utils.ActivityUtils;
 import com.wrapp.floatlabelededittext.FloatLabeledEditText;
 
 public class AddReminderActivity extends Activity implements OnClickListener
@@ -27,7 +27,7 @@ public class AddReminderActivity extends Activity implements OnClickListener
             entry.setText(titleText);
             entry.setSilent(true);
             RemindersProvider.addReminder(this, entry, true);
-            Toast.makeText(this, R.string.xreminder_added, Toast.LENGTH_SHORT).show();
+            ActivityUtils.showToastShort(this, R.string.xreminder_added);
         }
         finish();
     }

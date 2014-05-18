@@ -30,7 +30,9 @@ public class ReminderDBHelper extends SQLiteOpenHelper
             + "ongoing INTEGER, "
             + "silent INTEGER, " + "color INTEGER, "
             + "version INTEGER, "
-            + "pid VARCHAR(255) " + ");";
+            + "pid VARCHAR(255), "
+            + "account VARCHAR(255) "
+            + ");";
 
     public ReminderDBHelper(final Context context)
     {
@@ -45,7 +47,7 @@ public class ReminderDBHelper extends SQLiteOpenHelper
 
     public int deleteReminderForId(final long parseId) {
         return getWritableDatabase().delete(TABLE_NAME, "_id = ?", new String[] {
-            Long.toString(parseId)
+                Long.toString(parseId)
         });
     }
 

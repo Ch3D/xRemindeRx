@@ -106,6 +106,8 @@ public class ReminderUtils
         }
         obj.put(RemindersContract.Columns.VERSION,
                 values.getAsInteger(RemindersContract.Columns.VERSION));
+        obj.put(RemindersContract.Columns.ACCOUNT,
+                values.getAsString(RemindersContract.Columns.ACCOUNT));
         obj.put(RemindersContract.Columns.PROTOCOL,
                 values.getAsInteger(RemindersContract.Columns.PROTOCOL));
         obj.put(RemindersContract.Columns.ALARM_TIMESTAMP,
@@ -278,6 +280,7 @@ public class ReminderUtils
         values.put(RemindersContract.Columns.COLOR, entry.getColor());
         values.put(RemindersContract.Columns.VERSION, entry.getVersion());
         values.put(RemindersContract.Columns.PID, entry.getPid());
+        values.put(RemindersContract.Columns.ACCOUNT, entry.getAccount());
         return values;
     }
 
@@ -366,6 +369,7 @@ public class ReminderUtils
                 cursor.getInt(RemindersContract.Indexes.COLOR),
                 cursor.getInt(RemindersContract.Indexes.VERSION));
         entry.setPid(cursor.getString(RemindersContract.Indexes.PID));
+        entry.setAccount(cursor.getString(RemindersContract.Indexes.ACCOUNT));
         cursor.close();
         return entry;
     }

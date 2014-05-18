@@ -12,12 +12,15 @@ import android.os.Build;
 import android.provider.ContactsContract;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.widget.Toast;
 
 import com.ch3d.xreminderx.activity.ReminderDetailsActivity;
 import com.ch3d.xreminderx.adapter.RemindersAdapter;
 import com.ch3d.xreminderx.adapter.RemindersAdapter.ViewHolder;
+import com.ch3d.xreminderx.app.ReminderApplication;
 import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.provider.RemindersProvider;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 public class ActivityUtils
 {
@@ -68,6 +71,10 @@ public class ActivityUtils
         }
     }
 
+    public static GoogleApiClient getGoogleApi(final Context context) {
+        return ((ReminderApplication) context.getApplicationContext()).getGoogleApi();
+    }
+
     public static boolean isJeallyBean()
     {
         return Build.VERSION.SDK_INT >= 16;
@@ -76,6 +83,22 @@ public class ActivityUtils
     public static boolean isJeallyBeanMR1()
     {
         return Build.VERSION.SDK_INT >= 17;
+    }
+
+    public static void showToastLong(final Context context, final int resId) {
+        Toast.makeText(context, resId, Toast.LENGTH_LONG).show();
+    }
+
+    public static void showToastLong(final Context context, final String text) {
+        Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+    }
+
+    public static void showToastShort(final Context context, final int resId) {
+        Toast.makeText(context, resId, Toast.LENGTH_SHORT).show();
+    }
+
+    public static void showToastShort(final Context context, final String text) {
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
 
     public static void startDetailsActivity(final Context context, final View v, final int position)

@@ -28,7 +28,6 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
-import android.widget.Toast;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -44,6 +43,7 @@ import com.ch3d.xreminderx.model.ReminderColor;
 import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.provider.RemindersContract;
 import com.ch3d.xreminderx.provider.RemindersProvider;
+import com.ch3d.xreminderx.utils.ActivityUtils;
 import com.ch3d.xreminderx.utils.ContactBadgeHolder;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 import com.ch3d.xreminderx.utils.StringUtils;
@@ -54,13 +54,13 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
         OnReminderDateSetListener,
         OnReminderTimeSetListener
 {
-    private static final String REMINDER_FRAGMENT_DATA          = "ReminderEditFragment.data";
+    private static final String REMINDER_FRAGMENT_DATA = "ReminderEditFragment.data";
 
-    public static final String  TAG                             = "ReminderEdit";
+    public static final String TAG = "ReminderEdit";
 
-    private static final int    REQUEST_CODE_SPEECH_RECOGNITION = 1;
+    private static final int REQUEST_CODE_SPEECH_RECOGNITION = 1;
 
-    public static final int     REQUEST_CODE_GET_CONTACT        = 2;
+    public static final int REQUEST_CODE_GET_CONTACT = 2;
 
     /**
      * @param data array of data
@@ -83,8 +83,8 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
     }
 
     public static ReminderEditFragment newInstance(final Uri data) {
-        ReminderEditFragment fragment = new ReminderEditFragment();
-        Bundle bundle = new Bundle();
+        final ReminderEditFragment fragment = new ReminderEditFragment();
+        final Bundle bundle = new Bundle();
         bundle.putString(REMINDER_FRAGMENT_DATA, data.toString());
         fragment.setArguments(bundle);
         return fragment;
@@ -94,34 +94,34 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
     protected FloatLabeledEditText mText;
 
     @InjectView(R.f_reminder_edit.btnTsDatePicker)
-    protected Button               mBtnDatePicker;
+    protected Button mBtnDatePicker;
 
     @InjectView(R.f_reminder_edit.btnTsTimePicker)
-    protected Button               mBtnTimePicker;
+    protected Button mBtnTimePicker;
 
     @InjectView(R.f_reminder_edit.btnTsAlarmDatePicker)
-    protected Button               mBtnAlarmDatePicker;
+    protected Button mBtnAlarmDatePicker;
 
     @InjectView(R.f_reminder_edit.btnTsAlarmTimePicker)
-    protected Button               mBtnAlarmTimePicker;
+    protected Button mBtnAlarmTimePicker;
 
-    protected ReminderEntry        mReminder;
+    protected ReminderEntry mReminder;
 
-    private ContactBadgeHolder     mContactBadgeHolder;
+    private ContactBadgeHolder mContactBadgeHolder;
 
     @InjectView(R.f_reminder_edit.btnStartSpeech)
-    protected Button               btnSpeech;
+    protected Button btnSpeech;
 
     @InjectView(R.f_reminder_edit.cbOngoing)
-    protected CheckBox             mOngoing;
+    protected CheckBox mOngoing;
 
     @InjectView(R.f_reminder_edit.cbSilent)
-    protected CheckBox             mSilent;
+    protected CheckBox mSilent;
 
     @InjectView(R.f_reminder_edit.color)
-    protected Spinner              mColor;
+    protected Spinner mColor;
 
-    private ColorsAdapter          mColorsAdapter;
+    private ColorsAdapter mColorsAdapter;
 
     protected boolean checkValid()
     {
@@ -134,9 +134,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
         }
         if (mReminder.getAlarmTimestamp() > mReminder.getTimestamp())
         {
-            Toast.makeText(getActivity(),
-                    "Alarm time can't be after Event time", Toast.LENGTH_SHORT)
-                    .show();
+            ActivityUtils.showToastShort(getActivity(), "Alarm time can't be after Event time");
             return false;
         }
         return true;
@@ -314,7 +312,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
                 mReminder.setText(mText.getText().toString());
                 mReminder.setOngoing(mOngoing.isChecked());
                 mReminder.setSilent(mSilent.isChecked());
-                ReminderColor color = (ReminderColor) mColor.getSelectedItem();
+                final ReminderColor color = (ReminderColor) mColor.getSelectedItem();
                 mReminder.setColor(color.getColor());
 
                 RemindersProvider.updateReminder(getActivity(), mReminder, true);
@@ -382,7 +380,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
             public void onItemSelected(final AdapterView<?> arg0, final View arg1, final int pos,
                     final long arg3)
             {
-                ReminderColor color = (ReminderColor) mColor.getItemAtPosition(pos);
+                final ReminderColor color = (ReminderColor) mColor.getItemAtPosition(pos);
                 mReminder.setColor(color.getColor());
             }
 

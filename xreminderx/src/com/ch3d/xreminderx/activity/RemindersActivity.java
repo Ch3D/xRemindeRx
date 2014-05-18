@@ -9,6 +9,7 @@ import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.IntentSender.SendIntentException;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.nfc.NdefMessage;
@@ -30,10 +31,12 @@ import com.ch3d.xreminderx.app.BaseFragmentActivity;
 import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.model.ReminderFactory;
 import com.ch3d.xreminderx.provider.RemindersProvider;
+import com.ch3d.xreminderx.utils.ActivityUtils;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 import com.ch3d.xreminderx.utils.StringUtils;
 import com.ch3d.xreminderx.utils.ViewUtils;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
@@ -47,6 +50,8 @@ public class RemindersActivity extends BaseFragmentActivity implements
 {
     private static final int REQUEST_CODE_LOGIN = 0x01;
 
+    private static final int REQUEST_CODE_SIGN_IN = 0x02;
+
     @InjectView(android.R.id.edit)
     protected FloatLabeledEditText mEditQuickText;
 
@@ -56,7 +61,13 @@ public class RemindersActivity extends BaseFragmentActivity implements
     @Inject
     Lazy<SearchManager> searchManager;
 
-    private GoogleApiClient mPlusClient;
+    private GoogleApiClient mGoogleApi;
+
+    private ConnectionResult mConnectionResult;
+
+    private boolean mSignInSelected;
+
+    private boolean mIntentInProgress;
 
     private NdefMessage[] getNdefMessages(final Intent intent)
     {
@@ -76,8 +87,12 @@ public class RemindersActivity extends BaseFragmentActivity implements
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        if ((requestCode == REQUEST_CODE_LOGIN) && (resultCode == RESULT_OK)) {
-            mPlusClient.connect();
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_CODE_LOGIN) {
+                mGoogleApi.connect();
+            } else if (requestCode == REQUEST_CODE_SIGN_IN) {
+                mGoogleApi.connect();
+            }
         }
     }
 
@@ -102,18 +117,40 @@ public class RemindersActivity extends BaseFragmentActivity implements
     }
 
     @Override
-    public void onConnected(final Bundle arg0) {
+    public void onConnected(final Bundle bundle) {
+        invalidateOptionsMenu();
 
+        if (mIntentInProgress) {
+            // TODO: Ask to sync reminders into the cloud
+        }
+
+        mSignInSelected = false;
+        mIntentInProgress = false;
+        ActivityUtils.showToastShort(this,
+                "Signed in as " + Plus.AccountApi.getAccountName(mGoogleApi));
     }
 
     @Override
-    public void onConnectionFailed(final ConnectionResult arg0) {
+    public void onConnectionFailed(final ConnectionResult result) {
+        mConnectionResult = result;
+        invalidateOptionsMenu();
 
+        if (!result.hasResolution()) {
+            GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), this,
+                    0).show();
+        }
+        if (mIntentInProgress) {
+            mSignInSelected = false;
+        }
+        if (mSignInSelected) {
+            resolveSignInError();
+        }
     }
 
     @Override
     public void onConnectionSuspended(final int arg0) {
-
+        mSignInSelected = false;
+        invalidateOptionsMenu();
     }
 
     @Override
@@ -121,11 +158,10 @@ public class RemindersActivity extends BaseFragmentActivity implements
     {
         super.onCreate(savedInstanceState);
 
-        mPlusClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this).addApi(Plus.API, null)
-                .addScope(Plus.SCOPE_PLUS_LOGIN).addScope(Plus.SCOPE_PLUS_PROFILE).build();
-        mPlusClient.connect();
+        mGoogleApi = ActivityUtils.getGoogleApi(this);
+        mGoogleApi.registerConnectionCallbacks(this);
+        mGoogleApi.registerConnectionFailedListener(this);
+        mGoogleApi.connect();
 
         // getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.x_reminders);
@@ -171,13 +207,16 @@ public class RemindersActivity extends BaseFragmentActivity implements
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         if (item.getItemId() == R.menu.action_gplus_signin) {
-            startActivityForResult(new Intent(this, GooglePlusSignInActivity.class),
-                    REQUEST_CODE_LOGIN);
+            mSignInSelected = true;
+            mGoogleApi.connect();
+            // startActivityForResult(new Intent(this,
+            // GooglePlusSignInActivity.class),
+            // REQUEST_CODE_LOGIN);
             return true;
         } else if (item.getItemId() == R.menu.action_gplus_signout) {
-            Plus.AccountApi.revokeAccessAndDisconnect(mPlusClient);
-            mPlusClient.disconnect();
-            mPlusClient.connect();
+            Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApi);
+            mGoogleApi.disconnect();
+            mGoogleApi.connect();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -185,7 +224,8 @@ public class RemindersActivity extends BaseFragmentActivity implements
 
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
-        final boolean connected = mPlusClient.isConnected();
+        mGoogleApi.connect();
+        final boolean connected = mGoogleApi.isConnected();
         menu.findItem(R.menu.action_gplus_signin).setVisible(!connected);
         menu.findItem(R.menu.action_gplus_signout).setVisible(connected);
         return true;
@@ -255,6 +295,18 @@ public class RemindersActivity extends BaseFragmentActivity implements
         {
             final NdefMessage[] msgs = getNdefMessages(intent);
             parseNdefMessages(msgs);
+        }
+    }
+
+    private void resolveSignInError() {
+        if ((mConnectionResult != null) && mConnectionResult.hasResolution()) {
+            try {
+                mIntentInProgress = true;
+                mConnectionResult.startResolutionForResult(this, REQUEST_CODE_SIGN_IN);
+            } catch (final SendIntentException e) {
+                mIntentInProgress = false;
+                mGoogleApi.connect();
+            }
         }
     }
 }

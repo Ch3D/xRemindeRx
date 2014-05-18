@@ -60,6 +60,7 @@ public class ReminderFactory
         reminder.setTimestamp(ts);
         reminder.setContactUri(Uri.EMPTY);
         reminder.setText(StringUtils.EMPTY_STRING);
+        reminder.setAccount(StringUtils.EMPTY_STRING);
         reminder.setType(ReminderType.SIMPLE);
         return reminder;
     }

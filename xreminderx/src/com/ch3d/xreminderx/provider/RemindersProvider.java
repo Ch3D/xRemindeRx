@@ -13,8 +13,11 @@ import android.net.Uri;
 
 import com.ch3d.xreminderx.app.ReminderApplication;
 import com.ch3d.xreminderx.model.ReminderEntry;
+import com.ch3d.xreminderx.utils.ActivityUtils;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 import com.ch3d.xreminderx.utils.StringUtils;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.plus.Plus;
 
 import dagger.Lazy;
 
@@ -92,6 +95,11 @@ public class RemindersProvider extends ContentProvider
         return result;
     }
 
+    private void addAccount(final ContentValues values) {
+        values.put(RemindersContract.Columns.ACCOUNT,
+                Plus.AccountApi.getAccountName(getGoogleApi()));
+    }
+
     @Override
     public int delete(final Uri uri, final String selection, final String[] selectionArgs)
     {
@@ -107,12 +115,16 @@ public class RemindersProvider extends ContentProvider
             } else {
                 rowsAffected = mDbHelper.deleteReminder(selection, selectionArgs);
             }
-            if (rowsAffected > 0)
+            if ((rowsAffected > 0) && reminder.hasAccountOrRemoteId() && isGoogleApiConnected())
             {
                 mRemoteProvider.get().deleteRemote(reminder);
             }
         }
         return rowsAffected;
+    }
+
+    private GoogleApiClient getGoogleApi() {
+        return ActivityUtils.getGoogleApi(getContext());
     }
 
     @Override
@@ -126,11 +138,16 @@ public class RemindersProvider extends ContentProvider
     {
         final long id = mDbHelper.getWritableDatabase().insert(PATH_REMINDERS,
                 StringUtils.EMPTY_STRING, values);
-        if (id > 0)
+        if ((id > 0) && isGoogleApiConnected())
         {
+            addAccount(values);
             mRemoteProvider.get().insertRemote(getContext(), id, uri, values);
         }
         return ContentUris.withAppendedId(REMINDERS_URI, id);
+    }
+
+    private boolean isGoogleApiConnected() {
+        return getGoogleApi().isConnected();
     }
 
     @Override
@@ -170,8 +187,11 @@ public class RemindersProvider extends ContentProvider
             final String[] selectionArgs)
     {
         final int rowsAffected = mDbHelper.updateReminder(uri, values, selection, selectionArgs);
-        if ((rowsAffected > 0)/* && !skip */)
+        if ((rowsAffected > 0) && isGoogleApiConnected()
+                && values.containsKey(RemindersContract.Columns.PID)
+                && !StringUtils.isBlank(values.getAsString(RemindersContract.Columns.PID)))
         {
+            addAccount(values);
             mRemoteProvider.get().updateRemote(uri, values);
         }
         return rowsAffected;
