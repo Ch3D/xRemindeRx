@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:float="http://schemas.android.com/apk/res-auto"
     android:id="@+x_reminders/root"
     android:layout_width="match_parent"
@@ -10,7 +10,7 @@
    	<LinearLayout
    	    android:id="@+x_reminders/panel_bottom"
    	    android:background="#77000000" 
-   	    android:layout_gravity="bottom"
+   	    android:layout_alignParentBottom="true"
    	    android:layout_width="match_parent"
    	    android:layout_height="48dp">
 		<com.wrapp.floatlabelededittext.FloatLabeledEditText 
@@ -29,6 +29,7 @@
 		    style="@android:style/Widget.Holo.Button.Borderless"
 		    android:layout_width="wrap_content"
 		    android:layout_height="match_parent"
-		    android:src="@drawable/ic_done"/>
+		    android:src="@drawable/ic_done" 
+		    android:contentDescription="@string/descr_add_reminder_button" />
    	</LinearLayout>
-</FrameLayout>
+</RelativeLayout>

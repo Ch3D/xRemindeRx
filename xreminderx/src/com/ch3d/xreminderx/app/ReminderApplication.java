@@ -13,7 +13,6 @@ import com.ch3d.xreminderx.module.ParseCloudModule;
 import com.ch3d.xreminderx.module.ServiceModule;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
-import com.parse.Parse;
 
 import dagger.ObjectGraph;
 
@@ -43,8 +42,8 @@ public class ReminderApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Parse.initialize(this, "64LrLB3jNDJQq8sSApLLHUWbjv2wmiACyemSLfN3",
-                "u1rLwcDJzwZuNYa06M0ODtsMqmNbYU9MPKwnjG3E");
+        // Parse.initialize(this, "64LrLB3jNDJQq8sSApLLHUWbjv2wmiACyemSLfN3",
+        // "u1rLwcDJzwZuNYa06M0ODtsMqmNbYU9MPKwnjG3E");
 
         mPlusClient = new GoogleApiClient.Builder(this).addApi(Plus.API, null)
                 .addScope(Plus.SCOPE_PLUS_LOGIN).addScope(Plus.SCOPE_PLUS_PROFILE).build();

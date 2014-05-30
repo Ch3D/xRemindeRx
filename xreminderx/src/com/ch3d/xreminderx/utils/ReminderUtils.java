@@ -50,7 +50,6 @@ import com.parse.ParseObject;
  */
 public class ReminderUtils
 {
-
     private static final String NDEF_TYPE_REMINDER = "com.ch3d.xreminderx/reminder";
 
     public static final int FORMAT_TIME = DateUtils.FORMAT_SHOW_TIME;
@@ -454,8 +453,7 @@ public class ReminderUtils
                 intent);
     }
 
-    public static String sha1Hash(final String toHash)
-    {
+    public static String sha1Hash(final String toHash) {
         String hash = null;
         try
         {
@@ -466,11 +464,9 @@ public class ReminderUtils
 
             // This is ~55x faster than looping and String.formating()
             hash = bytesToHex(bytes);
-        } catch (final NoSuchAlgorithmException e)
-        {
+        } catch (final NoSuchAlgorithmException e) {
             e.printStackTrace();
-        } catch (final UnsupportedEncodingException e)
-        {
+        } catch (final UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         return hash;

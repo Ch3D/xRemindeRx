@@ -25,22 +25,24 @@ public class ReminderDetailsActivity extends BaseFragmentActivity
         return intent;
     }
 
-    public static Intent newIntent(final Context c, final String action, final int flags, Uri data) {
+    public static Intent newIntent(final Context c, final String action, final int flags,
+            final Uri data) {
         final Intent intent = newIntent(c, action, data);
         intent.addFlags(flags);
         return intent;
     }
 
-    public static Intent newIntent(final Context c, final String action, Uri data) {
+    public static Intent newIntent(final Context c, final String action, final Uri data) {
         final Intent intent = newIntent(c, action);
         intent.setData(data);
         return intent;
     }
 
     private void applyColorTheme() {
-        ReminderEntry reminder = getReminder();
-        setTheme(reminder != null ? ReminderUtils.getReminderTheme(this, reminder.getColor())
-                : R.style.Theme_XRX_Green);
+        final ReminderEntry reminder = getReminder();
+        // setTheme(reminder != null ? ReminderUtils.getReminderTheme(this,
+        // reminder.getColor())
+        // : R.style.Theme_XRX_Green);
     }
 
     @Override

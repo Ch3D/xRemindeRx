@@ -6,11 +6,15 @@ import android.graphics.Color;
 import com.ch3d.xreminderx.R;
 
 public enum ReminderColor {
-    LIGHT_GREEN("#9acc5b", R.drawable.bg_xrx_green_normal, R.style.Theme_XRX_Green),
-    LIGHT_BLUE("#4dbce8", R.drawable.bg_xrx_blue_normal, R.style.Theme_XRX_Blue);
+    // LIGHT_GREEN("#9acc5b", R.drawable.bg_xrx_green_normal,
+    // R.style.Theme_XRX_Green),
+    // LIGHT_BLUE("#4dbce8", R.drawable.bg_xrx_blue_normal,
+    // R.style.Theme_XRX_Blue);
+    LIGHT_GREEN("#9acc5b", R.drawable.ab_bottom_light_simple_new, R.style.AppBaseTheme),
+    LIGHT_BLUE("#4dbce8", R.drawable.ab_bottom_light_simple_new, R.style.AppBaseTheme);
 
-    private static ReminderColor getReminderColor(int color) {
-        ReminderColor[] v = values();
+    private static ReminderColor getReminderColor(final int color) {
+        final ReminderColor[] v = values();
         for (int i = 0; i < v.length; i++) {
             if (v[i].color == color) {
                 return v[i];
@@ -24,15 +28,15 @@ public enum ReminderColor {
         if (rc != null) {
             return rc.resId;
         }
-        return R.drawable.bg_xrx_green_normal;
+        return R.drawable.ab_bottom_light_simple;
     }
 
-    public static int getThemeId(int color) {
+    public static int getThemeId(final int color) {
         final ReminderColor rc = getReminderColor(color);
         if (rc != null) {
             return rc.theme;
         }
-        return R.style.Theme_XRX_Green;
+        return R.style.AppBaseTheme;
     }
 
     private final int color;

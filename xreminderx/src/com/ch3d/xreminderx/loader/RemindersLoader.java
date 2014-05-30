@@ -1,3 +1,4 @@
+
 package com.ch3d.xreminderx.loader;
 
 import android.content.ContentResolver;
@@ -12,23 +13,26 @@ import com.ch3d.xreminderx.provider.RemindersProvider;
 
 public class RemindersLoader extends CursorLoader
 {
-	private final int	mTag;
+    public static String EXTRA_ACCOUNT = "com.ch3d.xreminderx.loader.reminder.extra_account";
 
-	public RemindersLoader(final Context context, final Bundle bundle)
-	{
-		super(context);
-		// mTag = bundle.getInt(RemindersListFragment.TAG, RemindersListFragment.TAG_TODAY);
-		mTag = RemindersListFragment.TAG_ALL;
-	}
+    private final int mTag;
 
-	@Override
-	public Cursor loadInBackground()
-	{
-		final Uri uri = Uri.parse(RemindersProvider.REMINDERS_URI
-				+ ((mTag == RemindersListFragment.TAG_TODAY) ? "/today" : "/all"));
-		final ContentResolver contentResolver = getContext().getContentResolver();
+    public RemindersLoader(final Context context, final Bundle bundle)
+    {
+        super(context);
+        // mTag = bundle.getInt(RemindersListFragment.TAG,
+        // RemindersListFragment.TAG_TODAY);
+        mTag = RemindersListFragment.TAG_ALL;
+    }
 
-		final Cursor cursor = contentResolver.query(uri, null, null, null, null);
-		return cursor;
-	}
+    @Override
+    public Cursor loadInBackground()
+    {
+        final Uri uri = Uri.parse(RemindersProvider.REMINDERS_URI
+                + ((mTag == RemindersListFragment.TAG_TODAY) ? "/today" : "/all"));
+        final ContentResolver contentResolver = getContext().getContentResolver();
+
+        final Cursor cursor = contentResolver.query(uri, null, null, null, null);
+        return cursor;
+    }
 }

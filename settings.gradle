@@ -1,1 +1,1 @@
-include ':xreminderx',':libraries:floatlabel',':libraries:xreminderx.theming'
+include ':xreminderx',':libraries:floatlabel'/*,':libraries:xreminderx.theming'*/

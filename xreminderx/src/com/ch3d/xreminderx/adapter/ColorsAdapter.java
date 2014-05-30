@@ -12,17 +12,16 @@ import com.ch3d.xreminderx.model.ReminderColor;
 
 public class ColorsAdapter extends BaseAdapter
 {
-    private final Context         mContext;
+    private final Context mContext;
 
     private final ReminderColor[] mColors;
 
-    private final LayoutInflater  mInflater;
+    private final LayoutInflater mInflater;
 
     public ColorsAdapter(final Context context)
     {
         mContext = context;
         mColors = ReminderColor.values();
-
         mInflater = LayoutInflater.from(mContext);
     }
 

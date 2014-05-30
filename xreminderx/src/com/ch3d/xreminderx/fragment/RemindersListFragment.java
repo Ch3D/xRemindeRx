@@ -1,7 +1,10 @@
 
 package com.ch3d.xreminderx.fragment;
 
-import android.animation.LayoutTransition;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
@@ -17,9 +20,9 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
-import android.util.SparseArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,6 +30,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.CheckBox;
@@ -45,7 +50,8 @@ import com.ch3d.xreminderx.utils.ActivityUtils;
 import com.ch3d.xreminderx.utils.PreferenceHelper;
 import com.ch3d.xreminderx.utils.ReminderIntent;
 import com.ch3d.xreminderx.utils.ReminderUtils;
-import com.ch3d.xreminderx.utils.ViewUtils;
+import com.ch3d.xreminderx.view.ListViewObserveHelper;
+import com.ch3d.xreminderx.view.ListViewObserveHelper.Callback;
 import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener;
 import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener.DismissCallbacks;
 
@@ -126,8 +132,34 @@ public class RemindersListFragment extends ListFragment implements
 
     private SwipeRefreshLayout mSwipeLayout;
 
+    private ListView mListView;
+
+    protected boolean mVisibile = true;
+
     public RemindersListFragment()
     {
+    }
+
+    private View getContainerBottom() {
+        return getActivity().findViewById(R.x_reminders.panel_bottom);
+    }
+
+    private void hideContainerBottom() {
+        if (!mVisibile) {
+            return;
+        }
+        mVisibile = false;
+        final View containerBottom = getContainerBottom();
+        final ViewPropertyAnimator animation = containerBottom.animate()
+                .setInterpolator(new AccelerateInterpolator()).setDuration(350)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(final Animator animation) {
+                        getActivity().getActionBar().hide();
+                    }
+                });
+        animation.y(containerBottom.getY() + containerBottom.getHeight()
+                + getActivity().getActionBar().getHeight());
     }
 
     @Override
@@ -154,6 +186,25 @@ public class RemindersListFragment extends ListFragment implements
         loaderManager.initLoader(0, getArguments(), this);
         mAdapter = new RemindersAdapter(getActivity(), null, true);
 
+        mListView = (ListView) view.findViewById(android.R.id.list);
+        ListViewObserveHelper.attach(mListView, new Callback() {
+            @Override
+            public void onStateChanged(final int state) {
+                switch (state) {
+                    case Callback.STATE_VISIBLE:
+                        showContainerBottom();
+                        break;
+
+                    case Callback.STATE_INVISIBLE:
+                        hideContainerBottom();
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+        });
         return view;
     }
 
@@ -215,19 +266,13 @@ public class RemindersListFragment extends ListFragment implements
                 return true;
 
             case R.menu.action_remove:
-                final SparseArray<Boolean> mChecked = mAdapter.getCheckedItems();
-                final int size = mChecked.size();
+                final int[] mChecked = mAdapter.getCheckedItems();
+                final int size = mChecked.length;
                 for (int i = 0; i < size; i++)
                 {
-                    final int key = mChecked.keyAt(i);
-                    final Object obj = mChecked.get(key);
-                    if ((obj instanceof Boolean) && (Boolean) obj)
-                    {
-                        final View view = getListView().getChildAt(key);
-                        final ViewHolder tag = (ViewHolder) view.getTag();
-                        final long idLong = tag.id;
-                        mAdapter.removeReminder(view, (int) idLong);
-                    }
+                    final View view = getListView().getChildAt(mChecked[i]);
+                    final ViewHolder tag = (ViewHolder) view.getTag();
+                    removeReminder(view, (int) tag.id);
                 }
                 mAdapter.uncheckItems();
                 if (mActionMode != null)
@@ -259,7 +304,8 @@ public class RemindersListFragment extends ListFragment implements
         super.onViewCreated(view, savedInstanceState);
         // setEmptyText(getActivity().getString(R.string.you_have_no_reminders));
         final ListView listView = getListView();
-        mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
+        mSwipeLayout = (SwipeRefreshLayout)
+                view.findViewById(R.id.swipe_container);
         mSwipeLayout.setColorScheme(android.R.color.holo_blue_light,
                 android.R.color.holo_green_light, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
@@ -270,15 +316,11 @@ public class RemindersListFragment extends ListFragment implements
             }
         });
 
-        // listView.setDivider(new ColorDrawable(Color.TRANSPARENT));
-        listView.setLayoutTransition(new LayoutTransition());
         listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         listView.setMultiChoiceModeListener(mActionModeCallback);
         listView.setFooterDividersEnabled(false);
-        final int margin = ViewUtils.dipToPixels(getActivity(), 16);
-        listView.setPadding(margin, 0, margin, 0);
-        listView.addFooterView(View.inflate(getActivity(),
-                R.layout.footer_reminders, null), null, false);
+        // listView.addFooterView(View.inflate(getActivity(),
+        // R.layout.footer_reminders, null), null, false);
 
         mSwipeListener = new SwipeDismissListViewTouchListener(
                 listView, new DismissCallbacks() {
@@ -317,6 +359,32 @@ public class RemindersListFragment extends ListFragment implements
                 mSwipeLayout.setRefreshing(true);
             };
         }.execute();
+    }
+
+    public void removeReminder(final View convertView, final int id) {
+        final PropertyValuesHolder[] arrayOfPropertyValuesHolder = new PropertyValuesHolder[2];
+        arrayOfPropertyValuesHolder[0] = PropertyValuesHolder.ofFloat(View.X, 800);
+        arrayOfPropertyValuesHolder[1] = PropertyValuesHolder.ofFloat(View.ALPHA, 0);
+
+        final ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(convertView,
+                arrayOfPropertyValuesHolder);
+        anim.setDuration(300);
+        ViewCompat.setHasTransientState(convertView, true);
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(final Animator animation) {
+                ReminderUtils.deleteReminder(convertView.getContext(), id);
+                convertView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        convertView.setX(0);
+                        convertView.setAlpha(1);
+                        ViewCompat.setHasTransientState(convertView, false);
+                    }
+                });
+            }
+        });
+        anim.start();
     }
 
     private void removeReminders(
@@ -387,5 +455,28 @@ public class RemindersListFragment extends ListFragment implements
                 }
             }
         }
+    }
+
+    private void showContainerBottom() {
+        if (mVisibile) {
+            return;
+        }
+        mVisibile = true;
+        final View containerBottom = getContainerBottom();
+        final ViewPropertyAnimator animation = containerBottom.animate()
+                .setInterpolator(new AccelerateInterpolator()).setDuration(350)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(final Animator animation) {
+                        containerBottom.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                getActivity().getActionBar().show();
+                            }
+                        }, 350);
+                    }
+                });
+        animation.y(containerBottom.getY() - containerBottom.getHeight()
+                - getActivity().getActionBar().getHeight());
     }
 }

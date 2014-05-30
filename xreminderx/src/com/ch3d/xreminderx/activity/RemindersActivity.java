@@ -48,8 +48,6 @@ import dagger.Lazy;
 public class RemindersActivity extends BaseFragmentActivity implements
         android.view.View.OnClickListener, ConnectionCallbacks, OnConnectionFailedListener
 {
-    private static final int REQUEST_CODE_LOGIN = 0x01;
-
     private static final int REQUEST_CODE_SIGN_IN = 0x02;
 
     @InjectView(android.R.id.edit)
@@ -87,12 +85,8 @@ public class RemindersActivity extends BaseFragmentActivity implements
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_CODE_LOGIN) {
-                mGoogleApi.connect();
-            } else if (requestCode == REQUEST_CODE_SIGN_IN) {
-                mGoogleApi.connect();
-            }
+        if ((resultCode == RESULT_OK) && (requestCode == REQUEST_CODE_SIGN_IN)) {
+            mGoogleApi.connect();
         }
     }
 
@@ -126,6 +120,7 @@ public class RemindersActivity extends BaseFragmentActivity implements
 
         mSignInSelected = false;
         mIntentInProgress = false;
+        mConnectionResult = new ConnectionResult(ConnectionResult.SUCCESS, null);
         ActivityUtils.showToastShort(this,
                 "Signed in as " + Plus.AccountApi.getAccountName(mGoogleApi));
     }
@@ -209,9 +204,6 @@ public class RemindersActivity extends BaseFragmentActivity implements
         if (item.getItemId() == R.menu.action_gplus_signin) {
             mSignInSelected = true;
             mGoogleApi.connect();
-            // startActivityForResult(new Intent(this,
-            // GooglePlusSignInActivity.class),
-            // REQUEST_CODE_LOGIN);
             return true;
         } else if (item.getItemId() == R.menu.action_gplus_signout) {
             Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApi);
@@ -224,7 +216,10 @@ public class RemindersActivity extends BaseFragmentActivity implements
 
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
-        mGoogleApi.connect();
+        if ((mConnectionResult != null) && mConnectionResult.isSuccess()) {
+            mGoogleApi.connect();
+            mConnectionResult = null;
+        }
         final boolean connected = mGoogleApi.isConnected();
         menu.findItem(R.menu.action_gplus_signin).setVisible(!connected);
         menu.findItem(R.menu.action_gplus_signout).setVisible(connected);
