@@ -35,3 +35,8 @@ a.out
 build
 gradle.properties
 xreminderx-release-key.keystore
+
+#idea & android-studio
+.idea
+*.iml
+build/

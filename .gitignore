@@ -31,3 +31,8 @@ local.properties
 
 #gradle
 .gradle
+
+#idea & android-studio
+.idea
+*.iml
+build/

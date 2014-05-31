@@ -6,24 +6,20 @@ buildscript {
 		maven { url 'http://repo1.maven.org/maven2' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.7.+'
+        classpath 'com.android.tools.build:gradle:0.10.+'
     }
 }
 
 apply plugin: 'android-library'
 
-/*dependencies {
-  compile 'com.nineoldandroids:library:2.4.0'
-}*/
-
-    repositories {
-        mavenCentral()
-    }
+repositories {
+    mavenCentral()
+}
 
 
 android {
   compileSdkVersion 14
-  buildToolsVersion '19.0.1'
+  buildToolsVersion '19'
 
   sourceSets {
     main {

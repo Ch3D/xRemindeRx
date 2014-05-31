@@ -38,3 +38,8 @@ xreminderx-release-key.keystore
 libraries/xreminderx.theming/build/
 libraries/xreminderx.theming/bin
 libraries/xreminderx.theming/.gradle/1.9/
+
+#idea & android-studio
+.idea
+*.iml
+build/
