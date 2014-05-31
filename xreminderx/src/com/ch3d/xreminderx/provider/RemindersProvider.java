@@ -11,6 +11,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.ch3d.xreminderx.BuildConfig;
 import com.ch3d.xreminderx.app.ReminderApplication;
 import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.utils.ActivityUtils;
@@ -27,7 +28,7 @@ public class RemindersProvider extends ContentProvider
 
     private static final String PATH_SEARCH = "search";
 
-    private static final String AUTHORITY = "com.ch3d.xreminderx.provider";
+    private static final String AUTHORITY = BuildConfig.PROVIDER_AUTHORITY;
 
     public static final Uri URI = Uri.parse("content://" + AUTHORITY);
 

@@ -37,10 +37,14 @@ android {
 
 	buildTypes {
 		debug {
-			packageNameSuffix ".debug"			
+			packageNameSuffix ".debug"
+            buildConfigField "String", "PROVIDER_AUTHORITY", "\"com.ch3d.xreminderx.debug.provider\""
 		}
-	}
 
+        release {
+            buildConfigField "String", "PROVIDER_AUTHORITY", "\"com.ch3d.xreminderx.provider\""
+        }
+	}
 
 	/* disable lint error */
 	lintOptions {
@@ -100,8 +104,6 @@ android {
 		// testing
 		testPackageName "com.ch3d.xreminderx.tests"
 		testInstrumentationRunner "android.test.InstrumentationTestRunner"
-		// testHandlingProfiling true
-		// testFunctionalTest true
     }
 
 	testOptions {
@@ -109,13 +111,16 @@ android {
     }
 
 	android.applicationVariants.all { variant ->
+        def ver = null
 		def manifestParser = new DefaultManifestParser()
-		def ver = manifestParser.getVersionName(android.sourceSets.main.manifest.srcFile)
+        if (buildType == "debug") {
+    		ver = manifestParser.getVersionName(android.sourceSets.debug.manifest.srcFile)
+        } else {
+            ver = manifestParser.getVersionName(android.sourceSets.release.manifest.srcFile)
+        }
 
 		apk = variant.packageApplication.outputFile;
-
 		newName = apk.name.replace(".apk", "-v" + ver + ".apk");
-
 		variant.packageApplication.outputFile = new File(apk.parentFile, newName);
 		if (variant.zipAlign) {
 			variant.zipAlign.outputFile = new File(apk.parentFile, newName.replace("-unaligned", ""));
@@ -125,11 +130,25 @@ android {
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
+        }
+
+        release {
+            manifest.srcFile 'src/release/AndroidManifest.xml'
             java.srcDirs = ['src']
             resources.srcDirs = ['src']
             aidl.srcDirs = ['src']
             renderscript.srcDirs = ['src']
-            res.srcDirs = ['res']
+            res.srcDirs = ['res','src/release/res']
+            assets.srcDirs = ['assets']
+        }
+
+        debug {
+            manifest.srcFile 'src/debug/AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res','src/debug/res']
             assets.srcDirs = ['assets']
         }
 
