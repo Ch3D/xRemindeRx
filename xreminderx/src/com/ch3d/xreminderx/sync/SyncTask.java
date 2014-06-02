@@ -11,7 +11,6 @@ public abstract class SyncTask<T> extends AsyncTask<Void, Integer, T> {
 	private RemoteSynchronizer.Callback<T> mCallback;
 
 	SyncTask(RemoteSynchronizer synchronizer, RemoteSynchronizer.Callback<T> callback) {
-
 		mSynchronizer = synchronizer;
 		mCallback = callback;
 	}

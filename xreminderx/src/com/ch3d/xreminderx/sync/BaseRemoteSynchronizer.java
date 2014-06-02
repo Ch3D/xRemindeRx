@@ -22,5 +22,7 @@ public abstract class BaseRemoteSynchronizer implements RemoteSynchronizer<Void>
 		}.execute();
 	}
 
-	protected abstract void performSync();
+	protected void performSync() {
+		protocol.sync();
+	}
 }
