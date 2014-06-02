@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeightLarge">
     <TextView
-		android:id="@+x_reminder_item/text"
+		android:id="@+id/text"
       	android:ellipsize="end"
       	android:singleLine="true"
       	android:layout_weight="1"
@@ -17,7 +17,7 @@
       	android:layout_height="0dp"
       	android:textAppearance="?android:attr/textAppearanceLarge" />
   	<TextView
-      	android:id="@+x_reminder_item/date"
+      	android:id="@+id/date"
       	android:ellipsize="end"
       	android:singleLine="true"
       	android:layout_weight="1"

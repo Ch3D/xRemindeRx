@@ -29,8 +29,8 @@ public class ListViewObserveHelper implements OnScrollListener {
     public void onScroll(final AbsListView view, final int firstVisibleItem,
             final int visibleItemCount,
             final int totalItemCount) {
-        mCallback.onStateChanged(firstVisibleItem == 0 ? Callback.STATE_VISIBLE
-                : Callback.STATE_INVISIBLE);
+//        mCallback.onStateChanged(firstVisibleItem == 0 ? Callback.STATE_VISIBLE
+//                : Callback.STATE_INVISIBLE);
     }
 
     @Override

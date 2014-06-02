@@ -1,4 +1,3 @@
-
 package com.ch3d.xreminderx.fragment;
 
 import android.animation.Animator;
@@ -56,427 +55,387 @@ import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener;
 import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener.DismissCallbacks;
 
 public class RemindersListFragment extends ListFragment implements
-        LoaderCallbacks<Cursor>
-{
-    private ActionMode mActionMode;
+		LoaderCallbacks<Cursor> {
+	public static final String TAG = "tag_reminders";
+	public static final int TAG_TODAY = 0;
+	public static final int TAG_ALL = 1;
+	protected boolean mVisibile = true;
+	private ActionMode mActionMode;
+	private final MultiChoiceModeListener mActionModeCallback = new MultiChoiceModeListener() {
 
-    private final MultiChoiceModeListener mActionModeCallback = new MultiChoiceModeListener() {
+		@Override
+		public boolean onActionItemClicked(
+				final ActionMode mode,
+				final MenuItem item) {
+			return onOptionsItemSelected(item);
+		}
 
-        @Override
-        public boolean onActionItemClicked(
-                final ActionMode mode,
-                final MenuItem item)
-        {
-            return onOptionsItemSelected(item);
-        }
+		@Override
+		public boolean onCreateActionMode(
+				final ActionMode mode,
+				final Menu menu) {
+			mActionMode = mode;
+			final MenuInflater inflater = mode
+					.getMenuInflater();
+			inflater.inflate(
+					R.menu.reminders_list_contextual,
+					menu);
+			return true;
+		}
 
-        @Override
-        public boolean onCreateActionMode(
-                final ActionMode mode,
-                final Menu menu)
-        {
-            mActionMode = mode;
-            final MenuInflater inflater = mode
-                    .getMenuInflater();
-            inflater.inflate(
-                    R.menu.reminders_list_contextual,
-                    menu);
-            return true;
-        }
+		@Override
+		public void onDestroyActionMode(
+				final ActionMode mode) {
+			mAdapter.uncheckItems();
+			mActionMode = null;
+		}
 
-        @Override
-        public void onDestroyActionMode(
-                final ActionMode mode)
-        {
-            mAdapter.uncheckItems();
-            mActionMode = null;
-        }
+		@Override
+		public void onItemCheckedStateChanged(
+				final ActionMode mode,
+				final int position,
+				final long id,
+				final boolean checked) {
+			mAdapter.setChecked(
+					position,
+					checked);
+		}
 
-        @Override
-        public void onItemCheckedStateChanged(
-                final ActionMode mode,
-                final int position,
-                final long id,
-                final boolean checked)
-        {
-            mAdapter.setChecked(
-                    position,
-                    checked);
-        }
+		@Override
+		public boolean onPrepareActionMode(
+				final ActionMode mode,
+				final Menu menu) {
+			return false; // Return
+			// false
+			// if
+			// nothing
+			// is
+			// done
+		}
+	};
+	private RemindersAdapter mAdapter;
+	private SwipeDismissListViewTouchListener mSwipeListener;
+	private Handler mHandler;
+	private SwipeRefreshLayout mSwipeLayout;
+	private ListView mListView;
 
-        @Override
-        public boolean onPrepareActionMode(
-                final ActionMode mode,
-                final Menu menu)
-        {
-            return false; // Return
-            // false
-            // if
-            // nothing
-            // is
-            // done
-        }
-    };
+	public RemindersListFragment() {
+	}
 
-    public static final String TAG = "tag_reminders";
+	private View getContainerBottom() {
+		return getActivity().findViewById(R.x_reminders.panel_bottom);
+	}
 
-    public static final int TAG_TODAY = 0;
+	private void hideContainerBottom() {
+		if (!mVisibile) {
+			return;
+		}
+		mVisibile = false;
+		final View containerBottom = getContainerBottom();
+		final ViewPropertyAnimator animation = containerBottom.animate()
+				.setInterpolator(new AccelerateInterpolator()).setDuration(350)
+				.setListener(new AnimatorListenerAdapter() {
+					@Override
+					public void onAnimationEnd(final Animator animation) {
+						getActivity().getActionBar().hide();
+					}
+				});
+		animation.y(containerBottom.getY() + containerBottom.getHeight()
+				+ getActivity().getActionBar().getHeight());
+	}
 
-    public static final int TAG_ALL = 1;
+	@Override
+	public void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
 
-    private RemindersAdapter mAdapter;
+	@Override
+	public Loader<Cursor> onCreateLoader(final int arg0, final Bundle bundle) {
+		return new RemindersLoader(getActivity(), bundle);
+	}
 
-    private SwipeDismissListViewTouchListener mSwipeListener;
+	@Override
+	public View onCreateView(final LayoutInflater inflater,
+	                         final ViewGroup container, final Bundle savedInstanceState) {
+		final View view = inflater.inflate(R.layout.f_swipe_refresh_list, container, false);
 
-    private Handler mHandler;
+		mHandler = new Handler();
+		final LoaderManager loaderManager = getLoaderManager();
+		loaderManager.initLoader(0, getArguments(), this);
+		mAdapter = new RemindersAdapter(getActivity(), null, true);
 
-    private SwipeRefreshLayout mSwipeLayout;
+		mListView = (ListView) view.findViewById(android.R.id.list);
+		ListViewObserveHelper.attach(mListView, new Callback() {
+			@Override
+			public void onStateChanged(final int state) {
+				switch (state) {
+					case Callback.STATE_VISIBLE:
+						showContainerBottom();
+						break;
 
-    private ListView mListView;
+					case Callback.STATE_INVISIBLE:
+						hideContainerBottom();
+						break;
 
-    protected boolean mVisibile = true;
+					default:
+						break;
+				}
+			}
 
-    public RemindersListFragment()
-    {
-    }
+		});
+		return view;
+	}
 
-    private View getContainerBottom() {
-        return getActivity().findViewById(R.x_reminders.panel_bottom);
-    }
+	@Override
+	public void onListItemClick(final ListView l, final View v,
+	                            final int position, final long id) {
+		if (mActionMode == null) {
+			ActivityUtils.startDetailsActivity(getActivity(), v, position);
+		} else {
+			getListView().setItemChecked(position, true);
+			getListView().setSelection(position);
+			v.setSelected(true);
+		}
+	}
 
-    private void hideContainerBottom() {
-        if (!mVisibile) {
-            return;
-        }
-        mVisibile = false;
-        final View containerBottom = getContainerBottom();
-        final ViewPropertyAnimator animation = containerBottom.animate()
-                .setInterpolator(new AccelerateInterpolator()).setDuration(350)
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(final Animator animation) {
-                        getActivity().getActionBar().hide();
-                    }
-                });
-        animation.y(containerBottom.getY() + containerBottom.getHeight()
-                + getActivity().getActionBar().getHeight());
-    }
+	@Override
+	public void onLoaderReset(final Loader<Cursor> arg0) {
+		mAdapter.swapCursor(null);
+	}
 
-    @Override
-    public void onCreate(final Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
+	@Override
+	public void onLoadFinished(final Loader<Cursor> loader, final Cursor cursor) {
+		cursor.setNotificationUri(getActivity().getContentResolver(),
+				RemindersProvider.REMINDERS_URI);
+		final ContentObserver contentObserver = new ContentObserver(mHandler) {
+			@Override
+			public boolean deliverSelfNotifications() {
+				return true;
+			}
 
-    @Override
-    public Loader<Cursor> onCreateLoader(final int arg0, final Bundle bundle)
-    {
-        return new RemindersLoader(getActivity(), bundle);
-    }
+			@Override
+			public void onChange(final boolean selfChange) {
+				super.onChange(selfChange);
+				mSwipeListener.releaseTransientViews();
+			}
+		};
+		getActivity().getContentResolver().registerContentObserver(RemindersProvider.REMINDERS_URI,
+				true, contentObserver);
+		mAdapter.swapCursor(cursor);
+		setListAdapter(mAdapter);
+	}
 
-    @Override
-    public View onCreateView(final LayoutInflater inflater,
-            final ViewGroup container, final Bundle savedInstanceState)
-    {
-        final View view = inflater.inflate(R.layout.f_swipe_refresh_list, container, false);
+	@Override
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		switch (item.getItemId()) {
+			case R.menu.action_new_reminder:
+				startActivity(ReminderDetailsActivity.newIntent(getActivity(),
+						ReminderIntent.ACTION_NEW));
+				return true;
 
-        mHandler = new Handler();
-        final LoaderManager loaderManager = getLoaderManager();
-        loaderManager.initLoader(0, getArguments(), this);
-        mAdapter = new RemindersAdapter(getActivity(), null, true);
+			case R.menu.action_remove:
+				final int[] mChecked = mAdapter.getCheckedItems();
+				final int size = mChecked.length;
+				for (int i = 0; i < size; i++) {
+					final View view = getListView().getChildAt(mChecked[i]);
+					final ViewHolder tag = (ViewHolder) view.getTag();
+					removeReminder(view, (int) tag.id);
+				}
+				mAdapter.uncheckItems();
+				if (mActionMode != null) {
+					mActionMode.finish();
+				}
+				return true;
 
-        mListView = (ListView) view.findViewById(android.R.id.list);
-        ListViewObserveHelper.attach(mListView, new Callback() {
-            @Override
-            public void onStateChanged(final int state) {
-                switch (state) {
-                    case Callback.STATE_VISIBLE:
-                        showContainerBottom();
-                        break;
+			case R.menu.action_settings:
+				startActivity(new Intent(getActivity(), SettingsActivity.class));
+				return true;
 
-                    case Callback.STATE_INVISIBLE:
-                        hideContainerBottom();
-                        break;
+			default:
+				break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
-                    default:
-                        break;
-                }
-            }
+	@Override
+	public void onPause() {
+		super.onPause();
+		mSwipeListener.releaseTransientViews();
+	}
 
-        });
-        return view;
-    }
+	@Override
+	public void onViewCreated(final View view, final Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		// setEmptyText(getActivity().getString(R.string.you_have_no_reminders));
+		final ListView listView = getListView();
+		mSwipeLayout = (SwipeRefreshLayout)
+				view.findViewById(R.id.swipe_container);
+		mSwipeLayout.setColorScheme(android.R.color.holo_blue_light,
+				android.R.color.holo_green_light, android.R.color.holo_orange_light,
+				android.R.color.holo_red_light);
+		mSwipeLayout.setOnRefreshListener(new OnRefreshListener() {
+			@Override
+			public void onRefresh() {
+				performCloudSync();
+			}
+		});
 
-    @Override
-    public void onListItemClick(final ListView l, final View v,
-            final int position, final long id)
-    {
-        if (mActionMode == null)
-        {
-            ActivityUtils.startDetailsActivity(getActivity(), v, position);
-        }
-        else
-        {
-            getListView().setItemChecked(position, true);
-            getListView().setSelection(position);
-            v.setSelected(true);
-        }
-    }
+		listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+		listView.setMultiChoiceModeListener(mActionModeCallback);
+		listView.setFooterDividersEnabled(false);
+		// listView.addFooterView(View.inflate(getActivity(),
+		// R.layout.footer_reminders, null), null, false);
 
-    @Override
-    public void onLoaderReset(final Loader<Cursor> arg0)
-    {
-        mAdapter.swapCursor(null);
-    }
+		mSwipeListener = new SwipeDismissListViewTouchListener(
+				listView, new DismissCallbacks() {
+			@Override
+			public boolean canDismiss(final int position) {
+				return mActionMode == null;
+			}
 
-    @Override
-    public void onLoadFinished(final Loader<Cursor> loader, final Cursor cursor)
-    {
-        cursor.setNotificationUri(getActivity().getContentResolver(),
-                RemindersProvider.REMINDERS_URI);
-        final ContentObserver contentObserver = new ContentObserver(mHandler) {
-            @Override
-            public boolean deliverSelfNotifications()
-            {
-                return true;
-            }
+			@Override
+			public void onDismiss(final ListView listView,
+			                      final int[] reverseSortedPositions) {
+				removeReminders(reverseSortedPositions);
+			}
+		}
+		);
+		listView.setOnTouchListener(mSwipeListener);
+	}
 
-            @Override
-            public void onChange(final boolean selfChange)
-            {
-                super.onChange(selfChange);
-                mSwipeListener.releaseTransientViews();
-            }
-        };
-        getActivity().getContentResolver().registerContentObserver(RemindersProvider.REMINDERS_URI,
-                true, contentObserver);
-        mAdapter.swapCursor(cursor);
-        setListAdapter(mAdapter);
-    }
+	protected void performCloudSync() {
+		new AsyncTask<Void, Integer, Void>() {
 
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item)
-    {
-        switch (item.getItemId())
-        {
-            case R.menu.action_new_reminder:
-                startActivity(ReminderDetailsActivity.newIntent(getActivity(),
-                        ReminderIntent.ACTION_NEW));
-                return true;
+			@Override
+			protected Void doInBackground(final Void... params) {
+				SystemClock.sleep(2000);
+				return null;
+			}
 
-            case R.menu.action_remove:
-                final int[] mChecked = mAdapter.getCheckedItems();
-                final int size = mChecked.length;
-                for (int i = 0; i < size; i++)
-                {
-                    final View view = getListView().getChildAt(mChecked[i]);
-                    final ViewHolder tag = (ViewHolder) view.getTag();
-                    removeReminder(view, (int) tag.id);
-                }
-                mAdapter.uncheckItems();
-                if (mActionMode != null)
-                {
-                    mActionMode.finish();
-                }
-                return true;
+			@Override
+			protected void onPostExecute(final Void result) {
+				mSwipeLayout.setRefreshing(false);
+			}
 
-            case R.menu.action_settings:
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
+			@Override
+			protected void onPreExecute() {
+				mSwipeLayout.setRefreshing(true);
+			}
 
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+			;
+		}.execute();
+	}
 
-    @Override
-    public void onPause()
-    {
-        super.onPause();
-        mSwipeListener.releaseTransientViews();
-    }
+	public void removeReminder(final View convertView, final int id) {
+		final PropertyValuesHolder[] arrayOfPropertyValuesHolder = new PropertyValuesHolder[2];
+		arrayOfPropertyValuesHolder[0] = PropertyValuesHolder.ofFloat(View.X, 800);
+		arrayOfPropertyValuesHolder[1] = PropertyValuesHolder.ofFloat(View.ALPHA, 0);
 
-    @Override
-    public void onViewCreated(final View view, final Bundle savedInstanceState)
-    {
-        super.onViewCreated(view, savedInstanceState);
-        // setEmptyText(getActivity().getString(R.string.you_have_no_reminders));
-        final ListView listView = getListView();
-        mSwipeLayout = (SwipeRefreshLayout)
-                view.findViewById(R.id.swipe_container);
-        mSwipeLayout.setColorScheme(android.R.color.holo_blue_light,
-                android.R.color.holo_green_light, android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-        mSwipeLayout.setOnRefreshListener(new OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                performCloudSync();
-            }
-        });
+		final ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(convertView,
+				arrayOfPropertyValuesHolder);
+		anim.setDuration(300);
+		ViewCompat.setHasTransientState(convertView, true);
+		anim.addListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(final Animator animation) {
+				ReminderUtils.deleteReminder(convertView.getContext(), id);
+				convertView.post(new Runnable() {
+					@Override
+					public void run() {
+						convertView.setX(0);
+						convertView.setAlpha(1);
+						ViewCompat.setHasTransientState(convertView, false);
+					}
+				});
+			}
+		});
+		anim.start();
+	}
 
-        listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-        listView.setMultiChoiceModeListener(mActionModeCallback);
-        listView.setFooterDividersEnabled(false);
-        // listView.addFooterView(View.inflate(getActivity(),
-        // R.layout.footer_reminders, null), null, false);
+	private void removeReminders(
+			final int[] reverseSortedPositions) {
+		final FragmentActivity context = getActivity();
+		if (PreferenceHelper.isShowDisplayPrompt(context)) {
+			final View dialogView = View.inflate(context,
+					R.layout.f_dialog_remove_promt, null);
+			final CheckBox cb = (CheckBox) dialogView
+					.findViewById(R.f_dialog_remove_promt.checkboxPromt);
+			cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(
+						final CompoundButton buttonView,
+						final boolean isChecked) {
+					PreferenceHelper.setShowDisplayPrompt(
+							context, !isChecked);
+				}
+			});
+			final AlertDialog.Builder builder = new Builder(
+					context);
+			builder.setView(dialogView);
+			builder.setPositiveButton(R.string.remove,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(
+								final DialogInterface dialog,
+								final int which) {
+							for (final int position : reverseSortedPositions) {
+								final ViewGroup view = (ViewGroup) getListView()
+										.getChildAt(position);
+								final ViewHolder tag = (ViewHolder) view
+										.getTag();
+								ReminderUtils.deleteReminder(
+										context, (int) tag.id);
+							}
+							dialog.dismiss();
+						}
+					}
+			);
+			builder.setNegativeButton(R.string.cancel,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(
+								final DialogInterface dialog,
+								final int which) {
+							dialog.dismiss();
+						}
+					}
+			);
+			builder.show();
+		} else {
+			for (final int position : reverseSortedPositions) {
+				final View view = getListView()
+						.getChildAt(position);
+				final ViewHolder tag = (ViewHolder) view
+						.getTag();
+				if (tag != null) {
+					ReminderUtils.deleteReminder(context,
+							(int) tag.id);
+				}
+			}
+		}
+	}
 
-        mSwipeListener = new SwipeDismissListViewTouchListener(
-                listView, new DismissCallbacks() {
-                    @Override
-                    public boolean canDismiss(final int position)
-                    {
-                        return mActionMode == null;
-                    }
-
-                    @Override
-                    public void onDismiss(final ListView listView,
-                            final int[] reverseSortedPositions)
-                    {
-                        removeReminders(reverseSortedPositions);
-                    }
-                });
-        listView.setOnTouchListener(mSwipeListener);
-    }
-
-    protected void performCloudSync() {
-        new AsyncTask<Void, Integer, Void>() {
-
-            @Override
-            protected Void doInBackground(final Void... params) {
-                SystemClock.sleep(2000);
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(final Void result) {
-                mSwipeLayout.setRefreshing(false);
-            }
-
-            @Override
-            protected void onPreExecute() {
-                mSwipeLayout.setRefreshing(true);
-            };
-        }.execute();
-    }
-
-    public void removeReminder(final View convertView, final int id) {
-        final PropertyValuesHolder[] arrayOfPropertyValuesHolder = new PropertyValuesHolder[2];
-        arrayOfPropertyValuesHolder[0] = PropertyValuesHolder.ofFloat(View.X, 800);
-        arrayOfPropertyValuesHolder[1] = PropertyValuesHolder.ofFloat(View.ALPHA, 0);
-
-        final ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(convertView,
-                arrayOfPropertyValuesHolder);
-        anim.setDuration(300);
-        ViewCompat.setHasTransientState(convertView, true);
-        anim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(final Animator animation) {
-                ReminderUtils.deleteReminder(convertView.getContext(), id);
-                convertView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        convertView.setX(0);
-                        convertView.setAlpha(1);
-                        ViewCompat.setHasTransientState(convertView, false);
-                    }
-                });
-            }
-        });
-        anim.start();
-    }
-
-    private void removeReminders(
-            final int[] reverseSortedPositions)
-    {
-        final FragmentActivity context = getActivity();
-        if (PreferenceHelper.isShowDisplayPrompt(context))
-        {
-            final View dialogView = View.inflate(context,
-                    R.layout.f_dialog_remove_promt, null);
-            final CheckBox cb = (CheckBox) dialogView
-                    .findViewById(R.f_dialog_remove_promt.checkboxPromt);
-            cb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(
-                        final CompoundButton buttonView,
-                        final boolean isChecked)
-                {
-                    PreferenceHelper.setShowDisplayPrompt(
-                            context, !isChecked);
-                }
-            });
-            final AlertDialog.Builder builder = new Builder(
-                    context);
-            builder.setView(dialogView);
-            builder.setPositiveButton(R.string.remove,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(
-                                final DialogInterface dialog,
-                                final int which)
-                        {
-                            for (final int position : reverseSortedPositions)
-                            {
-                                final ViewGroup view = (ViewGroup) getListView()
-                                        .getChildAt(position);
-                                final ViewHolder tag = (ViewHolder) view
-                                        .getTag();
-                                ReminderUtils.deleteReminder(
-                                        context, (int) tag.id);
-                            }
-                            dialog.dismiss();
-                        }
-                    });
-            builder.setNegativeButton(R.string.cancel,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(
-                                final DialogInterface dialog,
-                                final int which)
-                        {
-                            dialog.dismiss();
-                        }
-                    });
-            builder.show();
-        }
-        else
-        {
-            for (final int position : reverseSortedPositions)
-            {
-                final View view = getListView()
-                        .getChildAt(position);
-                final ViewHolder tag = (ViewHolder) view
-                        .getTag();
-                if (tag != null) {
-                    ReminderUtils.deleteReminder(context,
-                            (int) tag.id);
-                }
-            }
-        }
-    }
-
-    private void showContainerBottom() {
-        if (mVisibile) {
-            return;
-        }
-        mVisibile = true;
-        final View containerBottom = getContainerBottom();
-        final ViewPropertyAnimator animation = containerBottom.animate()
-                .setInterpolator(new AccelerateInterpolator()).setDuration(350)
-                .setListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(final Animator animation) {
-                        containerBottom.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                getActivity().getActionBar().show();
-                            }
-                        }, 350);
-                    }
-                });
-        animation.y(containerBottom.getY() - containerBottom.getHeight()
-                - getActivity().getActionBar().getHeight());
-    }
+	private void showContainerBottom() {
+		if (mVisibile) {
+			return;
+		}
+		mVisibile = true;
+		final View containerBottom = getContainerBottom();
+		final ViewPropertyAnimator animation = containerBottom.animate()
+				.setInterpolator(new AccelerateInterpolator()).setDuration(350)
+				.setListener(new AnimatorListenerAdapter() {
+					@Override
+					public void onAnimationEnd(final Animator animation) {
+						containerBottom.postDelayed(new Runnable() {
+							@Override
+							public void run() {
+								getActivity().getActionBar().show();
+							}
+						}, 350);
+					}
+				});
+		animation.y(containerBottom.getY() - containerBottom.getHeight()
+				- getActivity().getActionBar().getHeight());
+	}
 }

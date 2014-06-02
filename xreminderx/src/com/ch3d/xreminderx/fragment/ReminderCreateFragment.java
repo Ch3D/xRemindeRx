@@ -4,6 +4,7 @@ package com.ch3d.xreminderx.fragment;
 import android.view.MenuItem;
 
 import com.ch3d.xreminderx.R;
+import com.ch3d.xreminderx.model.ReminderColor;
 import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.model.ReminderFactory;
 import com.ch3d.xreminderx.provider.RemindersProvider;
@@ -38,7 +39,8 @@ public class ReminderCreateFragment extends ReminderEditFragment
                 mReminder.setText(mText.getText().toString());
                 mReminder.setOngoing(mOngoing.isChecked());
                 mReminder.setSilent(mSilent.isChecked());
-                mReminder.setColor((Integer) mColor.getSelectedItem());
+                final ReminderColor reminderColor = (ReminderColor) mColor.getSelectedItem();
+                mReminder.setColor(reminderColor.getColor());
 
                 RemindersProvider.addReminder(getActivity(), mReminder, true);
                 getActivity().onBackPressed();

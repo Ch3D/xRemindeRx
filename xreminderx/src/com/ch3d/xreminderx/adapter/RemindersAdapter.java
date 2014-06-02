@@ -1,4 +1,3 @@
-
 package com.ch3d.xreminderx.adapter;
 
 import android.content.Context;
@@ -16,72 +15,61 @@ import com.ch3d.xreminderx.utils.ReminderUtils;
 
 public class RemindersAdapter extends CursorAdapter {
 
-    public static class ViewHolder {
-        public long id;
-        public TextView text;
-        public TextView date;
-    }
+	private final SparseBooleanArray mChecked = new SparseBooleanArray(10);
+	private final LayoutInflater mInflater;
 
-    private final SparseBooleanArray mChecked = new SparseBooleanArray(10);
+	public RemindersAdapter(final Context context, final Cursor c, final boolean autoRequery) {
+		super(context, c, autoRequery);
+		mInflater = LayoutInflater.from(context);
+	}
 
-    private final LayoutInflater mInflater;
+	@Override
+	public void bindView(final View view, final Context context, final Cursor cursor) {
+		final ViewHolder holder = (ViewHolder) view.getTag();
+		holder.id = cursor.getLong(RemindersContract.Indexes._ID);
+		holder.text.setText(cursor.getString(RemindersContract.Indexes.TEXT));
+		holder.date.setText(ReminderUtils.getFormattedDateTime(context,
+				cursor.getLong(RemindersContract.Indexes.TIMESTAMP)));
+	}
 
-    public RemindersAdapter(final Context context, final Cursor c,
-            final boolean autoRequery) {
-        super(context, c, autoRequery);
-        mInflater = LayoutInflater.from(context);
-    }
+	public int[] getCheckedItems() {
+		final int[] result = new int[mChecked.size()];
+		final int size = mChecked.size();
+		int j = 0;
+		for (int i = 0; i < size; i++) {
+			final int key = mChecked.keyAt(i);
+			if (mChecked.get(key)) {
+				result[j++] = key;
+			}
+		}
+		return result;
+	}
 
-    @Override
-    public void bindView(final View view, final Context context,
-            final Cursor cursor) {
-        final ViewHolder holder = (ViewHolder) view.getTag();
-        holder.id = cursor.getLong(RemindersContract.Indexes._ID);
-        holder.text.setText(cursor
-                .getString(RemindersContract.Indexes.TEXT));
-        final String date = ReminderUtils.formatDate(context,
-                cursor.getLong(RemindersContract.Indexes.TIMESTAMP));
-        final String time = ReminderUtils.formatTime(context,
-                cursor.getLong(RemindersContract.Indexes.TIMESTAMP));
-        holder.date.setText(date + " " + time);
-    }
+	@Override
+	public View newView(final Context context, final Cursor cursor,
+	                    final ViewGroup parent) {
+		final View convertView = mInflater.inflate(
+				R.layout.x_reminder_item, parent, false);
+		final ViewHolder holder = new ViewHolder();
+		holder.text = (TextView) convertView.findViewById(R.id.text);
+		holder.date = (TextView) convertView.findViewById(R.id.date);
+		convertView.setTag(holder);
+		return convertView;
+	}
 
-    public int[] getCheckedItems() {
-        final int[] result = new int[mChecked.size()];
-        final int size = mChecked.size();
-        int j = 0;
-        for (int i = 0; i < size; i++)
-        {
-            final int key = mChecked.keyAt(i);
-            if (mChecked.get(key))
-            {
-                result[j++] = key;
-            }
-        }
-        return result;
-    }
+	public void setChecked(final int position, final boolean checked) {
+		mChecked.put(position, checked);
+		notifyDataSetChanged();
+	}
 
-    @Override
-    public View newView(final Context context, final Cursor cursor,
-            final ViewGroup parent) {
-        final View convertView = mInflater.inflate(
-                R.layout.x_reminder_item, parent, false);
-        final ViewHolder holder = new ViewHolder();
-        holder.text = (TextView) convertView
-                .findViewById(R.x_reminder_item.text);
-        holder.date = (TextView) convertView
-                .findViewById(R.x_reminder_item.date);
-        convertView.setTag(holder);
-        return convertView;
-    }
+	public void uncheckItems() {
+		mChecked.clear();
+		notifyDataSetChanged();
+	}
 
-    public void setChecked(final int position, final boolean checked) {
-        mChecked.put(position, checked);
-        notifyDataSetChanged();
-    }
-
-    public void uncheckItems() {
-        mChecked.clear();
-        notifyDataSetChanged();
-    }
+	public static class ViewHolder {
+		public long id;
+		public TextView text;
+		public TextView date;
+	}
 }
