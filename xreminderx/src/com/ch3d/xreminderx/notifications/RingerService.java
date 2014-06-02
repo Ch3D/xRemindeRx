@@ -38,17 +38,19 @@ public class RingerService extends Service implements Callback {
 	private static final int MSG_RESUME = 1;
 	private final Set<Uri> dataSet = new HashSet<Uri>();
 	private final IBinder mBinder = new RingerBinder();
+	@Inject
+	protected TelephonyManager mTelephonyManager;
+	@Inject
+	protected PowerManager mPowerManager;
 	private int mInitialCallState;
 	private final PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
 		@Override
 		public void onCallStateChanged(
 				final int state,
 				final String ignored) {
-			/*The user			might			already be			in a call			when the
-			alarm fires.			When			we register			onCallStateChanged,
-			we get the			initial			in-call			state			which kills
-			the alarm.			Check			against the			initial			call state
-			so			we don't			kill the			alarm during			a call.*/
+			/*The user might already be	in a call when the alarm fires.	When we register
+			onCallStateChanged,	we get the initial in-call state which kills the alarm.
+			Check against the initial call state so	we don't kill the alarm during a call.*/
 			if ((state != TelephonyManager.CALL_STATE_IDLE)
 					&& (state != mInitialCallState)) {
 				// TODO:
@@ -58,15 +60,7 @@ public class RingerService extends Service implements Callback {
 		}
 	};
 	private MediaPlayer mMediaPlayer;
-
-	@Inject
-	private TelephonyManager mTelephonyManager;
-
 	private boolean mPlaying;
-
-	@Inject
-	private PowerManager mPowerManager;
-
 	private WakeLock cpuWakeLock;
 
 	private Handler mHandler;

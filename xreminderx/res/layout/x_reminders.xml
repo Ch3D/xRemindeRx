@@ -1,35 +1,41 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:float="http://schemas.android.com/apk/res-auto"
-    android:id="@+x_reminders/root"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <fragment class="com.ch3d.xreminderx.fragment.RemindersListFragment"
-        android:id="@+x_reminders/fragment_reminders_list"
+
+    <fragment
+        class="com.ch3d.xreminderx.fragment.RemindersListFragment"
+        android:id="@+id/fragment_reminders_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-   	<LinearLayout
-   	    android:id="@+x_reminders/panel_bottom"
-   	    android:background="#77000000" 
-   	    android:layout_alignParentBottom="true"
-   	    android:layout_width="match_parent"
-   	    android:layout_height="48dp">
-		<com.wrapp.floatlabelededittext.FloatLabeledEditText 
-		    android:id="@android:id/edit"
-		    android:layout_width="0dp"
-		    android:layout_weight="1"
-		    android:layout_height="match_parent"
-		    float:fletFloatingHint="@string/quick_reminder_text"
-		    float:fletHintTextColor="?android:attr/textColorSecondaryInverse"
-		    float:fletTextColor="?android:attr/textColorPrimaryInverse"
-		    android:inputType="textCapSentences"
-		    android:textColorHint="?android:attr/textColorSecondaryInverse"
-		    android:textColor="?android:attr/textColorPrimaryInverse"
-		    android:textAppearance="?android:attr/textAppearanceMedium" />
-		<ImageButton android:id="@android:id/button1" 
-		    style="@android:style/Widget.Holo.Button.Borderless"
-		    android:layout_width="wrap_content"
-		    android:layout_height="match_parent"
-		    android:src="@drawable/ic_done" 
-		    android:contentDescription="@string/descr_add_reminder_button" />
-   	</LinearLayout>
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:id="@+id/panel_bottom"
+        android:background="#77000000"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="48dp">
+
+        <com.wrapp.floatlabelededittext.FloatLabeledEditText
+            android:id="@android:id/edit"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            float:fletFloatingHint="@string/quick_reminder_text"
+            float:fletHintTextColor="?android:attr/textColorSecondaryInverse"
+            float:fletTextColor="?android:attr/textColorPrimaryInverse"
+            android:inputType="textCapSentences"
+            android:textColorHint="?android:attr/textColorSecondaryInverse"
+            android:textColor="?android:attr/textColorPrimaryInverse"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <ImageButton
+            android:id="@android:id/button1"
+            style="@android:style/Widget.Holo.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_done"
+            android:contentDescription="@string/descr_add_reminder_button" />
+    </LinearLayout>
 </RelativeLayout>

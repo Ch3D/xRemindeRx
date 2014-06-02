@@ -10,10 +10,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
@@ -43,8 +41,10 @@ import com.ch3d.xreminderx.activity.ReminderDetailsActivity;
 import com.ch3d.xreminderx.activity.SettingsActivity;
 import com.ch3d.xreminderx.adapter.RemindersAdapter;
 import com.ch3d.xreminderx.adapter.RemindersAdapter.ViewHolder;
+import com.ch3d.xreminderx.app.ReminderApplication;
 import com.ch3d.xreminderx.loader.RemindersLoader;
 import com.ch3d.xreminderx.provider.RemindersProvider;
+import com.ch3d.xreminderx.sync.RemoteSynchronizer;
 import com.ch3d.xreminderx.utils.ActivityUtils;
 import com.ch3d.xreminderx.utils.PreferenceHelper;
 import com.ch3d.xreminderx.utils.ReminderIntent;
@@ -54,12 +54,20 @@ import com.ch3d.xreminderx.view.ListViewObserveHelper.Callback;
 import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener;
 import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener.DismissCallbacks;
 
-public class RemindersListFragment extends ListFragment implements
-		LoaderCallbacks<Cursor> {
-	public static final String TAG = "tag_reminders";
+import javax.inject.Inject;
+
+public class RemindersListFragment extends ListFragment implements LoaderCallbacks<Cursor>, RemoteSynchronizer.Callback {
+	public static final String TAG = RemindersListFragment.class.getSimpleName();
 	public static final int TAG_TODAY = 0;
 	public static final int TAG_ALL = 1;
 	protected boolean mVisibile = true;
+
+	@Inject
+	RemoteSynchronizer mRemoteSynchronizer;
+
+//	@Inject
+//	RemoteSyncProtocol mSyncProtocol;
+
 	private ActionMode mActionMode;
 	private final MultiChoiceModeListener mActionModeCallback = new MultiChoiceModeListener() {
 
@@ -71,9 +79,7 @@ public class RemindersListFragment extends ListFragment implements
 		}
 
 		@Override
-		public boolean onCreateActionMode(
-				final ActionMode mode,
-				final Menu menu) {
+		public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
 			mActionMode = mode;
 			final MenuInflater inflater = mode
 					.getMenuInflater();
@@ -84,27 +90,22 @@ public class RemindersListFragment extends ListFragment implements
 		}
 
 		@Override
-		public void onDestroyActionMode(
-				final ActionMode mode) {
+		public void onDestroyActionMode(final ActionMode mode) {
 			mAdapter.uncheckItems();
 			mActionMode = null;
 		}
 
 		@Override
-		public void onItemCheckedStateChanged(
-				final ActionMode mode,
-				final int position,
-				final long id,
-				final boolean checked) {
+		public void onItemCheckedStateChanged(final ActionMode mode, final int position,
+		                                      final long id,
+		                                      final boolean checked) {
 			mAdapter.setChecked(
 					position,
 					checked);
 		}
 
 		@Override
-		public boolean onPrepareActionMode(
-				final ActionMode mode,
-				final Menu menu) {
+		public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
 			return false; // Return
 			// false
 			// if
@@ -123,7 +124,7 @@ public class RemindersListFragment extends ListFragment implements
 	}
 
 	private View getContainerBottom() {
-		return getActivity().findViewById(R.x_reminders.panel_bottom);
+		return getActivity().findViewById(R.id.panel_bottom);
 	}
 
 	private void hideContainerBottom() {
@@ -147,6 +148,7 @@ public class RemindersListFragment extends ListFragment implements
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		((ReminderApplication) getActivity().getApplication()).inject(this);
 		setHasOptionsMenu(true);
 	}
 
@@ -237,8 +239,8 @@ public class RemindersListFragment extends ListFragment implements
 			case R.menu.action_remove:
 				final int[] mChecked = mAdapter.getCheckedItems();
 				final int size = mChecked.length;
-				for (int i = 0; i < size; i++) {
-					final View view = getListView().getChildAt(mChecked[i]);
+				for (int cItem : mChecked) {
+					final View view = getListView().getChildAt(cItem);
 					final ViewHolder tag = (ViewHolder) view.getTag();
 					removeReminder(view, (int) tag.id);
 				}
@@ -284,8 +286,8 @@ public class RemindersListFragment extends ListFragment implements
 		listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
 		listView.setMultiChoiceModeListener(mActionModeCallback);
 		listView.setFooterDividersEnabled(false);
-		// listView.addFooterView(View.inflate(getActivity(),
-		// R.layout.footer_reminders, null), null, false);
+		listView.addFooterView(View.inflate(getActivity(),
+				R.layout.footer_reminders, null), null, false);
 
 		mSwipeListener = new SwipeDismissListViewTouchListener(
 				listView, new DismissCallbacks() {
@@ -305,26 +307,7 @@ public class RemindersListFragment extends ListFragment implements
 	}
 
 	protected void performCloudSync() {
-		new AsyncTask<Void, Integer, Void>() {
-
-			@Override
-			protected Void doInBackground(final Void... params) {
-				SystemClock.sleep(2000);
-				return null;
-			}
-
-			@Override
-			protected void onPostExecute(final Void result) {
-				mSwipeLayout.setRefreshing(false);
-			}
-
-			@Override
-			protected void onPreExecute() {
-				mSwipeLayout.setRefreshing(true);
-			}
-
-			;
-		}.execute();
+		mRemoteSynchronizer.sync(this);
 	}
 
 	public void removeReminder(final View convertView, final int id) {
@@ -437,5 +420,15 @@ public class RemindersListFragment extends ListFragment implements
 				});
 		animation.y(containerBottom.getY() - containerBottom.getHeight()
 				- getActivity().getActionBar().getHeight());
+	}
+
+	@Override
+	public void onPreExecute() {
+		mSwipeLayout.setRefreshing(true);
+	}
+
+	@Override
+	public void onPostExecute(Object result) {
+		mSwipeLayout.setRefreshing(false);
 	}
 }

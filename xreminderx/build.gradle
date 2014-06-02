@@ -3,9 +3,9 @@ import com.android.builder.DefaultManifestParser
 buildscript {
     repositories {
         mavenCentral()
-		maven { url 'http://repo1.maven.org/maven2' }
+        maven { url 'http://repo1.maven.org/maven2' }
     }
-    dependencies {		
+    dependencies {
         classpath 'com.android.tools.build:gradle:0.10.+'
     }
 }
@@ -13,55 +13,52 @@ buildscript {
 apply plugin: 'android'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	compile 'com.google.android.gms:play-services:4.3.23'
-	compile 'com.squareup.dagger:dagger:1.2.0'
-	compile 'com.squareup.dagger:dagger-compiler:1.2.0'
-	compile 'com.jakewharton:butterknife:4.0.1'
-	compile 'com.squareup:javawriter:2.4.0'
-	compile 'com.android.support:support-v4:19.1.+'
-	// compile 'com.parse:parse:1.5.0+'
-	compile files('libs/Parse-1.5.0.jar')
-	// compile project(':libraries:xreminderx.theming')
-	compile project(':libraries:floatlabel')
+    compile 'com.google.android.gms:play-services:4.3.23'
+    compile 'com.squareup.dagger:dagger:1.2.0'
+    compile 'com.squareup.dagger:dagger-compiler:1.2.0'
+    compile 'com.jakewharton:butterknife:4.0.1'
+    compile 'com.squareup:javawriter:2.4.0'
+    compile 'com.android.support:support-v4:19.1.+'
+    // compile 'com.parse:parse:1.5.0+'
+    compile files('libs/Parse-1.5.0.jar')
+    compile project(':libraries:floatlabel')
 }
 
 android {
-	/* fix dagger_butterknife jars dupulication error */
+    /* fix dagger_butterknife jars dupulication error */
     packagingOptions {
         exclude 'META-INF/services/javax.annotation.processing.Processor'
     }
 
-	buildTypes {
-		debug {
-			packageNameSuffix ".debug"
+    buildTypes {
+        debug {
+            packageNameSuffix '.d'
             buildConfigField "String", "PROVIDER_AUTHORITY", "\"com.ch3d.xreminderx.debug.provider\""
-		}
-
+        }
         release {
             buildConfigField "String", "PROVIDER_AUTHORITY", "\"com.ch3d.xreminderx.provider\""
         }
-	}
+    }
+    /* disable lint error */
+    lintOptions {
+        abortOnError false
+    }
 
-	/* disable lint error */
-	lintOptions {
-		abortOnError false
-	}
+    /* signing */
+    signingConfigs {
+        release {
+        }
+    }
 
-	/* signing */
-	signingConfigs {
-  		release {
-	    }
-	}
+    if (project.hasProperty("debugSigningPropertiesPath") && project.hasProperty("releaseSigningPropertiesPath")) {
+        File debugPropsFile = new File(System.getenv('HOME') + "/" + project.property("debugSigningPropertiesPath"))
+        File releasePropsFile = new File(System.getenv('HOME') + "/" + project.property("releaseSigningPropertiesPath"))
 
-	if(project.hasProperty("debugSigningPropertiesPath") && project.hasProperty("releaseSigningPropertiesPath")) {
-        File debugPropsFile = new File(System.getenv('HOME') +  "/" + project.property("debugSigningPropertiesPath"))
-        File releasePropsFile = new File(System.getenv('HOME') +  "/" + project.property("releaseSigningPropertiesPath"))
-
-        if(debugPropsFile.exists() && releasePropsFile.exists()) {
+        if (debugPropsFile.exists() && releasePropsFile.exists()) {
             Properties debugProps = new Properties()
             debugProps.load(new FileInputStream(debugPropsFile))
 
@@ -93,40 +90,35 @@ android {
             }
         }
     }
-    
     compileSdkVersion 19
-    buildToolsVersion "19"
-
+    buildToolsVersion '19.1.0'
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 19
 
-		// testing
-		testPackageName "com.ch3d.xreminderx.tests"
-		testInstrumentationRunner "android.test.InstrumentationTestRunner"
+        // testing
+        testPackageName "com.ch3d.xreminderx.tests"
+        testInstrumentationRunner 'android.test.InstrumentationTestRunner'
     }
-
-	testOptions {
+    testOptions {
         resultsDir = "$project.buildDir/tests/results"
     }
-
-	android.applicationVariants.all { variant ->
+    android.applicationVariants.all { variant ->
         def ver = null
-		def manifestParser = new DefaultManifestParser()
+        def manifestParser = new DefaultManifestParser()
         if (buildType == "debug") {
-    		ver = manifestParser.getVersionName(android.sourceSets.debug.manifest.srcFile)
+            ver = manifestParser.getVersionName(android.sourceSets.debug.manifest.srcFile)
         } else {
             ver = manifestParser.getVersionName(android.sourceSets.release.manifest.srcFile)
         }
 
-		apk = variant.packageApplication.outputFile;
-		newName = apk.name.replace(".apk", "-v" + ver + ".apk");
-		variant.packageApplication.outputFile = new File(apk.parentFile, newName);
-		if (variant.zipAlign) {
-			variant.zipAlign.outputFile = new File(apk.parentFile, newName.replace("-unaligned", ""));
-		}
-	}
-
+        apk = variant.packageApplication.outputFile;
+        newName = apk.name.replace(".apk", "-v" + ver + ".apk");
+        variant.packageApplication.outputFile = new File(apk.parentFile, newName);
+        if (variant.zipAlign) {
+            variant.zipAlign.outputFile = new File(apk.parentFile, newName.replace("-unaligned", ""));
+        }
+    }
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -138,7 +130,7 @@ android {
             resources.srcDirs = ['src']
             aidl.srcDirs = ['src']
             renderscript.srcDirs = ['src']
-            res.srcDirs = ['res','src/release/res']
+            res.srcDirs = ['res', 'src/release/res']
             assets.srcDirs = ['assets']
         }
 
@@ -148,10 +140,12 @@ android {
             resources.srcDirs = ['src']
             aidl.srcDirs = ['src']
             renderscript.srcDirs = ['src']
-            res.srcDirs = ['res','src/debug/res']
+            res.srcDirs = ['res', 'src/debug/res']
             assets.srcDirs = ['assets']
         }
 
         instrumentTest.setRoot('tests')
+    }
+    productFlavors {
     }
 }

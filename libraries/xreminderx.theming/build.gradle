@@ -1,9 +1,7 @@
-import com.android.builder.DefaultManifestParser
-
 buildscript {
     repositories {
         mavenCentral()
-		maven { url 'http://repo1.maven.org/maven2' }
+        maven { url 'http://repo1.maven.org/maven2' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.10.+'
@@ -12,18 +10,18 @@ buildscript {
 
 apply plugin: 'android-library'
 
-    repositories {
-        mavenCentral()
-    }
+repositories {
+    mavenCentral()
+}
 
 android {
-	/* disable lint error */
-	lintOptions {
-		abortOnError false
-	}
+    /* disable lint error */
+    lintOptions {
+        abortOnError false
+    }
 
     compileSdkVersion 19
-    buildToolsVersion "19"
+    buildToolsVersion '19.1.0'
 
     defaultConfig {
         minSdkVersion 16

@@ -1,4 +1,3 @@
-
 package com.ch3d.xreminderx.module;
 
 import com.ch3d.xreminderx.notifications.RingerService;
