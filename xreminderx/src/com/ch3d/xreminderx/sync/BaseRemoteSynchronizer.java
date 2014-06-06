@@ -3,7 +3,7 @@ package com.ch3d.xreminderx.sync;
 /**
  * Created by ch3d on 02-Jun-14.
  */
-public abstract class BaseRemoteSynchronizer implements RemoteSynchronizer<Void> {
+public abstract class BaseRemoteSynchronizer<T> implements RemoteSynchronizer<T> {
 	protected RemoteSyncProtocol protocol;
 
 	public BaseRemoteSynchronizer(final RemoteSyncProtocol protocol) {
@@ -12,10 +12,10 @@ public abstract class BaseRemoteSynchronizer implements RemoteSynchronizer<Void>
 	}
 
 	@Override
-	public final void sync(Callback<Void> callback) {
-		new SyncTask<Void>(this, callback) {
+	public final void sync(final Callback<T> callback) {
+		new SyncTask<T>(this, callback) {
 			@Override
-			protected Void doInBackground(Void... params) {
+			protected T doInBackground(final Void... params) {
 				performSync();
 				return null;
 			}

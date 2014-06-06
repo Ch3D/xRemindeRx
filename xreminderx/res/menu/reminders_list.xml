@@ -1,27 +1,30 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+menu/action_new_reminder"
         android:orderInCategory="101"
         android:showAsAction="ifRoom"
         android:icon="@drawable/ic_new_reminder"
         android:title="@string/new_reminder"/>
-    
-	<item android:id="@+menu/action_search"
-          android:title="Search"
-          android:icon="@drawable/ic_menu_search"
-          android:showAsAction="collapseActionView|ifRoom"
-          android:actionViewClass="android.widget.SearchView" />
-	
-	<item android:id="@+menu/action_gplus_signin"
-          android:title="Sign In using G+"
-          android:showAsAction="never"
-          android:actionViewClass="android.widget.SearchView" />
-	
-	<item android:id="@+menu/action_gplus_signout"
-          android:title="Sign Out"
-          android:showAsAction="never"
-          android:actionViewClass="android.widget.SearchView" />
-	
+
+    <item
+        android:id="@+menu/action_search"
+        android:title="Search"
+        android:icon="@drawable/ic_action_search"
+        android:showAsAction="collapseActionView|ifRoom"
+        android:actionViewClass="android.widget.SearchView"/>
+
+    <item
+        android:id="@+menu/action_gplus_signin"
+        android:title="Sign In using G+"
+        android:showAsAction="never"
+        android:actionViewClass="android.widget.SearchView"/>
+
+    <item
+        android:id="@+menu/action_gplus_signout"
+        android:title="Sign Out"
+        android:showAsAction="never"
+        android:actionViewClass="android.widget.SearchView"/>
+
     <item
         android:id="@+menu/action_settings"
         android:orderInCategory="102"

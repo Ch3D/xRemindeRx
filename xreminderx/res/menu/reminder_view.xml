@@ -1,14 +1,20 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+menu/action_edit"
+        android:id="@+id/action_edit"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
         android:icon="@drawable/ic_edit"
         android:title="@string/edit"/>
     <item
-        android:id="@+menu/action_delete"
+        android:id="@+id/action_share"
         android:orderInCategory="101"
         android:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_share"
+        android:title="@string/share"/>
+    <item
+        android:id="@+id/action_delete"
+        android:orderInCategory="102"
+        android:showAsAction="never"
         android:icon="@drawable/ic_cab_cancel"
         android:title="@string/delete"/>
 </menu>

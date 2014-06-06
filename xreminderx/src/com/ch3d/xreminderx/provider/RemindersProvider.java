@@ -53,6 +53,7 @@ public class RemindersProvider extends ContentProvider
 
     static
     {
+        sUriMatcher.addURI(AUTHORITY, PATH_REMINDERS, ALL);
         sUriMatcher.addURI(AUTHORITY, PATH_REMINDERS + "/all", ALL);
         sUriMatcher.addURI(AUTHORITY, PATH_REMINDERS + "/today", TODAY);
         sUriMatcher.addURI(AUTHORITY, PATH_REMINDERS + "/#", REMINDERS);
