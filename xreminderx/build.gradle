@@ -1,4 +1,4 @@
-import com.android.builder.DefaultManifestParser
+// import com.android.builder.DefaultManifestParser
 
 buildscript {
     repositories {
@@ -6,7 +6,7 @@ buildscript {
         maven { url 'http://repo1.maven.org/maven2' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.10.+'
+        classpath 'com.android.tools.build:gradle:0.11.+'
     }
 }
 
@@ -36,7 +36,7 @@ android {
 
     buildTypes {
         debug {
-            packageNameSuffix '.d'
+            applicationIdSuffix '.d'
             buildConfigField "String", "PROVIDER_AUTHORITY", "\"com.ch3d.xreminderx.debug.provider\""
         }
         release {
@@ -103,22 +103,25 @@ android {
     testOptions {
         resultsDir = "$project.buildDir/tests/results"
     }
-    android.applicationVariants.all { variant ->
-        def ver = null
-        def manifestParser = new DefaultManifestParser()
-        if (buildType == "debug") {
-            ver = manifestParser.getVersionName(android.sourceSets.debug.manifest.srcFile)
-        } else {
-            ver = manifestParser.getVersionName(android.sourceSets.release.manifest.srcFile)
-        }
 
-        apk = variant.packageApplication.outputFile;
-        newName = apk.name.replace(".apk", "-v" + ver + ".apk");
-        variant.packageApplication.outputFile = new File(apk.parentFile, newName);
-        if (variant.zipAlign) {
-            variant.zipAlign.outputFile = new File(apk.parentFile, newName.replace("-unaligned", ""));
-        }
-    }
+//    android.applicationVariants.all { variant ->
+//        def ver = null
+//        def manifestParser = new com.android.builder.DefaultManifestParser()
+//        if (buildType == "debug") {
+//            ver = manifestParser.getVersionName(android.sourceSets.debug.manifest.srcFile)
+//        } else {
+//            ver = manifestParser.getVersionName(android.sourceSets.release.manifest.srcFile)
+//        }
+//
+//        apk = variant.packageApplication.outputFile;
+//        newName = apk.name.replace(".apk", "-v" + ver + ".apk");
+//        project.version
+//        variant.packageApplication.outputFile = new File(apk.parentFile, newName);
+//        if (variant.zipAlign) {
+//            variant.zipAlign.outputFile = new File(apk.parentFile, newName.replace("-unaligned", ""));
+//        }
+//    }
+
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
