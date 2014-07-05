@@ -10,18 +10,50 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <LinearLayout
+    <ImageButton
+        android:id="@android:id/button1"
+        style="@android:style/Widget.Holo.Button.Borderless"
+        android:background="#77000000"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/ic_action_new"
+        android:contentDescription="@string/descr_add_reminder_button" />
+
+    <ImageButton
+        android:id="@android:id/button2"
+        style="@android:style/Widget.Holo.Button.Borderless"
+        android:alpha="0"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:src="@drawable/ic_done"
+        android:visibility="gone"
+        android:background="#7700ff00" />
+
+    <RelativeLayout
         android:id="@+id/panel_bottom"
         android:background="#77000000"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
         android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
+        android:layout_toLeftOf="@android:id/button2"
+        android:layout_width="wrap_content"
         android:layout_height="48dp">
 
         <com.wrapp.floatlabelededittext.FloatLabeledEditText
             android:id="@android:id/edit"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@android:id/button1"
+            android:visibility="gone"
             float:fletFloatingHint="@string/quick_reminder_text"
             float:fletHintTextColor="?android:attr/textColorSecondaryInverse"
             float:fletTextColor="?android:attr/textColorPrimaryInverse"
@@ -30,12 +62,6 @@
             android:textColor="?android:attr/textColorPrimaryInverse"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <ImageButton
-            android:id="@android:id/button1"
-            style="@android:style/Widget.Holo.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_done"
-            android:contentDescription="@string/descr_add_reminder_button" />
-    </LinearLayout>
+    </RelativeLayout>
+
 </RelativeLayout>
