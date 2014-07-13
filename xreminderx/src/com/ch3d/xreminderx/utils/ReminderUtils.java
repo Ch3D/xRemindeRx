@@ -48,13 +48,16 @@ import java.security.NoSuchAlgorithmException;
  */
 public class ReminderUtils {
 	public static final int FORMAT_TIME = DateUtils.FORMAT_SHOW_TIME;
-	public static final int FORMAT_DATE = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_ABBREV_WEEKDAY | DateUtils.FORMAT_ABBREV_MONTH;
-	public static final int FORMAT_DATETIME = DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_ABBREV_WEEKDAY | DateUtils.FORMAT_ABBREV_MONTH;
+	public static final int FORMAT_DATE =
+			DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_ABBREV_WEEKDAY
+					| DateUtils.FORMAT_ABBREV_MONTH;
+	public static final int FORMAT_DATETIME =
+			DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_SHOW_YEAR
+					| DateUtils.FORMAT_ABBREV_WEEKDAY | DateUtils.FORMAT_ABBREV_MONTH;
 	final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 	private static final String NDEF_TYPE_REMINDER = "com.ch3d.xreminderx/reminder";
 
-	public static String bytesToHex(final byte[] bytes)
-	{
+	public static String bytesToHex(final byte[] bytes) {
 		final char[] hexChars = new char[bytes.length * 2];
 		for (int j = 0; j < bytes.length; j++) {
 			final int v = bytes[j] & 0xFF;
@@ -64,20 +67,17 @@ public class ReminderUtils {
 		return new String(hexChars);
 	}
 
-	public static void cancelAlarm(final int id, final Context context)
-	{
+	public static void cancelAlarm(final int id, final Context context) {
 		final AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		alarmManager.cancel(ReminderUtils.getPendingAlarmOperation(context, id));
 	}
 
-	public static void cancelNotification(final Context context, final int intId)
-	{
+	public static void cancelNotification(final Context context, final int intId) {
 		final NotificationManager notifManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		notifManager.cancel(intId);
 	}
 
-	public static NdefRecord createNdefRecord(final Context context, final ReminderEntry entry)
-	{
+	public static NdefRecord createNdefRecord(final Context context, final ReminderEntry entry) {
 		final byte[] type = NDEF_TYPE_REMINDER.getBytes(Charset.forName("US-ASCII"));
 		final byte[] id = new byte[0];
 		final Parcel p = Parcel.obtain();
@@ -88,8 +88,7 @@ public class ReminderUtils {
 		return mimeRecord;
 	}
 
-	public static ParseObject createParseObject(final long rId, final ContentValues values)
-	{
+	public static ParseObject createParseObject(final long rId, final ContentValues values) {
 		final ParseObject obj = new ParseObject("reminders");
 		obj.put(RemindersContract.Columns.ID, rId);
 		final String parseObjectId = values.getAsString(RemindersContract.Columns.PID);
@@ -111,8 +110,7 @@ public class ReminderUtils {
 		return obj;
 	}
 
-	public static void deleteReminder(final Context context, final int id)
-	{
+	public static void deleteReminder(final Context context, final int id) {
 		context.getContentResolver().delete(ContentUris.withAppendedId(RemindersProvider.REMINDERS_URI, id), null, null);
 		context.getContentResolver().notifyChange(RemindersProvider.REMINDERS_URI, null);
 
@@ -120,11 +118,10 @@ public class ReminderUtils {
 		cancelNotification(context, id);
 	}
 
-	public static Bitmap fetchThumbnail(final Context context, final int thumbnailId, final Bitmap imgDefaultAvatar)
-	{
+	public static Bitmap fetchThumbnail(final Context context, final int thumbnailId, final Bitmap imgDefaultAvatar) {
 		final Uri uri = ContentUris.withAppendedId(ContactsContract.Data.CONTENT_URI, thumbnailId);
-		final Cursor cursor = context.getContentResolver().query(uri, new String[]{ContactsContract.CommonDataKinds.Photo.PHOTO}, null, null, null
-		);
+		final Cursor cursor =
+				context.getContentResolver().query(uri, new String[]{ContactsContract.CommonDataKinds.Photo.PHOTO}, null, null, null);
 
 		try {
 			Bitmap thumbnail = imgDefaultAvatar;
@@ -140,24 +137,20 @@ public class ReminderUtils {
 		}
 	}
 
-	public static Bitmap fetchThumbnail(final Context context, final ReminderEntry reminder)
-	{
+	public static Bitmap fetchThumbnail(final Context context, final ReminderEntry reminder) {
 		final Bitmap defImg = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_contact_picture);
 		return fetchThumbnail(context, reminder.getContactUri(), defImg);
 	}
 
-	public static Bitmap fetchThumbnail(final Context context, final ReminderEntry reminder, final Bitmap defaultImg)
-	{
+	public static Bitmap fetchThumbnail(final Context context, final ReminderEntry reminder, final Bitmap defaultImg) {
 		return fetchThumbnail(context, reminder.getContactUri(), defaultImg);
 	}
 
-	public static Bitmap fetchThumbnail(final Context context, final Uri contactUri, final Bitmap defaultImg)
-	{
+	public static Bitmap fetchThumbnail(final Context context, final Uri contactUri, final Bitmap defaultImg) {
 		if (contactUri != null) {
 			Cursor c = null;
 			try {
-				c = context.getContentResolver().query(contactUri, new String[]{ContactsContract.Contacts.PHOTO_ID}, null, null, null
-				);
+				c = context.getContentResolver().query(contactUri, new String[]{ContactsContract.Contacts.PHOTO_ID}, null, null, null);
 
 				if ((c != null) && c.moveToFirst()) {
 					final int photoId = c.getInt(0);
@@ -170,49 +163,40 @@ public class ReminderUtils {
 		return defaultImg;
 	}
 
-	public static String formatAlarmDate(final Context context, final ReminderEntry mReminder)
-	{
+	public static String formatAlarmDate(final Context context, final ReminderEntry mReminder) {
 		return formatDate(context, mReminder.getAlarmTimestamp());
 	}
 
-	public static String formatAlarmTime(final Context context, final ReminderEntry mReminder)
-	{
+	public static String formatAlarmTime(final Context context, final ReminderEntry mReminder) {
 		return formatTime(context, mReminder.getAlarmTimestamp());
 	}
 
-	public static String formatDate(final Context context, final long ts)
-	{
+	public static String formatDate(final Context context, final long ts) {
 		return com.ch3d.xreminderx.utils.DateUtils.getDate(context, ts);
 	}
 
-	public static String formatDateTime(final Context context, final long ts)
-	{
+	public static String formatDateTime(final Context context, final long ts) {
 		return com.ch3d.xreminderx.utils.DateUtils.getDate2(context, ts);
 	}
 
-	public static String formatDateTimeShort(final Context context, final long ts)
-	{
+	public static String formatDateTimeShort(final Context context, final long ts) {
 		final String dateTime = ReminderUtils.formatDate(context, ts) + " " + ReminderUtils.formatTime(context, ts);
 		return dateTime;
 	}
 
-	public static String formatTime(final Context context, final long ts)
-	{
+	public static String formatTime(final Context context, final long ts) {
 		return DateUtils.formatDateTime(context, ts, FORMAT_TIME);
 	}
 
-	public static String formatTimestmapDate(final Context context, final ReminderEntry mReminder)
-	{
+	public static String formatTimestmapDate(final Context context, final ReminderEntry mReminder) {
 		return formatDate(context, mReminder.getTimestamp());
 	}
 
-	public static String formatTimestmapTime(final Context context, final ReminderEntry mReminder)
-	{
+	public static String formatTimestmapTime(final Context context, final ReminderEntry mReminder) {
 		return formatTime(context, mReminder.getTimestamp());
 	}
 
-	public static ContentValues getContentValues(final ReminderEntry entry)
-	{
+	public static ContentValues getContentValues(final ReminderEntry entry) {
 		final ContentValues values = new ContentValues();
 		values.put(RemindersContract.Columns.TEXT, entry.getText());
 		values.put(RemindersContract.Columns.PROTOCOL, entry.getProtocolVersion());
@@ -229,8 +213,7 @@ public class ReminderUtils {
 		return values;
 	}
 
-	public static PendingIntent getPendingAlarmOngoingOperation(final Context context, final long id)
-	{
+	public static PendingIntent getPendingAlarmOngoingOperation(final Context context, final long id) {
 		final Intent nIntent = new Intent(context, AlarmReceiver.class);
 		nIntent.setAction(ReminderIntent.ACTION_NOTIFICATION_ONGOING);
 		nIntent.setData(ContentUris.withAppendedId(RemindersProvider.REMINDERS_URI, id));
@@ -238,8 +221,7 @@ public class ReminderUtils {
 		return intent;
 	}
 
-	public static PendingIntent getPendingAlarmOperation(final Context context, final long id)
-	{
+	public static PendingIntent getPendingAlarmOperation(final Context context, final long id) {
 		final Intent nIntent = new Intent(context, AlarmReceiver.class);
 		nIntent.setAction(ReminderIntent.ACTION_NOTIFICATION_SHOW);
 		nIntent.setData(ContentUris.withAppendedId(RemindersProvider.REMINDERS_URI, id));
@@ -247,17 +229,14 @@ public class ReminderUtils {
 		return intent;
 	}
 
-	public static boolean hasAddressbookContact(final Context context, final ReminderEntry entry)
-	{
+	public static boolean hasAddressbookContact(final Context context, final ReminderEntry entry) {
 		return hasAddressbookContact(context, entry.getContactUri());
 	}
 
-	public static boolean hasAddressbookContact(final Context context, final Uri contactUri)
-	{
+	public static boolean hasAddressbookContact(final Context context, final Uri contactUri) {
 		Cursor c = null;
 		try {
-			c = context.getContentResolver().query(contactUri, new String[]{ContactsContract.Contacts.PHOTO_ID}, null, null, null
-			);
+			c = context.getContentResolver().query(contactUri, new String[]{ContactsContract.Contacts.PHOTO_ID}, null, null, null);
 			if (c != null) {
 				return c.getCount() > 0;
 			}
@@ -267,26 +246,30 @@ public class ReminderUtils {
 		}
 	}
 
-	public static boolean intToBoolean(final int value)
-	{
+	public static boolean intToBoolean(final int value) {
 		return value == 1;
 	}
 
-	public static ReminderEntry parse(final Cursor cursor)
-	{
+	public static ReminderEntry parse(final Cursor cursor) {
 		cursor.moveToFirst();
 		if (cursor.getCount() <= 0) {
 			return NullReminderEntry.VALUE;
 		}
-		final ReminderEntry entry = ReminderFactory.create(cursor.getInt(RemindersContract.Indexes.PROTOCOL), cursor.getInt(RemindersContract.Indexes._ID), cursor.getInt(RemindersContract.Indexes.TYPE), cursor.getLong(RemindersContract.Indexes.TIMESTAMP), cursor.getLong(RemindersContract.Indexes.ALARM_TIMESTAMP), cursor.getString(RemindersContract.Indexes.TEXT), cursor.getString(RemindersContract.Indexes.CONTACT_URI), intToBoolean(cursor.getInt(RemindersContract.Indexes.IS_ONGOING)), intToBoolean(cursor.getInt(RemindersContract.Indexes.IS_SILENT)), cursor.getInt(RemindersContract.Indexes.COLOR), cursor.getInt(RemindersContract.Indexes.VERSION));
+		final ReminderEntry entry = ReminderFactory
+				.create(cursor.getInt(RemindersContract.Indexes.PROTOCOL), cursor.getInt(RemindersContract.Indexes._ID),
+				        cursor.getInt(RemindersContract.Indexes.TYPE), cursor.getLong(RemindersContract.Indexes.TIMESTAMP),
+				        cursor.getLong(RemindersContract.Indexes.ALARM_TIMESTAMP), cursor.getString(RemindersContract.Indexes.TEXT),
+				        cursor.getString(RemindersContract.Indexes.CONTACT_URI),
+				        intToBoolean(cursor.getInt(RemindersContract.Indexes.IS_ONGOING)),
+				        intToBoolean(cursor.getInt(RemindersContract.Indexes.IS_SILENT)), cursor.getInt(RemindersContract.Indexes.COLOR),
+				        cursor.getInt(RemindersContract.Indexes.VERSION));
 		entry.setPid(cursor.getString(RemindersContract.Indexes.PID));
 		entry.setAccount(cursor.getString(RemindersContract.Indexes.ACCOUNT));
 		cursor.close();
 		return entry;
 	}
 
-	public static ReminderEntry parse(final Parcel in)
-	{
+	public static ReminderEntry parse(final Parcel in) {
 		final int protocol = in.readInt();
 		final int id = in.readInt();
 		final ReminderEntry entry = ReminderFactory.create(protocol, id);
@@ -309,8 +292,7 @@ public class ReminderUtils {
 		return entry;
 	}
 
-	public static ReminderEntry parseReminder(final NdefRecord rec)
-	{
+	public static ReminderEntry parseReminder(final NdefRecord rec) {
 		final byte[] payload = rec.getPayload();
 		final Parcel p = Parcel.obtain();
 		p.unmarshall(payload, 0, payload.length);
@@ -319,8 +301,7 @@ public class ReminderUtils {
 		return ndefReminder;
 	}
 
-	public static void setAlarm(final Context context, final long id, final ReminderEntry entry)
-	{
+	public static void setAlarm(final Context context, final long id, final ReminderEntry entry) {
 		final AlarmManager mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		final NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		if (entry.isOngoing()) {
@@ -333,8 +314,7 @@ public class ReminderUtils {
 		mAlarmManager.set(AlarmManager.RTC_WAKEUP, entry.getAlarmTimestamp(), intent);
 	}
 
-	public static String sha1Hash(final String toHash)
-	{
+	public static String sha1Hash(final String toHash) {
 		String hash = null;
 		try {
 			final MessageDigest digest = MessageDigest.getInstance("SHA-1");
@@ -352,8 +332,7 @@ public class ReminderUtils {
 		return hash;
 	}
 
-	public static void writeToParcel(final int protocol, final ReminderEntry entry, final Parcel dest)
-	{
+	public static void writeToParcel(final int protocol, final ReminderEntry entry, final Parcel dest) {
 		dest.writeInt(protocol);
 		dest.writeInt(entry.getId());
 		dest.writeLong(entry.getTimestamp());
@@ -369,18 +348,15 @@ public class ReminderUtils {
 		dest.writeInt(entry.getColor());
 	}
 
-	public static String getFormattedDateTime(Context context, long timestamp)
-	{
+	public static String getFormattedDateTime(Context context, long timestamp) {
 		return getFormattedDate(context, timestamp) + " " + getFormattedTime(context, timestamp);
 	}
 
-	public static String getFormattedDate(Context context, long timestamp)
-	{
+	public static String getFormattedDate(Context context, long timestamp) {
 		return formatDate(context, timestamp);
 	}
 
-	public static String getFormattedTime(Context context, long timestamp)
-	{
+	public static String getFormattedTime(Context context, long timestamp) {
 		return formatTime(context, timestamp);
 	}
 }

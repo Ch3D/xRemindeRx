@@ -26,6 +26,7 @@ dependencies {
     compile 'com.squareup:javawriter:2.4.0'
     compile 'com.android.support:support-v4:19.1.+'
     compile 'com.nhaarman.listviewanimations:library:2.6.0'
+    compile 'com.intellij:annotations:+@jar'
     // compile 'com.parse:parse:1.5.0+'
     compile files('libs/Parse-1.5.0.jar')
     compile project(':libraries:floatlabel')

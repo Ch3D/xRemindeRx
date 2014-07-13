@@ -27,8 +27,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewPropertyAnimator;
-import android.view.animation.AccelerateInterpolator;
 import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.CheckBox;
@@ -49,8 +47,6 @@ import com.ch3d.xreminderx.utils.ActivityUtils;
 import com.ch3d.xreminderx.utils.PreferenceHelper;
 import com.ch3d.xreminderx.utils.ReminderIntent;
 import com.ch3d.xreminderx.utils.ReminderUtils;
-import com.ch3d.xreminderx.view.ListViewObserveHelper;
-import com.ch3d.xreminderx.view.ListViewObserveHelper.Callback;
 import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener;
 import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener.DismissCallbacks;
 import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
@@ -120,22 +116,6 @@ public class RemindersListFragment extends ListFragment implements LoaderCallbac
 		return getActivity().findViewById(R.id.panel_bottom);
 	}
 
-	private void hideContainerBottom() {
-		if (!mVisibile) {
-			return;
-		}
-		mVisibile = false;
-		final View containerBottom = getContainerBottom();
-		final ViewPropertyAnimator animation = containerBottom.animate().setInterpolator(new AccelerateInterpolator()).setDuration(350)
-				.setListener(new AnimatorListenerAdapter() {
-					@Override
-					public void onAnimationEnd(final Animator animation) {
-						getActivity().getActionBar().hide();
-					}
-				});
-		animation.y(containerBottom.getY() + containerBottom.getHeight() + getActivity().getActionBar().getHeight());
-	}
-
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -156,26 +136,7 @@ public class RemindersListFragment extends ListFragment implements LoaderCallbac
 		final LoaderManager loaderManager = getLoaderManager();
 		loaderManager.initLoader(0, getArguments(), this);
 		mAdapter = new RemindersAdapter(getActivity(), null, true);
-
 		mListView = (ListView) view.findViewById(android.R.id.list);
-		ListViewObserveHelper.attach(mListView, new Callback() {
-			@Override
-			public void onStateChanged(final int state) {
-				switch (state) {
-					case Callback.STATE_VISIBLE:
-						showContainerBottom();
-						break;
-
-					case Callback.STATE_INVISIBLE:
-						hideContainerBottom();
-						break;
-
-					default:
-						break;
-				}
-			}
-
-		});
 		return view;
 	}
 
@@ -273,7 +234,7 @@ public class RemindersListFragment extends ListFragment implements LoaderCallbac
 		listView.setFooterDividersEnabled(false);
 		listView.addFooterView(View.inflate(getActivity(), R.layout.footer_reminders, null), null, false);
 
-		mSwipeListener = new SwipeDismissListViewTouchListener(listView, new DismissCallbacks() {
+		mSwipeListener = new SwipeDismissListViewTouchListener(listView, mSwipeLayout, new DismissCallbacks() {
 			@Override
 			public boolean canDismiss(final int position) {
 				return mActionMode == null;
@@ -359,27 +320,6 @@ public class RemindersListFragment extends ListFragment implements LoaderCallbac
 				}
 			}
 		}
-	}
-
-	private void showContainerBottom() {
-		if (mVisibile) {
-			return;
-		}
-		mVisibile = true;
-		final View containerBottom = getContainerBottom();
-		final ViewPropertyAnimator animation = containerBottom.animate().setInterpolator(new AccelerateInterpolator()).setDuration(350)
-				.setListener(new AnimatorListenerAdapter() {
-					@Override
-					public void onAnimationEnd(final Animator animation) {
-						containerBottom.postDelayed(new Runnable() {
-							@Override
-							public void run() {
-								getActivity().getActionBar().show();
-							}
-						}, 350);
-					}
-				});
-		animation.y(containerBottom.getY() - containerBottom.getHeight() - getActivity().getActionBar().getHeight());
 	}
 
 	@Override
