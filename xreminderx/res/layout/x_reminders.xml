@@ -1,14 +1,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:float="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                xmlns:float="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/root"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
     <fragment
         class="com.ch3d.xreminderx.fragment.RemindersListFragment"
         android:id="@+id/fragment_reminders_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"/>
 
     <ImageButton
         android:id="@android:id/button1"
@@ -20,7 +20,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:src="@drawable/ic_action_new"
-        android:contentDescription="@string/descr_add_reminder_button" />
+        android:contentDescription="@string/descr_add_reminder_button"/>
 
     <ImageButton
         android:id="@android:id/button2"
@@ -34,7 +34,7 @@
         android:layout_alignParentBottom="true"
         android:src="@drawable/ic_done"
         android:visibility="gone"
-        android:background="#7700ff00" />
+        android:background="@android:color/holo_green_light"/>
 
     <RelativeLayout
         android:id="@+id/panel_bottom"
@@ -60,7 +60,7 @@
             android:inputType="textCapSentences"
             android:textColorHint="?android:attr/textColorSecondaryInverse"
             android:textColor="?android:attr/textColorPrimaryInverse"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     </RelativeLayout>
 

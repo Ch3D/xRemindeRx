@@ -1,66 +1,23 @@
-
 package com.ch3d.xreminderx.model;
 
 import android.graphics.Color;
 
-import com.ch3d.xreminderx.R;
-
 public enum ReminderColor {
-    // LIGHT_GREEN("#9acc5b", R.drawable.bg_xrx_green_normal,
-    // R.style.Theme_XRX_Green),
-    // LIGHT_BLUE("#4dbce8", R.drawable.bg_xrx_blue_normal,
-    // R.style.Theme_XRX_Blue);
-    LIGHT_GREEN("#9acc5b", R.drawable.ab_bottom_light_simple_new, R.style.AppBaseTheme),
-    LIGHT_BLUE("#4dbce8", R.drawable.ab_bottom_light_simple_new, R.style.AppBaseTheme);
+	WHITE(Color.WHITE),
+	BLUE(Color.BLUE),
+	GREEN(Color.GREEN),
+	RED(Color.RED),
+	YELLOW(Color.YELLOW);
 
-    private static ReminderColor getReminderColor(final int color) {
-        final ReminderColor[] v = values();
-        for (int i = 0; i < v.length; i++) {
-            if (v[i].color == color) {
-                return v[i];
-            }
-        }
-        return null;
-    }
+	private final int color;
 
-    public static int getResId(final int color) {
-        final ReminderColor rc = getReminderColor(color);
-        if (rc != null) {
-            return rc.resId;
-        }
-        return R.drawable.ab_bottom_light_simple;
-    }
+	private ReminderColor(final int color)
+	{
+		this.color = color;
+	}
 
-    public static int getThemeId(final int color) {
-        final ReminderColor rc = getReminderColor(color);
-        if (rc != null) {
-            return rc.theme;
-        }
-        return R.style.AppBaseTheme;
-    }
-
-    private final int color;
-
-    private final int resId;
-
-    private final int theme;
-
-    private ReminderColor(final String c, final int res, final int theme)
-    {
-        resId = res;
-        this.theme = theme;
-        color = Color.parseColor(c);
-    }
-
-    public int getColor() {
-        return color;
-    }
-
-    public int getResId() {
-        return resId;
-    }
-
-    public int getTheme() {
-        return theme;
-    }
+	public int getColor()
+	{
+		return color;
+	}
 }
