@@ -306,6 +306,7 @@ public class RemindersListFragment extends ListFragment implements LoaderCallbac
 		}
 		);
 		listView.setOnTouchListener(mSwipeListener);
+        listView.setOnScrollListener(mSwipeListener.makeScrollListener());
 	}
 
 	protected void performCloudSync() {

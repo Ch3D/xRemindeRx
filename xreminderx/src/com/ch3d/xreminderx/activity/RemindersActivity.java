@@ -1,5 +1,8 @@
 package com.ch3d.xreminderx.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.SearchManager;
@@ -18,6 +21,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.widget.ImageButton;
 import android.widget.SearchView;
 
 import com.ch3d.xreminderx.R;
@@ -45,262 +50,343 @@ import butterknife.OnClick;
 import dagger.Lazy;
 
 public class RemindersActivity extends BaseFragmentActivity implements
-		android.view.View.OnClickListener, ConnectionCallbacks, OnConnectionFailedListener {
-	private static final int REQUEST_CODE_SIGN_IN = 0x02;
+        android.view.View.OnClickListener, ConnectionCallbacks, OnConnectionFailedListener {
+    private static final int REQUEST_CODE_SIGN_IN = 0x02;
+    public static final int ANIMATION_DURATION = 300;
 
-	@InjectView(android.R.id.edit)
-	protected FloatLabeledEditText mEditQuickText;
+    @InjectView(android.R.id.edit)
+    protected FloatLabeledEditText mEditQuickText;
 
-	@InjectView(R.id.panel_bottom)
-	protected View mBottomPanel;
+    @InjectView(R.id.panel_bottom)
+    protected View mBottomPanel;
 
-	@Inject
-	Lazy<SearchManager> searchManager;
+    @InjectView(android.R.id.button1)
+    protected ImageButton mBtnAdd;
 
-	private GoogleApiClient mGoogleApi;
+    @InjectView(android.R.id.button2)
+    protected ImageButton mBtnNew;
 
-	private ConnectionResult mConnectionResult;
+    @Inject
+    Lazy<SearchManager> searchManager;
 
-	private boolean mSignInSelected;
+    private GoogleApiClient mGoogleApi;
 
-	private boolean mIntentInProgress;
+    private ConnectionResult mConnectionResult;
 
-	private NdefMessage[] getNdefMessages(final Intent intent) {
-		NdefMessage[] msgs = null;
-		final Parcelable[] rawMsgs = intent
-				.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-		if (rawMsgs != null) {
-			msgs = new NdefMessage[rawMsgs.length];
-			for (int i = 0; i < rawMsgs.length; i++) {
-				msgs[i] = (NdefMessage) rawMsgs[i];
-			}
-		}
-		return msgs;
-	}
+    private boolean mSignInSelected;
 
-	@Override
-	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-		if ((resultCode == RESULT_OK) && (requestCode == REQUEST_CODE_SIGN_IN)) {
-			mGoogleApi.connect();
-		}
-	}
+    private boolean mIntentInProgress;
 
-	@Override
-	@OnClick(android.R.id.button1)
-	public void onClick(final View v) {
-		final String title = mEditQuickText.getText().toString().trim();
-		if (StringUtils.isBlank(title)) {
-			return;
-		}
-		final ReminderEntry reminder = ReminderFactory.createNew();
-		reminder.setText(title);
-		reminder.setOngoing(false);
-		reminder.setSilent(true);
-		reminder.setColor(Color.WHITE);
+    private NdefMessage[] getNdefMessages(final Intent intent) {
+        NdefMessage[] msgs = null;
+        final Parcelable[] rawMsgs = intent
+                .getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+        if (rawMsgs != null) {
+            msgs = new NdefMessage[rawMsgs.length];
+            for (int i = 0; i < rawMsgs.length; i++) {
+                msgs[i] = (NdefMessage) rawMsgs[i];
+            }
+        }
+        return msgs;
+    }
 
-		mEditQuickText.getText().clear();
-		ViewUtils.hideKeyboard(mEditQuickText.getEditText());
-		RemindersProvider.addReminder(this, reminder, true);
-	}
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        if ((resultCode == RESULT_OK) && (requestCode == REQUEST_CODE_SIGN_IN)) {
+            mGoogleApi.connect();
+        }
+    }
 
-	@Override
-	public void onConnected(final Bundle bundle) {
-		invalidateOptionsMenu();
+    @Override
+    public void onBackPressed() {
+        if (mBtnAdd.getVisibility() != View.VISIBLE) {
+            mEditQuickText.setVisibility(View.VISIBLE);
 
-		if (mIntentInProgress) {
-			// TODO: Ask to sync reminders into the cloud
-		}
+            int[] location = new int[2];
+            mBtnNew.getLocationOnScreen(location);
+            ValueAnimator widthAnimator = ValueAnimator.ofInt(location[0], 0);
+            widthAnimator.setInterpolator(new AccelerateInterpolator());
+            widthAnimator.setDuration(ANIMATION_DURATION);
+            widthAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    mEditQuickText.getLayoutParams().width = (Integer) animation.getAnimatedValue();
+                    mEditQuickText.requestLayout();
+                }
+            });
+            widthAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    ActivityUtils.hideKeyboard(mEditQuickText.getEditText());
+                }
+            });
+            widthAnimator.start();
 
-		mSignInSelected = false;
-		mIntentInProgress = false;
-		mConnectionResult = new ConnectionResult(ConnectionResult.SUCCESS, null);
-		ActivityUtils.showToastShort(this,
-				"Signed in as " + Plus.AccountApi.getAccountName(mGoogleApi));
-	}
+            animateButton(mBtnNew, false);
+            animateButton(mBtnAdd, true);
+        } else {
+            super.onBackPressed();
+        }
+    }
 
-	@Override
-	public void onConnectionFailed(final ConnectionResult result) {
-		mConnectionResult = result;
-		invalidateOptionsMenu();
+    private void animateButton(final ImageButton btn, final boolean visible) {
+        final int visibility = visible ? View.VISIBLE : View.GONE;
+        if (visible) {
+            btn.setVisibility(visibility);
+        }
+        btn.animate().setDuration(ANIMATION_DURATION).
+                setInterpolator(new AccelerateInterpolator()).
+                alpha(visible ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                btn.setVisibility(visibility);
+            }
+        }).start();
+    }
 
-		if (!result.hasResolution()) {
-			GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), this,
-					0).show();
-		}
-		if (mIntentInProgress) {
-			mSignInSelected = false;
-		}
-		if (mSignInSelected) {
-			resolveSignInError();
-		}
-	}
+    @Override
+    @OnClick(android.R.id.button1)
+    public void onClick(final View v) {
+        mEditQuickText.setVisibility(View.VISIBLE);
 
-	@Override
-	public void onConnectionSuspended(final int arg0) {
-		mSignInSelected = false;
-		invalidateOptionsMenu();
-	}
+        int[] location = new int[2];
+        mBtnAdd.getLocationOnScreen(location);
+        ValueAnimator widthAnimator = ValueAnimator.ofInt(0, location[0]);
+        widthAnimator.setInterpolator(new AccelerateInterpolator());
+        widthAnimator.setDuration(ANIMATION_DURATION);
+        widthAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                mEditQuickText.getLayoutParams().width = (Integer) animation.getAnimatedValue();
+                mEditQuickText.requestLayout();
+            }
+        });
+        widthAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                ActivityUtils.showKeyboard(mEditQuickText.getEditText());
+            }
+        });
+        widthAnimator.start();
 
-	@Override
-	protected void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+        animateButton(mBtnNew, true);
+        animateButton(mBtnAdd, false);
 
-		final Intent intent = getIntent();
-		final String action = intent.getAction();
-		final String type = intent.getType();
-		if (Intent.ACTION_SEND.equals(action) && type != null) {
-			if ("text/plain".equals(type)) {
-				handleSendText(intent);
-			}
-		}
+        final String title = mEditQuickText.getText().toString().trim();
+        if (StringUtils.isBlank(title)) {
+            return;
+        }
+        final ReminderEntry reminder = ReminderFactory.createNew();
+        reminder.setText(title);
+        reminder.setOngoing(false);
+        reminder.setSilent(true);
+        reminder.setColor(Color.WHITE);
 
-		mGoogleApi = ActivityUtils.getGoogleApi(this);
-		mGoogleApi.registerConnectionCallbacks(this);
-		mGoogleApi.registerConnectionFailedListener(this);
-		mGoogleApi.connect();
+        mEditQuickText.getText().clear();
+        ViewUtils.hideKeyboard(mEditQuickText.getEditText());
+        RemindersProvider.addReminder(this, reminder, true);
+    }
 
-		setContentView(R.layout.x_reminders);
-		ButterKnife.inject(this);
-		setTitle(R.string.reminders);
 
-		// parse intent in case if
-		// application is not already running
-		parseNfcIntent(getIntent());
-	}
+    @Override
 
-	private void handleSendText(final Intent intent) {
-		final String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-		if (!StringUtils.isBlank(sharedText)) {
-			ReminderEntry entry = ReminderFactory.createNew();
-			entry.setText(sharedText);
-			RemindersProvider.addReminder(this, entry);
-		}
-	}
+    public void onConnected(final Bundle bundle) {
+        invalidateOptionsMenu();
 
-	@Override
-	public boolean onCreateOptionsMenu(final Menu menu) {
-		getMenuInflater().inflate(R.menu.reminders_list, menu);
-		final MenuItem menuItem = menu.findItem(R.menu.action_search);
-		menuItem.setOnActionExpandListener(new OnActionExpandListener() {
-			@Override
-			public boolean onMenuItemActionCollapse(final MenuItem item) {
-				mBottomPanel.setVisibility(View.VISIBLE);
-				return true;
-			}
+        if (mIntentInProgress) {
+            // TODO: Ask to sync reminders into the cloud
+        }
 
-			@Override
-			public boolean onMenuItemActionExpand(final MenuItem item) {
-				mBottomPanel.setVisibility(View.GONE);
-				return true;
-			}
-		});
-		final SearchView searchView = (SearchView) menuItem.getActionView();
-		searchView.setSearchableInfo(searchManager.get().getSearchableInfo(getComponentName()));
-		return true;
-	}
+        mSignInSelected = false;
+        mIntentInProgress = false;
+        mConnectionResult = new ConnectionResult(ConnectionResult.SUCCESS, null);
+        ActivityUtils.showToastShort(this,
+                "Signed in as " + Plus.AccountApi.getAccountName(mGoogleApi));
+    }
 
-	@Override
-	protected void onNewIntent(final Intent intent) {
-		super.onNewIntent(intent);
-		// parse intent in case if application is running
-		parseNfcIntent(intent);
-	}
+    @Override
+    public void onConnectionFailed(final ConnectionResult result) {
+        mConnectionResult = result;
+        invalidateOptionsMenu();
 
-	@Override
-	public boolean onOptionsItemSelected(final MenuItem item) {
-		if (item.getItemId() == R.menu.action_gplus_signin) {
-			mSignInSelected = true;
-			mGoogleApi.connect();
-			return true;
-		} else if (item.getItemId() == R.menu.action_gplus_signout) {
-			Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApi);
-			mGoogleApi.disconnect();
-			mGoogleApi.connect();
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+        if (!result.hasResolution()) {
+            GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(), this,
+                    0).show();
+        }
+        if (mIntentInProgress) {
+            mSignInSelected = false;
+        }
+        if (mSignInSelected) {
+            resolveSignInError();
+        }
+    }
 
-	@Override
-	public boolean onPrepareOptionsMenu(final Menu menu) {
-		if ((mConnectionResult != null) && mConnectionResult.isSuccess()) {
-			mGoogleApi.connect();
-			mConnectionResult = null;
-		}
-		final boolean connected = mGoogleApi.isConnected();
-		menu.findItem(R.menu.action_gplus_signin).setVisible(!connected);
-		menu.findItem(R.menu.action_gplus_signout).setVisible(connected);
-		return true;
-	}
+    @Override
+    public void onConnectionSuspended(final int arg0) {
+        mSignInSelected = false;
+        invalidateOptionsMenu();
+    }
 
-	private void parseNdefMessages(final NdefMessage[] msgs) {
-		if (msgs == null) {
-			return;
-		}
-		for (final NdefMessage msg : msgs) {
-			for (final NdefRecord rec : msg.getRecords()) {
-				final ReminderEntry reminder = ReminderUtils.parseReminder(rec);
-				final Cursor cursor = getContentResolver().query(
-						RemindersProvider.REMINDERS_URI,
-						null,
-						"text = ? AND ts = ? AND alarm_ts = ?",
-						new String[]{
-								reminder.getText(),
-								Long.toString(reminder.getTimestamp()),
-								Long.toString(reminder.getAlarmTimestamp())
-						},
-						null
-				);
-				if (cursor.getCount() > 0) {
-					final AlertDialog.Builder builder = new Builder(this);
-					builder.setTitle(R.string.reminder_is_already_exist);
-					builder.setMessage(reminder.getText());
-					builder.setPositiveButton(R.string.add,
-							new OnClickListener() {
-								@Override
-								public void onClick(
-										final DialogInterface dialog,
-										final int which) {
-									RemindersProvider.addReminder(
-											RemindersActivity.this, reminder);
-									dialog.dismiss();
-								}
-							}
-					);
-					builder.setNegativeButton(R.string.cancel,
-							new OnClickListener() {
-								@Override
-								public void onClick(
-										final DialogInterface dialog,
-										final int which) {
-									dialog.dismiss();
-								}
-							}
-					);
-					builder.show();
-				} else {
-					RemindersProvider.addReminder(this, reminder, true);
-				}
-			}
-		}
-	}
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-	private void parseNfcIntent(final Intent intent) {
-		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
-			final NdefMessage[] msgs = getNdefMessages(intent);
-			parseNdefMessages(msgs);
-		}
-	}
+        final Intent intent = getIntent();
+        final String action = intent.getAction();
+        final String type = intent.getType();
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type)) {
+                handleSendText(intent);
+            }
+        }
 
-	private void resolveSignInError() {
-		if ((mConnectionResult != null) && mConnectionResult.hasResolution()) {
-			try {
-				mIntentInProgress = true;
-				mConnectionResult.startResolutionForResult(this, REQUEST_CODE_SIGN_IN);
-			} catch (final SendIntentException e) {
-				mIntentInProgress = false;
-				mGoogleApi.connect();
-			}
-		}
-	}
+        mGoogleApi = ActivityUtils.getGoogleApi(this);
+        mGoogleApi.registerConnectionCallbacks(this);
+        mGoogleApi.registerConnectionFailedListener(this);
+        mGoogleApi.connect();
+
+        setContentView(R.layout.x_reminders);
+        ButterKnife.inject(this);
+        setTitle(R.string.reminders);
+
+        // parse intent in case if
+        // application is not already running
+        parseNfcIntent(getIntent());
+    }
+
+    private void handleSendText(final Intent intent) {
+        final String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if (!StringUtils.isBlank(sharedText)) {
+            ReminderEntry entry = ReminderFactory.createNew();
+            entry.setText(sharedText);
+            RemindersProvider.addReminder(this, entry);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.reminders_list, menu);
+        final MenuItem menuItem = menu.findItem(R.menu.action_search);
+        menuItem.setOnActionExpandListener(new OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionCollapse(final MenuItem item) {
+                mBottomPanel.setVisibility(View.VISIBLE);
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionExpand(final MenuItem item) {
+                mBottomPanel.setVisibility(View.GONE);
+                return true;
+            }
+        });
+        final SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setSearchableInfo(searchManager.get().getSearchableInfo(getComponentName()));
+        return true;
+    }
+
+    @Override
+    protected void onNewIntent(final Intent intent) {
+        super.onNewIntent(intent);
+        // parse intent in case if application is running
+        parseNfcIntent(intent);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        if (item.getItemId() == R.menu.action_gplus_signin) {
+            mSignInSelected = true;
+            mGoogleApi.connect();
+            return true;
+        } else if (item.getItemId() == R.menu.action_gplus_signout) {
+            Plus.AccountApi.revokeAccessAndDisconnect(mGoogleApi);
+            mGoogleApi.disconnect();
+            mGoogleApi.connect();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(final Menu menu) {
+        if ((mConnectionResult != null) && mConnectionResult.isSuccess()) {
+            mGoogleApi.connect();
+            mConnectionResult = null;
+        }
+        final boolean connected = mGoogleApi.isConnected();
+        menu.findItem(R.menu.action_gplus_signin).setVisible(!connected);
+        menu.findItem(R.menu.action_gplus_signout).setVisible(connected);
+        return true;
+    }
+
+    private void parseNdefMessages(final NdefMessage[] msgs) {
+        if (msgs == null) {
+            return;
+        }
+        for (final NdefMessage msg : msgs) {
+            for (final NdefRecord rec : msg.getRecords()) {
+                final ReminderEntry reminder = ReminderUtils.parseReminder(rec);
+                final Cursor cursor = getContentResolver().query(
+                        RemindersProvider.REMINDERS_URI,
+                        null,
+                        "text = ? AND ts = ? AND alarm_ts = ?",
+                        new String[]{
+                                reminder.getText(),
+                                Long.toString(reminder.getTimestamp()),
+                                Long.toString(reminder.getAlarmTimestamp())
+                        },
+                        null
+                );
+                if (cursor.getCount() > 0) {
+                    final AlertDialog.Builder builder = new Builder(this);
+                    builder.setTitle(R.string.reminder_is_already_exist);
+                    builder.setMessage(reminder.getText());
+                    builder.setPositiveButton(R.string.add,
+                            new OnClickListener() {
+                                @Override
+                                public void onClick(
+                                        final DialogInterface dialog,
+                                        final int which) {
+                                    RemindersProvider.addReminder(
+                                            RemindersActivity.this, reminder);
+                                    dialog.dismiss();
+                                }
+                            }
+                    );
+                    builder.setNegativeButton(R.string.cancel,
+                            new OnClickListener() {
+                                @Override
+                                public void onClick(
+                                        final DialogInterface dialog,
+                                        final int which) {
+                                    dialog.dismiss();
+                                }
+                            }
+                    );
+                    builder.show();
+                } else {
+                    RemindersProvider.addReminder(this, reminder, true);
+                }
+            }
+        }
+    }
+
+    private void parseNfcIntent(final Intent intent) {
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+            final NdefMessage[] msgs = getNdefMessages(intent);
+            parseNdefMessages(msgs);
+        }
+    }
+
+    private void resolveSignInError() {
+        if ((mConnectionResult != null) && mConnectionResult.hasResolution()) {
+            try {
+                mIntentInProgress = true;
+                mConnectionResult.startResolutionForResult(this, REQUEST_CODE_SIGN_IN);
+            } catch (final SendIntentException e) {
+                mIntentInProgress = false;
+                mGoogleApi.connect();
+            }
+        }
+    }
 }
