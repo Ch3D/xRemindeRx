@@ -63,7 +63,7 @@ public class ReminderViewFragment extends Fragment {
 
 	private void bindContactData(final ReminderEntry reminder, final boolean isContactRelated) {
 		if (isContactRelated) {
-			mContactBadgeHolder.setVisibility(View.VISIBLE);
+			mContactBadgeHolder.setVisibility(true);
 			getActivity().findViewById(R.x_contact_badge.btnRemove).setVisibility(View.GONE);
 			mContactBadgeHolder.setOnClickListener(new OnClickListener() {
 				@Override
@@ -73,7 +73,7 @@ public class ReminderViewFragment extends Fragment {
 			});
 			setContactBagdeData(reminder.getContactUri(), null);
 		} else {
-			mContactBadgeHolder.setVisibility(View.GONE);
+			mContactBadgeHolder.setVisibility(false);
 		}
 	}
 

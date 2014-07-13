@@ -58,7 +58,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 	@InjectView(R.f_reminder_edit.text)
 	protected FloatLabeledEditText mText;
 	@InjectView(R.f_reminder_edit.btnTsDatePicker)
-	
+
 	protected Button mBtnDatePicker;
 	@InjectView(R.f_reminder_edit.btnTsTimePicker)
 	protected Button mBtnTimePicker;
@@ -339,7 +339,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 		});
 
 		mReminder = getReminder();
-		mContactBadgeHolder.setVisibility(View.VISIBLE);
+		mContactBadgeHolder.setVisibility(true);
 		mContactBadgeHolder.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(final View v) {
