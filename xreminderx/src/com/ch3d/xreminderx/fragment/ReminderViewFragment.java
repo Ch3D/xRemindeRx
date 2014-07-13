@@ -64,8 +64,7 @@ public class ReminderViewFragment extends Fragment {
 	private void bindContactData(final ReminderEntry reminder, final boolean isContactRelated) {
 		if (isContactRelated) {
 			mContactBadgeHolder.setVisibility(View.VISIBLE);
-			getActivity().findViewById(R.x_contact_badge.btnRemove)
-					.setVisibility(View.GONE);
+			getActivity().findViewById(R.x_contact_badge.btnRemove).setVisibility(View.GONE);
 			mContactBadgeHolder.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(final View v) {
@@ -80,10 +79,8 @@ public class ReminderViewFragment extends Fragment {
 
 	private void bindView(final ReminderEntry reminder) {
 		ViewUtils.setAnimatedText(mText, reminder.getText());
-		ViewUtils.setAnimatedText(mTimestamp, ReminderUtils.formatDateTimeShort(getActivity(),
-				reminder.getTimestamp()));
-		ViewUtils.setAnimatedText(mAlarmTimstamp, ReminderUtils.formatDateTimeShort(getActivity(),
-				reminder.getAlarmTimestamp()));
+		ViewUtils.setAnimatedText(mTimestamp, ReminderUtils.formatDateTimeShort(getActivity(), reminder.getTimestamp()));
+		ViewUtils.setAnimatedText(mAlarmTimstamp, ReminderUtils.formatDateTimeShort(getActivity(), reminder.getAlarmTimestamp()));
 
 		mIconType.setImageLevel(reminder.getType().getId());
 		mColor.setBackgroundColor(reminder.getColor());
@@ -96,8 +93,7 @@ public class ReminderViewFragment extends Fragment {
 	}
 
 	private ReminderEntry getReminder() {
-		final Cursor cursor = getActivity().getContentResolver().query(
-				getActivity().getIntent().getData(), null, null, null, null);
+		final Cursor cursor = getActivity().getContentResolver().query(getActivity().getIntent().getData(), null, null, null, null);
 		final ReminderEntry reminder = ReminderUtils.parse(cursor);
 		return reminder;
 	}
@@ -114,13 +110,10 @@ public class ReminderViewFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(final LayoutInflater inflater,
-	                         final ViewGroup container, final Bundle savedInstanceState) {
-		final View view = inflater.inflate(R.layout.f_reminder_view, container,
-				false);
+	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+		final View view = inflater.inflate(R.layout.f_reminder_view, container, false);
 		ButterKnife.inject(this, view);
-		mContactBadgeHolder = new ContactBadgeHolder(getActivity(),
-				(ViewStub) view.findViewById(R.f_reminder_view.contact_badge));
+		mContactBadgeHolder = new ContactBadgeHolder(getActivity(), (ViewStub) view.findViewById(R.f_reminder_view.contact_badge));
 		return view;
 	}
 
@@ -145,13 +138,11 @@ public class ReminderViewFragment extends Fragment {
 
 			case R.id.action_edit:
 				final FragmentTransaction trx = getFragmentManager().beginTransaction();
-				trx.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
-						android.R.anim.fade_in, android.R.anim.fade_out);
+				trx.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out);
 				final Fragment viewFragment = getFragmentManager().findFragmentByTag(ReminderViewFragment.TAG);
 				trx.detach(viewFragment);
-				trx.add(R.x_reminder_details.root,
-						ReminderEditFragment.newInstance(getActivity().getIntent().getData()),
-						ReminderEditFragment.TAG);
+				trx.add(R.x_reminder_details.root, ReminderEditFragment.newInstance(getActivity().getIntent().getData()),
+				        ReminderEditFragment.TAG);
 				trx.addToBackStack(ReminderEditFragment.TAG);
 				trx.commit();
 				return true;
@@ -173,24 +164,20 @@ public class ReminderViewFragment extends Fragment {
 		getActivity().setTitle(R.string.view_reminder);
 		final ReminderEntry reminder = getReminder();
 		bindView(reminder);
-		final NfcAdapter nfcAdapter = NfcAdapter
-				.getDefaultAdapter(getActivity());
+		final NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
 		if (nfcAdapter != null) {
-			final NdefMessage msg = new NdefMessage(
-					ReminderUtils.createNdefRecord(getActivity(), reminder));
+			final NdefMessage msg = new NdefMessage(ReminderUtils.createNdefRecord(getActivity(), reminder));
 			nfcAdapter.setNdefPushMessage(msg, getActivity());
 		}
 
 	}
 
-	private void setContactBagdeData(final Uri uri,
-	                                 final OnClickListener removeClickListener) {
+	private void setContactBagdeData(final Uri uri, final OnClickListener removeClickListener) {
 		mContactBadgeHolder.setData(uri, removeClickListener);
 	}
 
 	private void showContactDetails(final ReminderEntry reminder) {
-		final Intent detailsIntent = ActivityUtils.getContactDetailsIntent(
-				getActivity(), reminder);
+		final Intent detailsIntent = ActivityUtils.getContactDetailsIntent(getActivity(), reminder);
 		if (detailsIntent != null) {
 			getActivity().startActivity(detailsIntent);
 		}
