@@ -1,29 +1,44 @@
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_alignParentTop="true"
-    android:layout_toLeftOf="@+x_reminder_item/delimiter"
-    android:layout_toRightOf="@+x_reminder_item/icon"
     android:layout_width="match_parent"
-    android:layout_height="?android:attr/listPreferredItemHeightLarge">
-    <TextView
-		android:id="@+id/text"
-      	android:ellipsize="end"
-      	android:singleLine="true"
-      	android:layout_weight="1"
-      	android:layout_width="match_parent"
-      	android:gravity="bottom"
-      	android:fontFamily="sans-serif-light"
-      	android:layout_height="0dp"
-      	android:textAppearance="?android:attr/textAppearanceLarge" />
-  	<TextView
-      	android:id="@+id/date"
-      	android:ellipsize="end"
-      	android:singleLine="true"
-      	android:layout_weight="1"
-      	android:layout_width="match_parent"
-      	android:gravity="top"
-      	android:fontFamily="sans-serif-thin"
-      	android:layout_height="0dp"
-      	android:textAppearance="?android:attr/textAppearance" />
-</LinearLayout>
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/card_background_white">
+
+        <TextView
+            android:id="@+id/text"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:paddingLeft="16dp"
+            android:paddingTop="4dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="4dp"
+            android:gravity="bottom"
+            android:fontFamily="sans-serif-light"
+            android:layout_height="0dp"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        <TextView
+            android:id="@+id/date"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="8dp"
+            android:gravity="top"
+            android:fontFamily="sans-serif-thin"
+            android:layout_height="0dp"
+            android:textColor="@android:color/secondary_text_light"
+            android:textAppearance="?android:attr/textAppearance"/>
+    </LinearLayout>
+</FrameLayout>
