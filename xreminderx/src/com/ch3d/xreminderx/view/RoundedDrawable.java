@@ -3,6 +3,7 @@ package com.ch3d.xreminderx.view;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.ComposeShader;
 import android.graphics.Matrix;
@@ -27,9 +28,10 @@ public class RoundedDrawable extends Drawable {
 	private final BitmapShader mBitmapShader;
 	private final Paint mPaint;
 	private final int mMargin;
+	private final RectF mRect2 = new RectF();
 
 	public static void setRoundedDrawable(ImageView imgView, Bitmap bitmap) {
-		setRoundedDrawable(imgView, bitmap, 0);
+		setRoundedDrawable(imgView, bitmap, 8);
 	}
 
 	public static void setRoundedDrawable(ImageView imgView, Bitmap bitmap, int margin) {
@@ -53,6 +55,7 @@ public class RoundedDrawable extends Drawable {
 	protected void onBoundsChange(Rect bounds) {
 		super.onBoundsChange(bounds);
 		mRect.set(mMargin, mMargin, bounds.width() - mMargin, bounds.height() - mMargin);
+		mRect2.set(0, 0, bounds.width(), bounds.height());
 
 		if (USE_VIGNETTE) {
 			RadialGradient vignette =
@@ -69,6 +72,9 @@ public class RoundedDrawable extends Drawable {
 
 	@Override
 	public void draw(Canvas canvas) {
+		Paint colorPaint = new Paint();
+		colorPaint.setColor(Color.RED);
+		canvas.drawRoundRect(mRect2, mCornerRadius, mCornerRadius, colorPaint);
 		canvas.drawRoundRect(mRect, mCornerRadius, mCornerRadius, mPaint);
 	}
 
