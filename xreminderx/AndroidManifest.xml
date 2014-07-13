@@ -54,6 +54,7 @@
             android:enabled="true"
             android:excludeFromRecents="true"
             android:windowSoftInputMode="stateAlwaysVisible"
+            android:launchMode="singleInstance"
             android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar"/>
 
         <receiver
