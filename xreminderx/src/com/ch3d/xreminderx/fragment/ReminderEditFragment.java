@@ -1,9 +1,4 @@
-
 package com.ch3d.xreminderx.fragment;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Locale;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -28,10 +23,6 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.OnClick;
-import butterknife.Optional;
 
 import com.ch3d.xreminderx.R;
 import com.ch3d.xreminderx.adapter.ColorsAdapter;
@@ -50,422 +41,370 @@ import com.ch3d.xreminderx.utils.StringUtils;
 import com.ch3d.xreminderx.utils.ViewUtils;
 import com.wrapp.floatlabelededittext.FloatLabeledEditText;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
+import butterknife.Optional;
+
 public class ReminderEditFragment extends Fragment implements OnClickListener,
-        OnReminderDateSetListener,
-        OnReminderTimeSetListener
-{
-    private static final String REMINDER_FRAGMENT_DATA = "ReminderEditFragment.data";
+		OnReminderDateSetListener,
+		OnReminderTimeSetListener {
+	public static final String TAG = "ReminderEdit";
+	public static final int REQUEST_CODE_GET_CONTACT = 2;
+	private static final String REMINDER_FRAGMENT_DATA = "ReminderEditFragment.data";
+	private static final int REQUEST_CODE_SPEECH_RECOGNITION = 1;
+	@InjectView(R.f_reminder_edit.text)
+	protected FloatLabeledEditText mText;
+	@InjectView(R.f_reminder_edit.btnTsDatePicker)
+	protected Button mBtnDatePicker;
+	@InjectView(R.f_reminder_edit.btnTsTimePicker)
+	protected Button mBtnTimePicker;
+	@InjectView(R.f_reminder_edit.btnTsAlarmDatePicker)
+	protected Button mBtnAlarmDatePicker;
+	@InjectView(R.f_reminder_edit.btnTsAlarmTimePicker)
+	protected Button mBtnAlarmTimePicker;
+	protected ReminderEntry mReminder;
+	@InjectView(R.f_reminder_edit.btnStartSpeech)
+	protected Button btnSpeech;
+	@InjectView(R.f_reminder_edit.cbOngoing)
+	protected CheckBox mOngoing;
+	@InjectView(R.f_reminder_edit.cbSilent)
+	protected CheckBox mSilent;
+	@InjectView(R.f_reminder_edit.color)
+	protected Spinner mColor;
+	private ContactBadgeHolder mContactBadgeHolder;
+	private ColorsAdapter mColorsAdapter;
 
-    public static final String TAG = "ReminderEdit";
+	/**
+	 * @param data array of data
+	 * @return index of max value in array
+	 */
+	private static int findMax(final float[] data) {
+		int result = -1;
+		float currMax = Float.MIN_VALUE;
+		for (int i = 0; i < data.length; i++) {
+			final float curr = data[i];
+			if (currMax < curr) {
+				currMax = curr;
+				result = i;
+			}
+		}
+		return result;
+	}
 
-    private static final int REQUEST_CODE_SPEECH_RECOGNITION = 1;
+	public static ReminderEditFragment newInstance(final Uri data) {
+		final ReminderEditFragment fragment = new ReminderEditFragment();
+		final Bundle bundle = new Bundle();
+		bundle.putString(REMINDER_FRAGMENT_DATA, data.toString());
+		fragment.setArguments(bundle);
+		return fragment;
+	}
 
-    public static final int REQUEST_CODE_GET_CONTACT = 2;
+	protected boolean checkValid() {
+		final boolean isBlank = StringUtils.isBlank(mText.getText().toString());
+		if (isBlank) {
+			mText.setError(getActivity().getString(R.string.please_enter_event_title));
+			mText.requestFocus();
+			return false;
+		}
+		if (mReminder.getAlarmTimestamp() > mReminder.getTimestamp()) {
+			ActivityUtils.showToastShort(getActivity(), "Alarm time can't be after Event time");
+			return false;
+		}
+		return true;
+	}
 
-    /**
-     * @param data array of data
-     * @return index of max value in array
-     */
-    private static int findMax(final float[] data)
-    {
-        int result = -1;
-        float currMax = Float.MIN_VALUE;
-        for (int i = 0; i < data.length; i++)
-        {
-            final float curr = data[i];
-            if (currMax < curr)
-            {
-                currMax = curr;
-                result = i;
-            }
-        }
-        return result;
-    }
+	protected ReminderEntry getReminder() {
+		final Uri data = Uri.parse(getArguments().getString(REMINDER_FRAGMENT_DATA));
+		final Cursor query = getActivity().getContentResolver().query(
+				data, null, null,
+				null, null);
+		return ReminderUtils.parse(query);
+	}
 
-    public static ReminderEditFragment newInstance(final Uri data) {
-        final ReminderEditFragment fragment = new ReminderEditFragment();
-        final Bundle bundle = new Bundle();
-        bundle.putString(REMINDER_FRAGMENT_DATA, data.toString());
-        fragment.setArguments(bundle);
-        return fragment;
-    }
+	protected int getTitleResource() {
+		return R.string.edit_reminder;
+	}
 
-    @InjectView(R.f_reminder_edit.text)
-    protected FloatLabeledEditText mText;
+	private Calendar modifyDate(final long ts, final int year, final int monthOfYear,
+	                            final int dayOfMonth) {
+		final Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(ts);
+		c.set(Calendar.YEAR, year);
+		c.set(Calendar.MONTH, monthOfYear);
+		c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+		return c;
+	}
 
-    @InjectView(R.f_reminder_edit.btnTsDatePicker)
-    protected Button mBtnDatePicker;
+	private Calendar modifyTime(final long ts, final int hourOfDay, final int minute) {
+		final Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(ts);
+		c.set(Calendar.HOUR_OF_DAY, hourOfDay);
+		c.set(Calendar.MINUTE, minute);
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MILLISECOND, 0);
+		return c;
+	}
 
-    @InjectView(R.f_reminder_edit.btnTsTimePicker)
-    protected Button mBtnTimePicker;
+	@Override
+	public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+		if (resultCode != Activity.RESULT_OK) {
+			return;
+		}
+		if (requestCode == REQUEST_CODE_SPEECH_RECOGNITION) {
+			final ArrayList<String> words = data
+					.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+			final float[] scores = data
+					.getFloatArrayExtra(RecognizerIntent.EXTRA_CONFIDENCE_SCORES);
 
-    @InjectView(R.f_reminder_edit.btnTsAlarmDatePicker)
-    protected Button mBtnAlarmDatePicker;
+			final int maxItemIndex = findMax(scores);
+			mText.setText(words.get(maxItemIndex));
+		} else if (requestCode == REQUEST_CODE_GET_CONTACT) {
+			if (data != null) {
+				final Uri uri = data.getData();
+				setContactData(uri);
+			}
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
 
-    @InjectView(R.f_reminder_edit.btnTsAlarmTimePicker)
-    protected Button mBtnAlarmTimePicker;
+	@Override
+	@Optional
+	@OnClick({
+			R.f_reminder_edit.btnStartSpeech, R.x_contact_badge.btnRemove,
+			R.f_reminder_edit.btnTsDatePicker, R.f_reminder_edit.btnTsTimePicker,
+			R.f_reminder_edit.btnTsAlarmDatePicker, R.f_reminder_edit.btnTsAlarmTimePicker
+	})
+	public void onClick(final View v) {
+		final Bundle bundle = new Bundle();
+		bundle.putLong(RemindersContract.Columns.TIMESTAMP, mReminder.getTimestamp());
+		switch (v.getId()) {
+			case R.f_reminder_edit.btnStartSpeech:
+				final Intent speechIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+				speechIntent
+						.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+								RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+				speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+				speechIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speech recognition...");
+				startActivityForResult(speechIntent, REQUEST_CODE_SPEECH_RECOGNITION);
+				break;
 
-    protected ReminderEntry mReminder;
+			case R.x_contact_badge.btnRemove:
+				setContactData(Uri.EMPTY);
+				break;
 
-    private ContactBadgeHolder mContactBadgeHolder;
+			// case R.f_reminder_edit.btnPickContact:
+			// final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+			// intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+			// startActivityForResult(intent, REQUEST_CODE_GET_CONTACT);
+			// break;
 
-    @InjectView(R.f_reminder_edit.btnStartSpeech)
-    protected Button btnSpeech;
+			case R.f_reminder_edit.btnTsDatePicker:
+				final DatePickerDialogFragment dateFragment = new DatePickerDialogFragment(this);
+				dateFragment.setArguments(bundle);
+				dateFragment.show(getFragmentManager(), RemindersContract.Columns.TIMESTAMP);
+				break;
 
-    @InjectView(R.f_reminder_edit.cbOngoing)
-    protected CheckBox mOngoing;
+			case R.f_reminder_edit.btnTsTimePicker:
+				final TimePickerDialogFragment timeFragment = new TimePickerDialogFragment(this);
+				timeFragment.setArguments(bundle);
+				timeFragment.show(getFragmentManager(), RemindersContract.Columns.TIMESTAMP);
+				break;
 
-    @InjectView(R.f_reminder_edit.cbSilent)
-    protected CheckBox mSilent;
+			case R.f_reminder_edit.btnTsAlarmDatePicker:
+				final DatePickerDialogFragment alarmDateFragment = new DatePickerDialogFragment(
+						this);
+				alarmDateFragment.setArguments(bundle);
+				alarmDateFragment.show(getFragmentManager(),
+						RemindersContract.Columns.ALARM_TIMESTAMP);
+				break;
 
-    @InjectView(R.f_reminder_edit.color)
-    protected Spinner mColor;
+			case R.f_reminder_edit.btnTsAlarmTimePicker:
+				final TimePickerDialogFragment alarmTimeFragment = new TimePickerDialogFragment(
+						this);
+				alarmTimeFragment.setArguments(bundle);
+				alarmTimeFragment.show(getFragmentManager(),
+						RemindersContract.Columns.ALARM_TIMESTAMP);
+				break;
 
-    private ColorsAdapter mColorsAdapter;
+			default:
+				break;
+		}
+	}
 
-    protected boolean checkValid()
-    {
-        final boolean isBlank = StringUtils.isBlank(mText.getText().toString());
-        if (isBlank)
-        {
-            mText.setError(getActivity().getString(R.string.please_enter_event_title));
-            mText.requestFocus();
-            return false;
-        }
-        if (mReminder.getAlarmTimestamp() > mReminder.getTimestamp())
-        {
-            ActivityUtils.showToastShort(getActivity(), "Alarm time can't be after Event time");
-            return false;
-        }
-        return true;
-    }
+	@Override
+	public void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setHasOptionsMenu(true);
+	}
 
-    protected ReminderEntry getReminder()
-    {
-        final Uri data = Uri.parse(getArguments().getString(REMINDER_FRAGMENT_DATA));
-        final Cursor query = getActivity().getContentResolver().query(
-                data, null, null,
-                null, null);
-        return ReminderUtils.parse(query);
-    }
+	@Override
+	public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
+		inflater.inflate(R.menu.reminder_edit, menu);
+	}
 
-    protected int getTitleResource()
-    {
-        return R.string.edit_reminder;
-    }
+	@Override
+	public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+	                         final Bundle savedInstanceState) {
+		final View view = inflater.inflate(R.layout.f_reminder_edit, container, false);
+		mContactBadgeHolder = new ContactBadgeHolder(getActivity(),
+				(ViewStub) view.findViewById(R.f_reminder_edit.contact_badge));
+		ButterKnife.inject(this, view);
+		return view;
+	}
 
-    private Calendar modifyDate(final long ts, final int year, final int monthOfYear,
-            final int dayOfMonth)
-    {
-        final Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(ts);
-        c.set(Calendar.YEAR, year);
-        c.set(Calendar.MONDAY, monthOfYear);
-        c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-        return c;
-    }
+	@Override
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				getActivity().onBackPressed();
+				return true;
 
-    private Calendar modifyTime(final long ts, final int hourOfDay, final int minute)
-    {
-        final Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(ts);
-        c.set(Calendar.HOUR_OF_DAY, hourOfDay);
-        c.set(Calendar.MINUTE, minute);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        return c;
-    }
+			case R.menu.action_save:
+				if (!checkValid()) {
+					return false;
+				}
 
-    @Override
-    public void onActivityResult(final int requestCode, final int resultCode, final Intent data)
-    {
-        if (resultCode != Activity.RESULT_OK)
-        {
-            return;
-        }
-        if (requestCode == REQUEST_CODE_SPEECH_RECOGNITION)
-        {
-            final ArrayList<String> words = data
-                    .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            final float[] scores = data
-                    .getFloatArrayExtra(RecognizerIntent.EXTRA_CONFIDENCE_SCORES);
+				mReminder.setText(mText.getText().toString());
+				mReminder.setOngoing(mOngoing.isChecked());
+				mReminder.setSilent(mSilent.isChecked());
+				final ReminderColor color = (ReminderColor) mColor.getSelectedItem();
+				mReminder.setColor(color.getColor());
 
-            final int maxItemIndex = findMax(scores);
-            mText.setText(words.get(maxItemIndex));
-        }
-        else if (requestCode == REQUEST_CODE_GET_CONTACT)
-        {
-            if (data != null)
-            {
-                final Uri uri = data.getData();
-                setContactData(uri);
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
+				RemindersProvider.updateReminder(getActivity(), mReminder, true);
+				setAlarm(mReminder);
 
-    @Override
-    @Optional
-    @OnClick({
-            R.f_reminder_edit.btnStartSpeech, R.x_contact_badge.btnRemove,
-            R.f_reminder_edit.btnTsDatePicker, R.f_reminder_edit.btnTsTimePicker,
-            R.f_reminder_edit.btnTsAlarmDatePicker, R.f_reminder_edit.btnTsAlarmTimePicker
-    })
-    public void onClick(final View v)
-    {
-        final Bundle bundle = new Bundle();
-        bundle.putLong(RemindersContract.Columns.TIMESTAMP, mReminder.getTimestamp());
-        switch (v.getId())
-        {
-            case R.f_reminder_edit.btnStartSpeech:
-                final Intent speechIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-                speechIntent
-                        .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                                RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
-                speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-                speechIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speech recognition...");
-                startActivityForResult(speechIntent, REQUEST_CODE_SPEECH_RECOGNITION);
-                break;
+				getActivity().onBackPressed();
+				return true;
 
-            case R.x_contact_badge.btnRemove:
-                setContactData(Uri.EMPTY);
-                break;
+			default:
+				return super.onOptionsItemSelected(item);
+		}
+	}
 
-            // case R.f_reminder_edit.btnPickContact:
-            // final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            // intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
-            // startActivityForResult(intent, REQUEST_CODE_GET_CONTACT);
-            // break;
+	@Override
+	public void onPause() {
+		super.onPause();
+		ViewUtils.hideKeyboard(mText.getEditText());
+	}
 
-            case R.f_reminder_edit.btnTsDatePicker:
-                final DatePickerDialogFragment dateFragment = new DatePickerDialogFragment(this);
-                dateFragment.setArguments(bundle);
-                dateFragment.show(getFragmentManager(), RemindersContract.Columns.TIMESTAMP);
-                break;
+	@Override
+	public void onReminderDateSet(final String tag, final int year, final int monthOfYear,
+	                              final int dayOfMonth) {
+		if (RemindersContract.Columns.TIMESTAMP.equals(tag)) {
+			final Calendar calendar = modifyDate(mReminder.getTimestamp(), year, monthOfYear,
+					dayOfMonth);
+			mReminder.setTimestamp(calendar.getTimeInMillis());
+		} else if (RemindersContract.Columns.ALARM_TIMESTAMP.equals(tag)) {
+			final Calendar c = modifyDate(mReminder.getAlarmTimestamp(), year, monthOfYear,
+					dayOfMonth);
+			mReminder.setAlarmTimestamp(c.getTimeInMillis());
+		}
+		updateRemiderViewData();
+	}
 
-            case R.f_reminder_edit.btnTsTimePicker:
-                final TimePickerDialogFragment timeFragment = new TimePickerDialogFragment(this);
-                timeFragment.setArguments(bundle);
-                timeFragment.show(getFragmentManager(), RemindersContract.Columns.TIMESTAMP);
-                break;
+	@Override
+	public void onReminderTimeSet(final String tag, final int hourOfDay, final int minute) {
+		if (RemindersContract.Columns.TIMESTAMP.equals(tag)) {
+			final Calendar c = modifyTime(mReminder.getTimestamp(), hourOfDay, minute);
+			mReminder.setTimestamp(c.getTimeInMillis());
+		} else if (RemindersContract.Columns.ALARM_TIMESTAMP.equals(tag)) {
+			final Calendar c = modifyTime(mReminder.getAlarmTimestamp(), hourOfDay, minute);
+			mReminder.setAlarmTimestamp(c.getTimeInMillis());
+		}
+		updateRemiderViewData();
+	}
 
-            case R.f_reminder_edit.btnTsAlarmDatePicker:
-                final DatePickerDialogFragment alarmDateFragment = new DatePickerDialogFragment(
-                        this);
-                alarmDateFragment.setArguments(bundle);
-                alarmDateFragment.show(getFragmentManager(),
-                        RemindersContract.Columns.ALARM_TIMESTAMP);
-                break;
+	@Override
+	public void onViewCreated(final View view, final Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		getActivity().setTitle(getTitleResource());
+		mColorsAdapter = new ColorsAdapter(getActivity());
+		mColor.setAdapter(mColorsAdapter);
+		mColor.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(final AdapterView<?> arg0, final View arg1, final int pos,
+			                           final long arg3) {
+				final ReminderColor color = (ReminderColor) mColor.getItemAtPosition(pos);
+				mReminder.setColor(color.getColor());
+			}
 
-            case R.f_reminder_edit.btnTsAlarmTimePicker:
-                final TimePickerDialogFragment alarmTimeFragment = new TimePickerDialogFragment(
-                        this);
-                alarmTimeFragment.setArguments(bundle);
-                alarmTimeFragment.show(getFragmentManager(),
-                        RemindersContract.Columns.ALARM_TIMESTAMP);
-                break;
+			@Override
+			public void onNothingSelected(final AdapterView<?> arg0) {
 
-            default:
-                break;
-        }
-    }
+			}
+		});
+		mText.getEditText().setSelectAllOnFocus(true);
 
-    @Override
-    public void onCreate(final Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
+		mText.requestFocus();
+		mText.selectAll();
+		mText.getEditText().addTextChangedListener(new TextWatcher() {
+			@Override
+			public void afterTextChanged(final Editable s) {
+				// Do nothing
+			}
 
-    @Override
-    public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater)
-    {
-        inflater.inflate(R.menu.reminder_edit, menu);
-    }
+			@Override
+			public void beforeTextChanged(final CharSequence s, final int start, final int count,
+			                              final int after) {
+				// Do nothing
+			}
 
-    @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-            final Bundle savedInstanceState)
-    {
-        final View view = inflater.inflate(R.layout.f_reminder_edit, container, false);
-        mContactBadgeHolder = new ContactBadgeHolder(getActivity(),
-                (ViewStub) view.findViewById(R.f_reminder_edit.contact_badge));
-        ButterKnife.inject(this, view);
-        return view;
-    }
+			@Override
+			public void onTextChanged(final CharSequence s, final int start, final int before,
+			                          final int count) {
+				mReminder.setText(s.toString());
+			}
+		});
 
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item)
-    {
-        switch (item.getItemId())
-        {
-            case android.R.id.home:
-                getActivity().onBackPressed();
-                return true;
+		mReminder = getReminder();
+		mContactBadgeHolder.setVisibility(View.VISIBLE);
+		mContactBadgeHolder.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(final View v) {
+				final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+				intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
+				startActivityForResult(intent, REQUEST_CODE_GET_CONTACT);
+			}
+		});
+		setContactData(mReminder.getContactUri());
 
-            case R.menu.action_save:
-                if (!checkValid())
-                {
-                    return false;
-                }
+		updateRemiderViewData();
+	}
 
-                mReminder.setText(mText.getText().toString());
-                mReminder.setOngoing(mOngoing.isChecked());
-                mReminder.setSilent(mSilent.isChecked());
-                final ReminderColor color = (ReminderColor) mColor.getSelectedItem();
-                mReminder.setColor(color.getColor());
+	protected void setAlarm(final ReminderEntry entry) {
+		final int id = mReminder.getId();
+		ReminderUtils.setAlarm(getActivity(), id, entry);
+	}
 
-                RemindersProvider.updateReminder(getActivity(), mReminder, true);
-                setAlarm(mReminder);
+	private void setContactBadgeData(final Uri uri, final OnClickListener removeClickListener) {
+		mContactBadgeHolder.setData(uri, removeClickListener);
+	}
 
-                getActivity().onBackPressed();
-                return true;
+	protected void setContactData(final Uri uri) {
+		mReminder.setContactUri(uri);
+		setContactBadgeData(uri, this);
+	}
 
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+	protected void updateRemiderViewData() {
+		mText.setText(mReminder.getText());
+		ViewUtils.moveCursorRight(mText.getEditText());
 
-    @Override
-    public void onPause()
-    {
-        super.onPause();
-        ViewUtils.hideKeyboard(mText.getEditText());
-    }
+		mOngoing.setChecked(mReminder.isOngoing());
+		mSilent.setChecked(mReminder.isSilent());
+		final int colorPosition =
+				mColorsAdapter.getPosition(mReminder.getColor());
+		mColor.setSelection(colorPosition);
 
-    @Override
-    public void onReminderDateSet(final String tag, final int year, final int monthOfYear,
-            final int dayOfMonth)
-    {
-        if (RemindersContract.Columns.TIMESTAMP.equals(tag))
-        {
-            final Calendar calendar = modifyDate(mReminder.getTimestamp(), year, monthOfYear,
-                    dayOfMonth);
-            mReminder.setTimestamp(calendar.getTimeInMillis());
-        }
-        else if (RemindersContract.Columns.ALARM_TIMESTAMP.equals(tag))
-        {
-            final Calendar c = modifyDate(mReminder.getAlarmTimestamp(), year, monthOfYear,
-                    dayOfMonth);
-            mReminder.setAlarmTimestamp(c.getTimeInMillis());
-        }
-        updateRemiderViewData();
-    }
+		setContactBadgeData(mReminder.getContactUri(), this);
+		mBtnDatePicker.setText(ReminderUtils.formatTimestmapDate(getActivity(), mReminder));
+		mBtnTimePicker.setText(ReminderUtils.formatTimestmapTime(getActivity(), mReminder));
 
-    @Override
-    public void onReminderTimeSet(final String tag, final int hourOfDay, final int minute)
-    {
-        if (RemindersContract.Columns.TIMESTAMP.equals(tag))
-        {
-            final Calendar c = modifyTime(mReminder.getTimestamp(), hourOfDay, minute);
-            mReminder.setTimestamp(c.getTimeInMillis());
-        }
-        else if (RemindersContract.Columns.ALARM_TIMESTAMP.equals(tag))
-        {
-            final Calendar c = modifyTime(mReminder.getAlarmTimestamp(), hourOfDay, minute);
-            mReminder.setAlarmTimestamp(c.getTimeInMillis());
-        }
-        updateRemiderViewData();
-    }
-
-    @Override
-    public void onViewCreated(final View view, final Bundle savedInstanceState)
-    {
-        super.onViewCreated(view, savedInstanceState);
-        getActivity().setTitle(getTitleResource());
-        mColorsAdapter = new ColorsAdapter(getActivity());
-        mColor.setAdapter(mColorsAdapter);
-        mColor.setOnItemSelectedListener(new OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(final AdapterView<?> arg0, final View arg1, final int pos,
-                    final long arg3)
-            {
-                final ReminderColor color = (ReminderColor) mColor.getItemAtPosition(pos);
-                mReminder.setColor(color.getColor());
-            }
-
-            @Override
-            public void onNothingSelected(final AdapterView<?> arg0)
-            {
-
-            }
-        });
-        mText.getEditText().setSelectAllOnFocus(true);
-
-        mText.requestFocus();
-        mText.selectAll();
-        mText.getEditText().addTextChangedListener(new TextWatcher()
-        {
-            @Override
-            public void afterTextChanged(final Editable s)
-            {
-                // Do nothing
-            }
-
-            @Override
-            public void beforeTextChanged(final CharSequence s, final int start, final int count,
-                    final int after)
-            {
-                // Do nothing
-            }
-
-            @Override
-            public void onTextChanged(final CharSequence s, final int start, final int before,
-                    final int count)
-            {
-                mReminder.setText(s.toString());
-            }
-        });
-
-        mReminder = getReminder();
-        mContactBadgeHolder.setVisibility(View.VISIBLE);
-        mContactBadgeHolder.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View v)
-            {
-                final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE);
-                startActivityForResult(intent, REQUEST_CODE_GET_CONTACT);
-            }
-        });
-        setContactData(mReminder.getContactUri());
-
-        updateRemiderViewData();
-    }
-
-    protected void setAlarm(final ReminderEntry entry)
-    {
-        final int id = mReminder.getId();
-        ReminderUtils.setAlarm(getActivity(), id, entry);
-    }
-
-    private void setContactBadgeData(final Uri uri, final OnClickListener removeClickListener)
-    {
-        mContactBadgeHolder.setData(uri, removeClickListener);
-    }
-
-    protected void setContactData(final Uri uri)
-    {
-        mReminder.setContactUri(uri);
-        setContactBadgeData(uri, this);
-    }
-
-    protected void updateRemiderViewData()
-    {
-        mText.setText(mReminder.getText());
-        ViewUtils.moveCursorRight(mText.getEditText());
-
-        mOngoing.setChecked(mReminder.isOngoing());
-        mSilent.setChecked(mReminder.isSilent());
-        final int colorPosition =
-                mColorsAdapter.getPosition(mReminder.getColor());
-        mColor.setSelection(colorPosition);
-
-        setContactBadgeData(mReminder.getContactUri(), this);
-        mBtnDatePicker.setText(ReminderUtils.formatTimestmapDate(getActivity(), mReminder));
-        mBtnTimePicker.setText(ReminderUtils.formatTimestmapTime(getActivity(), mReminder));
-
-        mBtnAlarmDatePicker.setText(ReminderUtils.formatAlarmDate(getActivity(), mReminder));
-        mBtnAlarmTimePicker.setText(ReminderUtils.formatAlarmTime(getActivity(), mReminder));
-    }
+		mBtnAlarmDatePicker.setText(ReminderUtils.formatAlarmDate(getActivity(), mReminder));
+		mBtnAlarmTimePicker.setText(ReminderUtils.formatAlarmTime(getActivity(), mReminder));
+	}
 }

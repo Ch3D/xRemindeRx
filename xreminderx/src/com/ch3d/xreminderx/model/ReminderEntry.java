@@ -1,7 +1,4 @@
-
 package com.ch3d.xreminderx.model;
-
-import java.util.Calendar;
 
 import android.graphics.Color;
 import android.net.Uri;
@@ -11,244 +8,195 @@ import android.os.Parcelable;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 import com.ch3d.xreminderx.utils.StringUtils;
 
-public class ReminderEntry implements Parcelable
-{
-    public static final int DEFAULT_COLOR = Color.WHITE;
+import java.util.Calendar;
 
-    public static final Parcelable.Creator<ReminderEntry> CREATOR = new Parcelable.Creator<ReminderEntry>()
-    {
-        @Override
-        public ReminderEntry createFromParcel(
-                final Parcel in)
-        {
-            return ReminderUtils
-                    .parse(in);
-        }
+public class ReminderEntry implements Parcelable {
+	public static final int DEFAULT_COLOR = Color.WHITE;
+	private int color = DEFAULT_COLOR;
+	public static final Parcelable.Creator<ReminderEntry> CREATOR = new Parcelable.Creator<ReminderEntry>() {
+		@Override
+		public ReminderEntry createFromParcel(final Parcel in) {
+			return ReminderUtils.parse(in);
+		}
 
-        @Override
-        public ReminderEntry[] newArray(
-                final int size)
-        {
-            return new ReminderEntry[size];
-        }
-    };
+		@Override
+		public ReminderEntry[] newArray(final int size) {
+			return new ReminderEntry[size];
+		}
+	};
 
-    private final int id;
+	private final int id;
+	private final int protocolVersion;
+	private long timestamp;
+	private long alarmTimestamp;
+	private String text;
+	private String account;
+	private Uri contactUri = Uri.EMPTY;
+	private ReminderType type = ReminderType.SIMPLE;
+	private int ongoing;
+	private int silent;
+	private int version;
+	/**
+	 * id on remote/cloud storage
+	 */
+	private String pid = StringUtils.EMPTY_STRING;
 
-    private long timestamp;
+	ReminderEntry(final int id) {
+		this(0, id);
+	}
 
-    private long alarmTimestamp;
+	ReminderEntry(final int protocolVersion, final int id) {
+		this.protocolVersion = protocolVersion;
+		this.id = id;
+	}
 
-    private String text;
+	ReminderEntry(final int id, final int type, final long ts, final long alarmTs, final String text) {
+		this(id);
+		timestamp = ts;
+		alarmTimestamp = alarmTs;
+		this.text = text;
+	}
 
-    private String account;
+	@Override
+	public int describeContents() {
+		return 0;
+	}
 
-    private Uri contactUri = Uri.EMPTY;
+	public String getAccount() {
+		return account;
+	}
 
-    private ReminderType type = ReminderType.SIMPLE;
+	public void setAccount(final String account) {
+		this.account = account;
+	}
 
-    private final int protocolVersion;
+	public long getAlarmTimestamp() {
+		return alarmTimestamp;
+	}
 
-    private int ongoing;
+	public void setAlarmTimestamp(final long alarmTimestamp) {
+		this.alarmTimestamp = alarmTimestamp;
+	}
 
-    private int silent;
+	public int getColor() {
+		return color;
+	}
 
-    private int version;
+	public void setColor(final int color) {
+		this.color = color;
+	}
 
-    /**
-     * id on remote/cloud storage
-     */
-    private String pid = StringUtils.EMPTY_STRING;
+	public Uri getContactUri() {
+		return contactUri;
+	}
 
-    private int color = DEFAULT_COLOR;
+	public void setContactUri(final Uri contactUri) {
+		this.contactUri = contactUri;
+	}
 
-    ReminderEntry(final int id)
-    {
-        this(0, id);
-    }
+	public int getId() {
+		return id;
+	}
 
-    ReminderEntry(final int protocolVersion, final int id)
-    {
-        this.protocolVersion = protocolVersion;
-        this.id = id;
-    }
+	public int getOutgoing() {
+		return ongoing;
+	}
 
-    ReminderEntry(final int id, final int type, final long ts, final long alarmTs, final String text)
-    {
-        this(id);
-        timestamp = ts;
-        alarmTimestamp = alarmTs;
-        this.text = text;
-    }
+	public String getPid() {
+		return pid;
+	}
 
-    @Override
-    public int describeContents()
-    {
-        return 0;
-    }
+	public void setPid(final String pid) {
+		this.pid = pid;
+	}
 
-    public String getAccount() {
-        return account;
-    }
+	public int getProtocolVersion() {
+		return protocolVersion;
+	}
 
-    public long getAlarmTimestamp()
-    {
-        return alarmTimestamp;
-    }
+	public int getSilent() {
+		return silent;
+	}
 
-    public int getColor()
-    {
-        return color;
-    }
+	public String getText() {
+		return text;
+	}
 
-    public Uri getContactUri()
-    {
-        return contactUri;
-    }
+	public void setText(final String text) {
+		this.text = text;
+	}
 
-    public int getId()
-    {
-        return id;
-    }
+	public long getTimestamp() {
+		return timestamp;
+	}
 
-    public int getOutgoing()
-    {
-        return ongoing;
-    }
+	public void setTimestamp(final long timestamp) {
+		this.timestamp = timestamp;
+	}
 
-    public String getPid() {
-        return pid;
-    }
+	public ReminderType getType() {
+		return type;
+	}
 
-    public int getProtocolVersion()
-    {
-        return protocolVersion;
-    }
+	public void setType(final ReminderType type) {
+		this.type = type;
+	}
 
-    public int getSilent()
-    {
-        return silent;
-    }
+	public int getVersion() {
+		return version;
+	}
 
-    public String getText()
-    {
-        return text;
-    }
+	void setVersion(final int version) {
+		this.version = version;
+	}
 
-    public long getTimestamp()
-    {
-        return timestamp;
-    }
+	public boolean hasAccountOrRemoteId() {
+		return !StringUtils.isBlank(account) || !StringUtils.isBlank(pid);
+	}
 
-    public ReminderType getType()
-    {
-        return type;
-    }
+	public boolean isContactRelated() {
+		return (getContactUri() != null) && !getContactUri().equals(Uri.EMPTY);
+	}
 
-    public int getVersion() {
-        return version;
-    }
+	public boolean isNull() {
+		return this == NullReminderEntry.VALUE;
+	}
 
-    public boolean hasAccountOrRemoteId() {
-        return !StringUtils.isBlank(account) || !StringUtils.isBlank(pid);
-    }
+	public boolean isOngoing() {
+		return ReminderUtils.intToBoolean(ongoing);
+	}
 
-    public boolean isContactRelated()
-    {
-        return (getContactUri() != null) && !getContactUri().equals(Uri.EMPTY);
-    }
+	public void setOngoing(final int ongoing) {
+		this.ongoing = ongoing;
+	}
 
-    public boolean isNull()
-    {
-        return this == NullReminderEntry.VALUE;
-    }
+	public void setOngoing(final boolean ongoing) {
+		this.ongoing = ongoing ? 1 : 0;
+	}
 
-    public boolean isOngoing()
-    {
-        return ReminderUtils.intToBoolean(ongoing);
-    }
+	public boolean isSilent() {
+		return ReminderUtils.intToBoolean(silent);
+	}
 
-    public boolean isSilent()
-    {
-        return ReminderUtils.intToBoolean(silent);
-    }
+	public void setSilent(final int silent) {
+		this.silent = silent;
+	}
 
-    public void postpone(final int time)
-    {
-        setAlarmTimestamp(Calendar.getInstance().getTimeInMillis() + time);
-    }
+	public void setSilent(final boolean silent) {
+		this.silent = silent ? 1 : 0;
+	}
 
-    public void setAccount(final String account) {
-        this.account = account;
-    }
+	public void postpone(final int time) {
+		setAlarmTimestamp(Calendar.getInstance().getTimeInMillis() + time);
+	}
 
-    public void setAlarmTimestamp(final long alarmTimestamp)
-    {
-        this.alarmTimestamp = alarmTimestamp;
-    }
+	@Override
+	public String toString() {
+		return "Reminder [" + "id:" + getId() + " text:" + text + " timestamp:" + timestamp + "]";
+	}
 
-    public void setColor(final int color)
-    {
-        this.color = color;
-    }
-
-    public void setContactUri(final Uri contactUri)
-    {
-        this.contactUri = contactUri;
-    }
-
-    public void setOngoing(final boolean ongoing)
-    {
-        this.ongoing = ongoing ? 1 : 0;
-    }
-
-    public void setOngoing(final int ongoing)
-    {
-        this.ongoing = ongoing;
-    }
-
-    public void setPid(final String pid) {
-        this.pid = pid;
-    }
-
-    public void setSilent(final boolean silent)
-    {
-        this.silent = silent ? 1 : 0;
-    }
-
-    public void setSilent(final int silent)
-    {
-        this.silent = silent;
-    }
-
-    public void setText(final String text)
-    {
-        this.text = text;
-    }
-
-    public void setTimestamp(final long timestamp)
-    {
-        this.timestamp = timestamp;
-    }
-
-    public void setType(final ReminderType type)
-    {
-        this.type = type;
-    }
-
-    void setVersion(final int version) {
-        this.version = version;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "Reminder [" + "id:" + getId() + " text:" + text + " timestamp:" + timestamp + "]";
-    }
-
-    @Override
-    public void writeToParcel(final Parcel dest, final int protocol)
-    {
-        ReminderUtils.writeToParcel(protocol, this, dest);
-    }
+	@Override
+	public void writeToParcel(final Parcel dest, final int protocol) {
+		ReminderUtils.writeToParcel(protocol, this, dest);
+	}
 }

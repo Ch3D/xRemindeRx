@@ -56,10 +56,12 @@ import com.ch3d.xreminderx.view.SwipeDismissListViewTouchListener.DismissCallbac
 
 import javax.inject.Inject;
 
-public class RemindersListFragment extends ListFragment implements LoaderCallbacks<Cursor>, RemoteSynchronizer.Callback {
-	public static final String TAG = RemindersListFragment.class.getSimpleName();
+public class RemindersListFragment extends ListFragment implements LoaderCallbacks<Cursor>,
+		RemoteSynchronizer.Callback {
+
 	public static final int TAG_TODAY = 0;
 	public static final int TAG_ALL = 1;
+
 	protected boolean mVisibile = true;
 
 	@Inject

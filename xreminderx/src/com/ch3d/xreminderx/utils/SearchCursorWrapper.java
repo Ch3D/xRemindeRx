@@ -1,11 +1,9 @@
-package com.ch3d.xreminderx.loader;
+package com.ch3d.xreminderx.utils;
 
 import android.database.Cursor;
 import android.database.CursorWrapper;
 
 import com.ch3d.xreminderx.provider.RemindersContract;
-import com.ch3d.xreminderx.utils.CursorVisitor;
-import com.ch3d.xreminderx.utils.DBUtils;
 
 /**
  * Created by ch3d on 04-Jun-14.

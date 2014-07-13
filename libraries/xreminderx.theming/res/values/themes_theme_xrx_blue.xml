@@ -5,7 +5,7 @@
 
   <style name="Theme_XRX_Blue" parent="@style/_Theme_XRX_Blue"/>
 
-  <style name="_Theme_XRX_Blue" parent="android:Theme.Holo.Light">bg_xrx_green_normal
+  <style name="_Theme_XRX_Blue" parent="android:Theme.Holo.Light">
 
     <item name="android:editTextBackground">@drawable/theme_xrx_blue_edit_text_holo_light</item>
     

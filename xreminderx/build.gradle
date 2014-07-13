@@ -6,11 +6,13 @@ buildscript {
         maven { url 'http://repo1.maven.org/maven2' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.11.+'
+        classpath 'com.android.tools.build:gradle:0.12.+'
+        classpath 'com.jakewharton.hugo:hugo-plugin:1.1.0'
     }
 }
 
 apply plugin: 'android'
+apply plugin: 'hugo'
 
 repositories {
     mavenCentral()
