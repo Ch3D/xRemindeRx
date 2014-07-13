@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.view.View;
@@ -14,7 +15,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ch3d.xreminderx.R;
-import com.ch3d.xreminderx.view.RoundedDrawable;
+
+import static com.ch3d.xreminderx.view.RoundedDrawableFactory.setRoundedColorDrawable;
 
 public class ContactBadgeHolder {
 	private final Activity activity;
@@ -69,7 +71,7 @@ public class ContactBadgeHolder {
 		mContactBadge.setVisibility(View.VISIBLE);
 		ImageView imgContactAvatar = (ImageView) activity.findViewById(R.x_contact_badge.imgAvatar);
 		Bitmap bitmap = ReminderUtils.fetchThumbnail(activity, photoId, mImgDefaultAvatar);
-		RoundedDrawable.setRoundedDrawable(imgContactAvatar, bitmap);
+		setRoundedColorDrawable(imgContactAvatar, bitmap, Color.WHITE);
 	}
 
 	public void setVisibility(final int visibility) {
