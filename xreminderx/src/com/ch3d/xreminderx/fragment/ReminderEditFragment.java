@@ -50,9 +50,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import butterknife.Optional;
 
-public class ReminderEditFragment extends Fragment implements OnClickListener,
-		OnReminderDateSetListener,
-		OnReminderTimeSetListener {
+public class ReminderEditFragment extends Fragment implements OnClickListener, OnReminderDateSetListener, OnReminderTimeSetListener {
 	public static final String TAG = "ReminderEdit";
 	public static final int REQUEST_CODE_GET_CONTACT = 2;
 	private static final String REMINDER_FRAGMENT_DATA = "ReminderEditFragment.data";
@@ -111,7 +109,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 			mText.requestFocus();
 			return false;
 		}
-		if (mReminder.getAlarmTimestamp() > mReminder.getTimestamp()) {
+		if (mReminder.getAlarmTimestamp() >= mReminder.getTimestamp()) {
 			ActivityUtils.showToastShort(getActivity(), "Alarm time can't be after Event time");
 			return false;
 		}
@@ -120,9 +118,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 
 	protected ReminderEntry getReminder() {
 		final Uri data = Uri.parse(getArguments().getString(REMINDER_FRAGMENT_DATA));
-		final Cursor query = getActivity().getContentResolver().query(
-				data, null, null,
-				null, null);
+		final Cursor query = getActivity().getContentResolver().query(data, null, null, null, null);
 		return ReminderUtils.parse(query);
 	}
 
@@ -130,8 +126,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 		return R.string.edit_reminder;
 	}
 
-	private Calendar modifyDate(final long ts, final int year, final int monthOfYear,
-	                            final int dayOfMonth) {
+	private Calendar modifyDate(final long ts, final int year, final int monthOfYear, final int dayOfMonth) {
 		final Calendar c = Calendar.getInstance();
 		c.setTimeInMillis(ts);
 		c.set(Calendar.YEAR, year);
@@ -156,10 +151,8 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 			return;
 		}
 		if (requestCode == REQUEST_CODE_SPEECH_RECOGNITION) {
-			final ArrayList<String> words = data
-					.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-			final float[] scores = data
-					.getFloatArrayExtra(RecognizerIntent.EXTRA_CONFIDENCE_SCORES);
+			final ArrayList<String> words = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+			final float[] scores = data.getFloatArrayExtra(RecognizerIntent.EXTRA_CONFIDENCE_SCORES);
 
 			final int maxItemIndex = findMax(scores);
 			mText.setText(words.get(maxItemIndex));
@@ -174,20 +167,15 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 
 	@Override
 	@Optional
-	@OnClick({
-			R.f_reminder_edit.btnStartSpeech, R.x_contact_badge.btnRemove,
-			R.f_reminder_edit.btnTsDatePicker, R.f_reminder_edit.btnTsTimePicker,
-			R.f_reminder_edit.btnTsAlarmDatePicker, R.f_reminder_edit.btnTsAlarmTimePicker
-	})
+	@OnClick({R.f_reminder_edit.btnStartSpeech, R.x_contact_badge.btnRemove, R.f_reminder_edit.btnTsDatePicker,
+			         R.f_reminder_edit.btnTsTimePicker, R.f_reminder_edit.btnTsAlarmDatePicker, R.f_reminder_edit.btnTsAlarmTimePicker})
 	public void onClick(final View v) {
 		final Bundle bundle = new Bundle();
 		bundle.putLong(RemindersContract.Columns.TIMESTAMP, mReminder.getTimestamp());
 		switch (v.getId()) {
 			case R.f_reminder_edit.btnStartSpeech:
 				final Intent speechIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-				speechIntent
-						.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-								RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
+				speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
 				speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
 				speechIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speech recognition...");
 				startActivityForResult(speechIntent, REQUEST_CODE_SPEECH_RECOGNITION);
@@ -216,19 +204,15 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 				break;
 
 			case R.f_reminder_edit.btnTsAlarmDatePicker:
-				final DatePickerDialogFragment alarmDateFragment = new DatePickerDialogFragment(
-						this);
+				final DatePickerDialogFragment alarmDateFragment = new DatePickerDialogFragment(this);
 				alarmDateFragment.setArguments(bundle);
-				alarmDateFragment.show(getFragmentManager(),
-						RemindersContract.Columns.ALARM_TIMESTAMP);
+				alarmDateFragment.show(getFragmentManager(), RemindersContract.Columns.ALARM_TIMESTAMP);
 				break;
 
 			case R.f_reminder_edit.btnTsAlarmTimePicker:
-				final TimePickerDialogFragment alarmTimeFragment = new TimePickerDialogFragment(
-						this);
+				final TimePickerDialogFragment alarmTimeFragment = new TimePickerDialogFragment(this);
 				alarmTimeFragment.setArguments(bundle);
-				alarmTimeFragment.show(getFragmentManager(),
-						RemindersContract.Columns.ALARM_TIMESTAMP);
+				alarmTimeFragment.show(getFragmentManager(), RemindersContract.Columns.ALARM_TIMESTAMP);
 				break;
 
 			default:
@@ -248,11 +232,9 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 	}
 
 	@Override
-	public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-	                         final Bundle savedInstanceState) {
+	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.f_reminder_edit, container, false);
-		mContactBadgeHolder = new ContactBadgeHolder(getActivity(),
-				(ViewStub) view.findViewById(R.f_reminder_edit.contact_badge));
+		mContactBadgeHolder = new ContactBadgeHolder(getActivity(), (ViewStub) view.findViewById(R.f_reminder_edit.contact_badge));
 		ButterKnife.inject(this, view);
 		return view;
 	}
@@ -293,15 +275,12 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 	}
 
 	@Override
-	public void onReminderDateSet(final String tag, final int year, final int monthOfYear,
-	                              final int dayOfMonth) {
+	public void onReminderDateSet(final String tag, final int year, final int monthOfYear, final int dayOfMonth) {
 		if (RemindersContract.Columns.TIMESTAMP.equals(tag)) {
-			final Calendar calendar = modifyDate(mReminder.getTimestamp(), year, monthOfYear,
-					dayOfMonth);
+			final Calendar calendar = modifyDate(mReminder.getTimestamp(), year, monthOfYear, dayOfMonth);
 			mReminder.setTimestamp(calendar.getTimeInMillis());
 		} else if (RemindersContract.Columns.ALARM_TIMESTAMP.equals(tag)) {
-			final Calendar c = modifyDate(mReminder.getAlarmTimestamp(), year, monthOfYear,
-					dayOfMonth);
+			final Calendar c = modifyDate(mReminder.getAlarmTimestamp(), year, monthOfYear, dayOfMonth);
 			mReminder.setAlarmTimestamp(c.getTimeInMillis());
 		}
 		updateRemiderViewData();
@@ -327,8 +306,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 		mColor.setAdapter(mColorsAdapter);
 		mColor.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
-			public void onItemSelected(final AdapterView<?> arg0, final View arg1, final int pos,
-			                           final long arg3) {
+			public void onItemSelected(final AdapterView<?> arg0, final View arg1, final int pos, final long arg3) {
 				final ReminderColor color = (ReminderColor) mColor.getItemAtPosition(pos);
 				mReminder.setColor(color.getColor());
 			}
@@ -349,14 +327,12 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 			}
 
 			@Override
-			public void beforeTextChanged(final CharSequence s, final int start, final int count,
-			                              final int after) {
+			public void beforeTextChanged(final CharSequence s, final int start, final int count, final int after) {
 				// Do nothing
 			}
 
 			@Override
-			public void onTextChanged(final CharSequence s, final int start, final int before,
-			                          final int count) {
+			public void onTextChanged(final CharSequence s, final int start, final int before, final int count) {
 				mReminder.setText(s.toString());
 			}
 		});
@@ -396,8 +372,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener,
 
 		mOngoing.setChecked(mReminder.isOngoing());
 		mSilent.setChecked(mReminder.isSilent());
-		final int colorPosition =
-				mColorsAdapter.getPosition(mReminder.getColor());
+		final int colorPosition = mColorsAdapter.getPosition(mReminder.getColor());
 		mColor.setSelection(colorPosition);
 
 		setContactBadgeData(mReminder.getContactUri(), this);

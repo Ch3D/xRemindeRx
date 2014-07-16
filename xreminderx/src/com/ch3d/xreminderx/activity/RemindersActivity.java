@@ -1,8 +1,5 @@
 package com.ch3d.xreminderx.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.SearchManager;
@@ -22,7 +19,6 @@ import android.view.MenuItem;
 import android.view.MenuItem.OnActionExpandListener;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 
@@ -32,6 +28,7 @@ import com.ch3d.xreminderx.model.ReminderEntry;
 import com.ch3d.xreminderx.model.ReminderFactory;
 import com.ch3d.xreminderx.provider.RemindersProvider;
 import com.ch3d.xreminderx.utils.ActivityUtils;
+import com.ch3d.xreminderx.utils.AnimationUtils;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 import com.ch3d.xreminderx.utils.StringUtils;
 import com.ch3d.xreminderx.utils.ViewUtils;
@@ -76,63 +73,7 @@ public class RemindersActivity extends BaseFragmentActivity implements Connectio
 
 	private boolean mIntentInProgress;
 
-	public static void animateButton(final ImageButton btn, final boolean visible)
-	{
-		final int visibility = visible ? View.VISIBLE : View.GONE;
-		if (visible) {
-			btn.setVisibility(visibility);
-		}
-		btn.animate().setDuration(ANIMATION_DURATION).
-				setInterpolator(new AccelerateInterpolator()).
-				alpha(visible ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(Animator animation)
-			{
-				btn.setVisibility(visibility);
-			}
-		}).start();
-	}
-
-	public static void animateEditText(final FloatLabeledEditText floatView, final View anchor, final boolean visible)
-	{
-		ValueAnimator widthAnimator = null;
-		floatView.setVisibility(View.VISIBLE);
-		if (!visible) {
-			int[] location = new int[2];
-			anchor.getLocationOnScreen(location);
-			widthAnimator = ValueAnimator.ofInt(location[0], 0);
-		} else {
-			int[] location = new int[2];
-			anchor.getLocationOnScreen(location);
-			widthAnimator = ValueAnimator.ofInt(0, location[0]);
-		}
-
-		widthAnimator.setInterpolator(new AccelerateInterpolator());
-		widthAnimator.setDuration(ANIMATION_DURATION);
-		widthAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-			@Override
-			public void onAnimationUpdate(ValueAnimator animation)
-			{
-				floatView.getLayoutParams().width = (Integer) animation.getAnimatedValue();
-				floatView.requestLayout();
-			}
-		});
-		widthAnimator.addListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(Animator animation)
-			{
-				if (visible) {
-					// ActivityUtils.showKeyboard(mEditQuickText.getEditText());
-				} else {
-					ActivityUtils.hideKeyboard(floatView.getEditText());
-				}
-			}
-		});
-		widthAnimator.start();
-	}
-
-	private NdefMessage[] getNdefMessages(final Intent intent)
-	{
+	private NdefMessage[] getNdefMessages(final Intent intent) {
 		NdefMessage[] msgs = null;
 		final Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 		if (rawMsgs != null) {
@@ -145,16 +86,14 @@ public class RemindersActivity extends BaseFragmentActivity implements Connectio
 	}
 
 	@Override
-	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data)
-	{
+	protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 		if ((resultCode == RESULT_OK) && (requestCode == REQUEST_CODE_SIGN_IN)) {
 			mGoogleApi.connect();
 		}
 	}
 
 	@OnClick(android.R.id.button2)
-	public void onAddClick(final View v)
-	{
+	public void onAddClick(final View v) {
 		final String title = mEditQuickText.getText().toString().trim();
 		if (StringUtils.isBlank(title)) {
 			return;
@@ -171,27 +110,24 @@ public class RemindersActivity extends BaseFragmentActivity implements Connectio
 	}
 
 	@OnClick(android.R.id.button1)
-	public void onNewClick(final View v)
-	{
+	public void onNewClick(final View v) {
 		setAddModeEnabled(true);
 	}
 
-	private void setAddModeEnabled(boolean enabled)
-	{
+	private void setAddModeEnabled(boolean enabled) {
 		if (enabled) {
 			ActivityUtils.showKeyboard(mEditQuickText.getEditText());
-			animateEditText(mEditQuickText, mBtnAdd, true);
+			AnimationUtils.animateEditText(mEditQuickText, mBtnAdd, true);
 		} else {
-			animateEditText(mEditQuickText, mBtnNew, false);
+			AnimationUtils.animateEditText(mEditQuickText, mBtnNew, false);
 		}
-		animateButton(mBtnNew, enabled);
-		animateButton(mBtnAdd, !enabled);
+		AnimationUtils.animateButton(mBtnNew, enabled);
+		AnimationUtils.animateButton(mBtnAdd, !enabled);
 	}
 
 	@Override
 
-	public void onConnected(final Bundle bundle)
-	{
+	public void onConnected(final Bundle bundle) {
 		invalidateOptionsMenu();
 
 		if (mIntentInProgress) {
@@ -205,8 +141,7 @@ public class RemindersActivity extends BaseFragmentActivity implements Connectio
 	}
 
 	@Override
-	public void onConnectionFailed(final ConnectionResult result)
-	{
+	public void onConnectionFailed(final ConnectionResult result) {
 		mConnectionResult = result;
 		invalidateOptionsMenu();
 
@@ -222,15 +157,13 @@ public class RemindersActivity extends BaseFragmentActivity implements Connectio
 	}
 
 	@Override
-	public void onConnectionSuspended(final int arg0)
-	{
+	public void onConnectionSuspended(final int arg0) {
 		mSignInSelected = false;
 		invalidateOptionsMenu();
 	}
 
 	@Override
-	protected void onCreate(final Bundle savedInstanceState)
-	{
+	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		final Intent intent = getIntent();
@@ -252,23 +185,23 @@ public class RemindersActivity extends BaseFragmentActivity implements Connectio
 		setTitle(R.string.reminders);
 
 		final View activityRootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
-		activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(ActivityUtils.createKeyboardListener(activityRootView, new ActivityUtils.KeyboardVisibilityListener() {
-			@Override
-			public void onVisibilityChanged(boolean isVisible)
-			{
-				if (!isVisible) {
-					setAddModeEnabled(false);
-				}
-			}
-		}));
+		activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(
+				ActivityUtils.createKeyboardListener(activityRootView, new ActivityUtils.KeyboardVisibilityListener() {
+					@Override
+					public void onVisibilityChanged(boolean isVisible) {
+						if (!isVisible) {
+							setAddModeEnabled(false);
+						}
+					}
+				})
+		                                                                );
 
 		// parse intent in case if
 		// application is not already running
 		parseNfcIntent(getIntent());
 	}
 
-	private void handleSendText(final Intent intent)
-	{
+	private void handleSendText(final Intent intent) {
 		final String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
 		if (!StringUtils.isBlank(sharedText)) {
 			ReminderEntry entry = ReminderFactory.createNew();
@@ -278,21 +211,18 @@ public class RemindersActivity extends BaseFragmentActivity implements Connectio
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(final Menu menu)
-	{
+	public boolean onCreateOptionsMenu(final Menu menu) {
 		getMenuInflater().inflate(R.menu.reminders_list, menu);
 		final MenuItem menuItem = menu.findItem(R.menu.action_search);
 		menuItem.setOnActionExpandListener(new OnActionExpandListener() {
 			@Override
-			public boolean onMenuItemActionCollapse(final MenuItem item)
-			{
+			public boolean onMenuItemActionCollapse(final MenuItem item) {
 				// mBottomPanel.setVisibility(View.VISIBLE);
 				return true;
 			}
 
 			@Override
-			public boolean onMenuItemActionExpand(final MenuItem item)
-			{
+			public boolean onMenuItemActionExpand(final MenuItem item) {
 				setAddModeEnabled(false);
 				// mBottomPanel.setVisibility(View.GONE);
 				return true;
@@ -304,16 +234,14 @@ public class RemindersActivity extends BaseFragmentActivity implements Connectio
 	}
 
 	@Override
-	protected void onNewIntent(final Intent intent)
-	{
+	protected void onNewIntent(final Intent intent) {
 		super.onNewIntent(intent);
 		// parse intent in case if application is running
 		parseNfcIntent(intent);
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(final MenuItem item)
-	{
+	public boolean onOptionsItemSelected(final MenuItem item) {
 		if (item.getItemId() == R.menu.action_gplus_signin) {
 			mSignInSelected = true;
 			mGoogleApi.connect();
@@ -328,8 +256,7 @@ public class RemindersActivity extends BaseFragmentActivity implements Connectio
 	}
 
 	@Override
-	public boolean onPrepareOptionsMenu(final Menu menu)
-	{
+	public boolean onPrepareOptionsMenu(final Menu menu) {
 		if ((mConnectionResult != null) && mConnectionResult.isSuccess()) {
 			mGoogleApi.connect();
 			mConnectionResult = null;
@@ -340,36 +267,37 @@ public class RemindersActivity extends BaseFragmentActivity implements Connectio
 		return true;
 	}
 
-	private void parseNdefMessages(final NdefMessage[] msgs)
-	{
+	private void parseNdefMessages(final NdefMessage[] msgs) {
 		if (msgs == null) {
 			return;
 		}
 		for (final NdefMessage msg : msgs) {
 			for (final NdefRecord rec : msg.getRecords()) {
 				final ReminderEntry reminder = ReminderUtils.parseReminder(rec);
-				final Cursor cursor = getContentResolver().query(RemindersProvider.REMINDERS_URI, null, "text = ? AND ts = ? AND alarm_ts = ?", new String[]{reminder.getText(), Long.toString(reminder.getTimestamp()), Long.toString(reminder.getAlarmTimestamp())}, null);
+				final Cursor cursor = getContentResolver()
+						.query(RemindersProvider.REMINDERS_URI, null, "text = ? AND ts = ? AND alarm_ts = ?",
+						       new String[]{reminder.getText(), Long.toString(reminder.getTimestamp()),
+								       Long.toString(reminder.getAlarmTimestamp())}, null
+						      );
 				if (cursor.getCount() > 0) {
 					final AlertDialog.Builder builder = new Builder(this);
 					builder.setTitle(R.string.reminder_is_already_exist);
 					builder.setMessage(reminder.getText());
 					builder.setPositiveButton(R.string.add, new OnClickListener() {
-								@Override
-								public void onClick(final DialogInterface dialog, final int which)
-								{
-									RemindersProvider.addReminder(RemindersActivity.this, reminder);
-									dialog.dismiss();
-								}
-							}
-					);
+						                          @Override
+						                          public void onClick(final DialogInterface dialog, final int which) {
+							                          RemindersProvider.addReminder(RemindersActivity.this, reminder);
+							                          dialog.dismiss();
+						                          }
+					                          }
+					                         );
 					builder.setNegativeButton(R.string.cancel, new OnClickListener() {
-								@Override
-								public void onClick(final DialogInterface dialog, final int which)
-								{
-									dialog.dismiss();
-								}
-							}
-					);
+						                          @Override
+						                          public void onClick(final DialogInterface dialog, final int which) {
+							                          dialog.dismiss();
+						                          }
+					                          }
+					                         );
 					builder.show();
 				} else {
 					RemindersProvider.addReminder(this, reminder, true);
@@ -378,16 +306,14 @@ public class RemindersActivity extends BaseFragmentActivity implements Connectio
 		}
 	}
 
-	private void parseNfcIntent(final Intent intent)
-	{
+	private void parseNfcIntent(final Intent intent) {
 		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
 			final NdefMessage[] msgs = getNdefMessages(intent);
 			parseNdefMessages(msgs);
 		}
 	}
 
-	private void resolveSignInError()
-	{
+	private void resolveSignInError() {
 		if ((mConnectionResult != null) && mConnectionResult.hasResolution()) {
 			try {
 				mIntentInProgress = true;

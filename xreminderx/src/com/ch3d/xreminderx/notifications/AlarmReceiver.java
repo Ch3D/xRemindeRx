@@ -135,8 +135,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         final NotificationManager nManager = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
 
-        final PendingIntent operation = ReminderUtils.getPendingAlarmOperation(
-                context, reminder.getId());
+        final PendingIntent operation = ReminderUtils.getPendingIntent(context, reminder.getId());
 
         // cancel alarm
         aManager.cancel(operation);
@@ -179,8 +178,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         final Cursor query2 = context.getContentResolver().query(uri, null,
                 null, null, null);
         final ReminderEntry updatedReminder = ReminderUtils.parse(query2);
-        final PendingIntent operation = ReminderUtils.getPendingAlarmOperation(
-                context, reminder.getId());
+        final PendingIntent operation = ReminderUtils.getPendingIntent(context, reminder.getId());
         aManager.set(AlarmManager.RTC_WAKEUP,
                 updatedReminder.getAlarmTimestamp(), operation);
 

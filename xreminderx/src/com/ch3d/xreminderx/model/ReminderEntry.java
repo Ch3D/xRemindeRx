@@ -57,6 +57,10 @@ public class ReminderEntry implements Parcelable {
 		this.text = text;
 	}
 
+	public boolean isQuick() {
+		return alarmTimestamp == ReminderFactory.NULL_TIMESTAMP;
+	}
+
 	@Override
 	public int describeContents() {
 		return 0;

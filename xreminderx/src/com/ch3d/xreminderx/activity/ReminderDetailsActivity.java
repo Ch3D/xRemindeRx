@@ -23,8 +23,7 @@ public class ReminderDetailsActivity extends BaseFragmentActivity {
 		return intent;
 	}
 
-	public static Intent newIntent(final Context c, final String action, final int flags,
-	                               final Uri data) {
+	public static Intent newIntent(final Context c, final String action, final int flags, final Uri data) {
 		final Intent intent = newIntent(c, action, data);
 		intent.addFlags(flags);
 		return intent;
@@ -34,10 +33,6 @@ public class ReminderDetailsActivity extends BaseFragmentActivity {
 		final Intent intent = newIntent(c, action);
 		intent.setData(data);
 		return intent;
-	}
-
-	private void applyColorTheme() {
-		final ReminderEntry reminder = getReminder();
 	}
 
 	@Override
@@ -52,16 +47,13 @@ public class ReminderDetailsActivity extends BaseFragmentActivity {
 			return null;
 		}
 
-		final Cursor query = getContentResolver().query(
-				data, null, null,
-				null, null);
+		final Cursor query = getContentResolver().query(data, null, null, null, null);
 		return ReminderUtils.parse(query);
 	}
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		applyColorTheme();
 		setContentView(R.layout.x_reminder_details);
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		final Intent intent = getIntent();
@@ -75,8 +67,7 @@ public class ReminderDetailsActivity extends BaseFragmentActivity {
 				trx.commit();
 			} else if (Intent.ACTION_EDIT.equals(action)) {
 				final FragmentTransaction trx = getSupportFragmentManager().beginTransaction();
-				trx.add(R.x_reminder_details.root, ReminderEditFragment
-						.newInstance(getIntent().getData()), ReminderViewFragment.TAG);
+				trx.add(R.x_reminder_details.root, ReminderEditFragment.newInstance(getIntent().getData()), ReminderViewFragment.TAG);
 				trx.commit();
 			} else if (ReminderIntent.ACTION_NEW.equals(action)) {
 				final FragmentTransaction trx = getSupportFragmentManager().beginTransaction();

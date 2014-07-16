@@ -45,14 +45,11 @@ public class RingerService extends Service implements Callback {
 	private int mInitialCallState;
 	private final PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
 		@Override
-		public void onCallStateChanged(
-				final int state,
-				final String ignored) {
+		public void onCallStateChanged(final int state, final String ignored) {
 			/*The user might already be	in a call when the alarm fires.	When we register
 			onCallStateChanged,	we get the initial in-call state which kills the alarm.
 			Check against the initial call state so	we don't kill the alarm during a call.*/
-			if ((state != TelephonyManager.CALL_STATE_IDLE)
-					&& (state != mInitialCallState)) {
+			if ((state != TelephonyManager.CALL_STATE_IDLE) && (state != mInitialCallState)) {
 				// TODO:
 				// sendKillBroadcast(mCurrentAlarm);
 				stopSelf();
@@ -168,8 +165,7 @@ public class RingerService extends Service implements Callback {
 				Log.v(TAG, "Using the in-call alarm");
 				mMediaPlayer.setVolume(IN_CALL_VOLUME, IN_CALL_VOLUME);
 			} else {
-				mMediaPlayer.setDataSource(this,
-						RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM));
+				mMediaPlayer.setDataSource(this, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM));
 			}
 			startAlarm(mMediaPlayer);
 		} catch (final Exception ex) {
@@ -197,9 +193,7 @@ public class RingerService extends Service implements Callback {
 		}
 	}
 
-	private void startAlarm(final MediaPlayer player) throws java.io.IOException,
-			IllegalArgumentException,
-			IllegalStateException {
+	private void startAlarm(final MediaPlayer player) throws java.io.IOException, IllegalArgumentException, IllegalStateException {
 		final AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 		// do not play alarms if stream volume is 0
 		// (typically because ringer mode is silent).

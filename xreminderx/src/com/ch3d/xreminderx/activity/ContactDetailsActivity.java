@@ -30,8 +30,7 @@ public class ContactDetailsActivity extends BaseFragmentActivity
         final AlarmManager aManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         final NotificationManager nManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        final PendingIntent operation = ReminderUtils.getPendingAlarmOperation(this,
-                reminder.getId());
+        final PendingIntent operation = ReminderUtils.getPendingIntent(this, reminder.getId());
 
         if (!ReminderIntent.ACTION_NOTIFICATION_ONGOING.equals(getIntent().getAction()))
         {
