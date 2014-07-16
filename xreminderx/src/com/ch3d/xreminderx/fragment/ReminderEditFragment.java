@@ -58,6 +58,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 	@InjectView(R.f_reminder_edit.text)
 	protected FloatLabeledEditText mText;
 	@InjectView(R.f_reminder_edit.btnTsDatePicker)
+	
 	protected Button mBtnDatePicker;
 	@InjectView(R.f_reminder_edit.btnTsTimePicker)
 	protected Button mBtnTimePicker;
