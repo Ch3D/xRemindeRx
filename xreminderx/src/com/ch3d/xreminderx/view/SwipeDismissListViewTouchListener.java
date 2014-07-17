@@ -64,7 +64,7 @@ public class SwipeDismissListViewTouchListener implements View.OnTouchListener, 
 		this.swipeRefreshLayout = swipeRefreshLayout;
 		final ViewConfiguration vc = ViewConfiguration.get(listView.getContext());
 		mSlop = vc.getScaledTouchSlop();
-		mMinFlingVelocity = vc.getScaledMinimumFlingVelocity() * 16;
+		mMinFlingVelocity = vc.getScaledMinimumFlingVelocity() * 8;
 		mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
 		mAnimationTime = listView.getContext().getResources().getInteger(android.R.integer.config_shortAnimTime);
 		mListView = listView;
