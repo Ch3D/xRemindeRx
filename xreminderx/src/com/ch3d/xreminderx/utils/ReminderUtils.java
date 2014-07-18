@@ -142,6 +142,11 @@ public class ReminderUtils {
 		return fetchThumbnail(context, reminder.getContactUri(), defImg);
 	}
 
+	public static Bitmap fetchThumbnail(final Context context, final Uri uri) {
+		final Bitmap defImg = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_contact_picture);
+		return fetchThumbnail(context, uri, defImg);
+	}
+
 	public static Bitmap fetchThumbnail(final Context context, final ReminderEntry reminder, final Bitmap defaultImg) {
 		return fetchThumbnail(context, reminder.getContactUri(), defaultImg);
 	}
@@ -358,5 +363,27 @@ public class ReminderUtils {
 
 	public static String getFormattedTime(Context context, long timestamp) {
 		return formatTime(context, timestamp);
+	}
+
+	public static Bitmap setData(Context context, ReminderEntry reminder) {
+		final Uri uri = reminder.getContactUri();
+		if (uri == null) {
+			return null;
+		}
+
+		Cursor c = null;
+		try {
+			c = context.getContentResolver()
+					.query(uri, new String[]{ContactsContract.Contacts.PHOTO_ID, ContactsContract.Contacts.LOOKUP_KEY}, null, null, null);
+
+			if ((c != null) && c.moveToFirst()) {
+				final int photoId = c.getInt(0);
+				return fetchThumbnail(context, photoId, null);
+			} else {
+				return null;
+			}
+		} finally {
+			DBUtils.close(c);
+		}
 	}
 }

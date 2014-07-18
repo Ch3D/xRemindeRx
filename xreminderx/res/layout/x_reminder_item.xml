@@ -41,4 +41,11 @@
             android:textColor="@android:color/secondary_text_light"
             android:textAppearance="?android:attr/textAppearance"/>
     </LinearLayout>
+
+    <ImageView
+        android:id="@android:id/icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginRight="40dp"
+        android:layout_gravity="right|center_vertical"/>
 </FrameLayout>

@@ -68,7 +68,7 @@ public class ContactBadgeHolder {
 
 	private void setQuickContactData(Bitmap bitmap) {
 		setVisible(mContactStub, true);
-		setRoundedColorDrawable((ImageView) findById(activity, R.x_contact_badge.imgAvatar), bitmap, Color.WHITE);
+		setRoundedColorDrawable((ImageView) findById(activity, R.x_contact_badge.imgAvatar), bitmap, Color.RED);
 	}
 
 	private Bitmap getBitmap(int photoId) {

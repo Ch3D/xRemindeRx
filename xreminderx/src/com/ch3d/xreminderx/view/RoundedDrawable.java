@@ -30,7 +30,11 @@ public class RoundedDrawable extends Drawable {
 	protected RoundedDrawable(Bitmap bitmap, float cornerRadius, int margin) {
 		mCornerRadius = cornerRadius;
 
-		mBitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+		if (bitmap == null) {
+			mBitmapShader = null;
+		} else {
+			mBitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+		}
 
 		mPaint = new Paint();
 		mPaint.setAntiAlias(true);
@@ -42,6 +46,11 @@ public class RoundedDrawable extends Drawable {
 	@Override
 	protected void onBoundsChange(Rect bounds) {
 		super.onBoundsChange(bounds);
+
+		if (mBitmapShader == null) {
+			return;
+		}
+
 		mRect.set(mMargin, mMargin, bounds.width() - mMargin, bounds.height() - mMargin);
 
 		if (USE_VIGNETTE) {
@@ -59,7 +68,9 @@ public class RoundedDrawable extends Drawable {
 
 	@Override
 	public void draw(Canvas canvas) {
-		canvas.drawRoundRect(mRect, mCornerRadius, mCornerRadius, mPaint);
+		if (mBitmapShader != null) {
+			canvas.drawRoundRect(mRect, mCornerRadius, mCornerRadius, mPaint);
+		}
 	}
 
 	@Override
