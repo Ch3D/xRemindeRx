@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.ch3d.xreminderx.R;
 import com.ch3d.xreminderx.provider.RemindersContract;
 import com.ch3d.xreminderx.utils.ReminderUtils;
-import com.ch3d.xreminderx.view.RoundedDrawableFactory;
+import com.ch3d.xreminderx.view.drawable.RoundedDrawableHelper;
 
 public class RemindersAdapter extends CursorAdapter {
 
@@ -40,7 +40,7 @@ public class RemindersAdapter extends CursorAdapter {
 		} else {
 			bitmap = null;
 		}
-		RoundedDrawableFactory.setRoundedColorDrawable(holder.icon, bitmap, cursor.getInt(RemindersContract.Indexes.COLOR));
+		RoundedDrawableHelper.setRoundedColorDrawable(holder.icon, bitmap, cursor.getInt(RemindersContract.Indexes.COLOR));
 	}
 
 	public int[] getCheckedItems() {

@@ -3,7 +3,6 @@ package com.ch3d.xreminderx.fragment;
 import android.content.ContentUris;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
@@ -71,7 +70,8 @@ public class ReminderViewFragment extends Fragment {
 					showContactDetails(reminder);
 				}
 			});
-			setContactBagdeData(reminder.getContactUri(), null);
+			mContactBadgeHolder.updateData(reminder);
+			mContactBadgeHolder.setOnRemoveListener(null);
 		} else {
 			mContactBadgeHolder.setVisibility(false);
 		}
@@ -113,7 +113,8 @@ public class ReminderViewFragment extends Fragment {
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.f_reminder_view, container, false);
 		ButterKnife.inject(this, view);
-		mContactBadgeHolder = new ContactBadgeHolder(getActivity(), (ViewStub) view.findViewById(R.f_reminder_view.contact_badge));
+		mContactBadgeHolder =
+				new ContactBadgeHolder(getActivity(), (ViewStub) view.findViewById(R.f_reminder_view.contact_badge), getReminder());
 		return view;
 	}
 
@@ -170,10 +171,6 @@ public class ReminderViewFragment extends Fragment {
 			nfcAdapter.setNdefPushMessage(msg, getActivity());
 		}
 
-	}
-
-	private void setContactBagdeData(final Uri uri, final OnClickListener removeClickListener) {
-		mContactBadgeHolder.setData(uri, removeClickListener);
 	}
 
 	private void showContactDetails(final ReminderEntry reminder) {

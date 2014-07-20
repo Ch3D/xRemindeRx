@@ -55,10 +55,10 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 	public static final int REQUEST_CODE_GET_CONTACT = 2;
 	private static final String REMINDER_FRAGMENT_DATA = "ReminderEditFragment.data";
 	private static final int REQUEST_CODE_SPEECH_RECOGNITION = 1;
+
 	@InjectView(R.f_reminder_edit.text)
 	protected FloatLabeledEditText mText;
 	@InjectView(R.f_reminder_edit.btnTsDatePicker)
-
 	protected Button mBtnDatePicker;
 	@InjectView(R.f_reminder_edit.btnTsTimePicker)
 	protected Button mBtnTimePicker;
@@ -66,7 +66,6 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 	protected Button mBtnAlarmDatePicker;
 	@InjectView(R.f_reminder_edit.btnTsAlarmTimePicker)
 	protected Button mBtnAlarmTimePicker;
-	protected ReminderEntry mReminder;
 	@InjectView(R.f_reminder_edit.btnStartSpeech)
 	protected Button btnSpeech;
 	@InjectView(R.f_reminder_edit.cbOngoing)
@@ -75,6 +74,8 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 	protected CheckBox mSilent;
 	@InjectView(R.f_reminder_edit.color)
 	protected Spinner mColor;
+
+	protected ReminderEntry mReminder;
 	private ContactBadgeHolder mContactBadgeHolder;
 	private ColorsAdapter mColorsAdapter;
 
@@ -160,7 +161,8 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 		} else if (requestCode == REQUEST_CODE_GET_CONTACT) {
 			if (data != null) {
 				final Uri uri = data.getData();
-				setContactData(uri);
+				mReminder.setContactUri(uri);
+				mContactBadgeHolder.setData(uri, mReminder.getColor());
 			}
 		}
 		super.onActivityResult(requestCode, resultCode, data);
@@ -183,7 +185,8 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 				break;
 
 			case R.x_contact_badge.btnRemove:
-				setContactData(Uri.EMPTY);
+				mReminder.setContactUri(Uri.EMPTY);
+				mContactBadgeHolder.clearData();
 				break;
 
 			// case R.f_reminder_edit.btnPickContact:
@@ -235,7 +238,9 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 	@Override
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.f_reminder_edit, container, false);
-		mContactBadgeHolder = new ContactBadgeHolder(getActivity(), (ViewStub) view.findViewById(R.f_reminder_edit.contact_badge));
+		mContactBadgeHolder =
+				new ContactBadgeHolder(getActivity(), (ViewStub) view.findViewById(R.f_reminder_edit.contact_badge), mReminder);
+		mContactBadgeHolder.setOnRemoveListener(this);
 		ButterKnife.inject(this, view);
 		return view;
 	}
@@ -310,6 +315,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 			public void onItemSelected(final AdapterView<?> arg0, final View arg1, final int pos, final long arg3) {
 				final ReminderColor color = (ReminderColor) mColor.getItemAtPosition(pos);
 				mReminder.setColor(color.getColor());
+				mContactBadgeHolder.refresh();
 			}
 
 			@Override
@@ -339,6 +345,10 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 		});
 
 		mReminder = getReminder();
+
+		mContactBadgeHolder =
+				new ContactBadgeHolder(getActivity(), (ViewStub) view.findViewById(R.f_reminder_edit.contact_badge), mReminder);
+		mContactBadgeHolder.setOnRemoveListener(this);
 		mContactBadgeHolder.setVisibility(true);
 		mContactBadgeHolder.setOnClickListener(new OnClickListener() {
 			@Override
@@ -348,7 +358,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 				startActivityForResult(intent, REQUEST_CODE_GET_CONTACT);
 			}
 		});
-		setContactData(mReminder.getContactUri());
+		mContactBadgeHolder.refresh();
 
 		updateRemiderViewData();
 	}
@@ -358,13 +368,9 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 		ReminderUtils.setAlarm(getActivity(), id, entry);
 	}
 
-	private void setContactBadgeData(final Uri uri, final OnClickListener removeClickListener) {
-		mContactBadgeHolder.setData(uri, removeClickListener);
-	}
-
-	protected void setContactData(final Uri uri) {
-		mReminder.setContactUri(uri);
-		setContactBadgeData(uri, this);
+	protected void setContactData(final ReminderEntry reminder) {
+		mReminder.setContactUri(reminder.getContactUri());
+		mContactBadgeHolder.refresh();
 	}
 
 	protected void updateRemiderViewData() {
@@ -376,7 +382,7 @@ public class ReminderEditFragment extends Fragment implements OnClickListener, O
 		final int colorPosition = mColorsAdapter.getPosition(mReminder.getColor());
 		mColor.setSelection(colorPosition);
 
-		setContactBadgeData(mReminder.getContactUri(), this);
+		mContactBadgeHolder.refresh();
 		mBtnDatePicker.setText(ReminderUtils.formatTimestmapDate(getActivity(), mReminder));
 		mBtnTimePicker.setText(ReminderUtils.formatTimestmapTime(getActivity(), mReminder));
 

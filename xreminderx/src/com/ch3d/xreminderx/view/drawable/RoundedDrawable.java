@@ -1,6 +1,5 @@
-package com.ch3d.xreminderx.view;
+package com.ch3d.xreminderx.view.drawable;
 
-import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
@@ -24,30 +23,33 @@ public class RoundedDrawable extends Drawable {
 	protected final float mCornerRadius;
 	private final RectF mRect = new RectF();
 	private final BitmapShader mBitmapShader;
-	private final Paint mPaint;
 	private final int mMargin;
+	private Paint mPaint = null;
 
-	protected RoundedDrawable(Bitmap bitmap, float cornerRadius, int margin) {
+	RoundedDrawable(BitmapShader shader, float cornerRadius, int margin) {
 		mCornerRadius = cornerRadius;
-
-		if (bitmap == null) {
-			mBitmapShader = null;
-		} else {
-			mBitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-		}
-
-		mPaint = new Paint();
-		mPaint.setAntiAlias(true);
-		mPaint.setShader(mBitmapShader);
-
+		mBitmapShader = shader;
 		mMargin = margin;
+	}
+
+	RoundedDrawable initPaint() {
+		if (mBitmapShader != null) {
+			mPaint = new Paint();
+			mPaint.setAntiAlias(true);
+			mPaint.setShader(mBitmapShader);
+		}
+		return this;
+	}
+
+	boolean hasPaint() {
+		return mPaint != null;
 	}
 
 	@Override
 	protected void onBoundsChange(Rect bounds) {
 		super.onBoundsChange(bounds);
 
-		if (mBitmapShader == null) {
+		if (!hasPaint()) {
 			return;
 		}
 
@@ -68,9 +70,10 @@ public class RoundedDrawable extends Drawable {
 
 	@Override
 	public void draw(Canvas canvas) {
-		if (mBitmapShader != null) {
-			canvas.drawRoundRect(mRect, mCornerRadius, mCornerRadius, mPaint);
+		if (!hasPaint()) {
+			return;
 		}
+		canvas.drawRoundRect(mRect, mCornerRadius, mCornerRadius, mPaint);
 	}
 
 	@Override
