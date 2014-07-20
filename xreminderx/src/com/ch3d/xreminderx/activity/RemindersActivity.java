@@ -166,15 +166,6 @@ public class RemindersActivity extends BaseFragmentActivity implements Connectio
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		final Intent intent = getIntent();
-		final String action = intent.getAction();
-		final String type = intent.getType();
-		if (Intent.ACTION_SEND.equals(action) && type != null) {
-			if ("text/plain".equals(type)) {
-				handleSendText(intent);
-			}
-		}
-
 		mGoogleApi = ActivityUtils.getGoogleApi(this);
 		mGoogleApi.registerConnectionCallbacks(this);
 		mGoogleApi.registerConnectionFailedListener(this);
@@ -199,15 +190,6 @@ public class RemindersActivity extends BaseFragmentActivity implements Connectio
 		// parse intent in case if
 		// application is not already running
 		parseNfcIntent(getIntent());
-	}
-
-	private void handleSendText(final Intent intent) {
-		final String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-		if (!StringUtils.isBlank(sharedText)) {
-			ReminderEntry entry = ReminderFactory.createNew();
-			entry.setText(sharedText);
-			RemindersProvider.addReminder(this, entry);
-		}
 	}
 
 	@Override

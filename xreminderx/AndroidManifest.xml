@@ -49,6 +49,18 @@
         </receiver>
 
         <activity
+            android:name="com.ch3d.xreminderx.activity.share.ShareIntentActivity"
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar"
+            android:excludeFromRecents="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name="com.ch3d.xreminderx.widget.AddReminderActivity"
             android:exported="false"
             android:enabled="true"
