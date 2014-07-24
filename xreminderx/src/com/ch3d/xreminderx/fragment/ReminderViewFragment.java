@@ -32,6 +32,8 @@ import com.ch3d.xreminderx.utils.ViewUtils;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
+import static com.ch3d.xreminderx.utils.ViewUtils.setVisible;
+
 public class ReminderViewFragment extends Fragment {
 	public static final String TAG = "ReminderDetails";
 
@@ -59,6 +61,9 @@ public class ReminderViewFragment extends Fragment {
 	@InjectView(R.f_reminder_view.color)
 	protected View mColor;
 
+	@InjectView(R.id.panel_alarm)
+	protected View panelAlarm;
+
 	private ContactBadgeHolder mContactBadgeHolder;
 
 	private void bindContactData(final ReminderEntry reminder, final boolean isContactRelated) {
@@ -84,18 +89,18 @@ public class ReminderViewFragment extends Fragment {
 
 		mIconType.setImageLevel(reminder.getType().getId());
 		mColor.setBackgroundColor(reminder.getColor());
-		ViewUtils.setVisible(mOngoing, reminder.isOngoing());
-		ViewUtils.setVisible(mSilent, reminder.isSilent());
+		setVisible(mOngoing, reminder.isOngoing());
+		setVisible(mSilent, reminder.isSilent());
 
 		final boolean isContactRelated = reminder.isContactRelated();
-		ViewUtils.setVisible(mPanelContact, isContactRelated);
+		setVisible(mPanelContact, isContactRelated);
 		bindContactData(reminder, isContactRelated);
+		setVisible(panelAlarm, !reminder.isQuick());
 	}
 
 	private ReminderEntry getReminder() {
 		final Cursor cursor = getActivity().getContentResolver().query(getActivity().getIntent().getData(), null, null, null, null);
-		final ReminderEntry reminder = ReminderUtils.parse(cursor);
-		return reminder;
+		return ReminderUtils.parse(cursor);
 	}
 
 	@Override
