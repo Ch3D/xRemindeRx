@@ -267,9 +267,7 @@ public class ReminderUtils {
 		final AlarmManager mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		final NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 		if (entry.isOngoing()) {
-			if (!entry.isQuick()) {
-				mAlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 500, getPendingIntentOngoing(context, id));
-			}
+			mAlarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 500, getPendingIntentOngoing(context, id));
 		} else {
 			mNotificationManager.cancel((int) id);
 		}
