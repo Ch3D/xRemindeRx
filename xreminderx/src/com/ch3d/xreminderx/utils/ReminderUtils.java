@@ -172,8 +172,8 @@ public class ReminderUtils {
 		values.put(RemindersContract.Columns.TIMESTAMP, entry.getTimestamp());
 		values.put(RemindersContract.Columns.TYPE, entry.getType().getId());
 		values.put(RemindersContract.Columns.ALARM_TIMESTAMP, entry.getAlarmTimestamp());
-		values.put(RemindersContract.Columns.IS_ONGOING, entry.isOngoing() ? 1 : 0);
-		values.put(RemindersContract.Columns.IS_SILENT, entry.isSilent() ? 1 : 0);
+		values.put(RemindersContract.Columns.IS_ONGOING, entry.getOutgoing());
+		values.put(RemindersContract.Columns.IS_SILENT, entry.getSilent());
 		values.put(RemindersContract.Columns.COLOR, entry.getColor());
 		values.put(RemindersContract.Columns.VERSION, entry.getVersion());
 		values.put(RemindersContract.Columns.PID, entry.getPid());

@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ch3d.xreminderx.R;
@@ -40,32 +39,29 @@ import static com.ch3d.xreminderx.utils.ViewUtils.setVisible;
 public class ReminderViewFragment extends Fragment {
 	public static final String TAG = "ReminderDetails";
 
-	@InjectView(R.f_reminder_view.text)
+	@InjectView(R.id.title)
 	protected TextView mText;
 
-	@InjectView(R.f_reminder_view.timestamp)
+	@InjectView(R.id.timestamp)
 	protected TextView mTimestamp;
 
 	@InjectView(R.id.alarmTimestamp)
 	protected TextView mAlarmTimstamp;
 
-	@InjectView(R.f_reminder_view.icon_type)
-	protected ImageView mIconType;
-
-	@InjectView(R.f_reminder_view.panelSelectContact)
+	@InjectView(R.id.panelSelectContact)
 	protected View mPanelContact;
 
-	@InjectView(R.f_reminder_view.txtOngoing)
+	@InjectView(R.id.textOngoing)
 	protected TextView mOngoing;
 
-	@InjectView(R.f_reminder_view.txtSilent)
+	@InjectView(R.id.textSilent)
 	protected TextView mSilent;
 
-	@InjectView(R.f_reminder_view.color)
+	@InjectView(R.id.color)
 	protected View mColor;
 
 	@InjectViews({R.id.alarmTimestamp, R.id.alarmTimestamp_delimiter, R.id.alarmTimestamp_header})
-	List<View> alarmViews;
+	protected List<View> alarmViews;
 
 	private ContactBadgeHolder mContactBadgeHolder;
 
@@ -90,7 +86,6 @@ public class ReminderViewFragment extends Fragment {
 		ViewUtils.setAnimatedText(mTimestamp, ReminderUtils.formatDateTimeShort(getActivity(), reminder.getTimestamp()));
 		ViewUtils.setAnimatedText(mAlarmTimstamp, ReminderUtils.formatDateTimeShort(getActivity(), reminder.getAlarmTimestamp()));
 
-		mIconType.setImageLevel(reminder.getType().getId());
 		mColor.setBackgroundColor(reminder.getColor());
 		setVisible(mOngoing, reminder.isOngoing());
 		setVisible(mSilent, reminder.isSilent());
@@ -121,7 +116,7 @@ public class ReminderViewFragment extends Fragment {
 	public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		final View view = inflater.inflate(R.layout.f_reminder_view, container, false);
 		ButterKnife.inject(this, view);
-		mContactBadgeHolder = new ContactBadgeHolder(getActivity(), (ViewStub) view.findViewById(R.f_reminder_view.contact_badge));
+		mContactBadgeHolder = new ContactBadgeHolder(getActivity(), (ViewStub) view.findViewById(R.id.contact_badge));
 		return view;
 	}
 

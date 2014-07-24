@@ -32,25 +32,21 @@ public class FloatLabeledEditText extends LinearLayout {
 	private final Context mContext;
 	private final TextWatcher onTextChanged = new TextWatcher() {
 		@Override
-		public void afterTextChanged(final Editable editable)
-		{
+		public void afterTextChanged(final Editable editable) {
 			setShowHint(editable.length() != 0);
 		}
 
 		@Override
-		public void beforeTextChanged(final CharSequence charSequence, final int i, final int i2, final int i3)
-		{
+		public void beforeTextChanged(final CharSequence charSequence, final int i, final int i2, final int i3) {
 		}
 
 		@Override
-		public void onTextChanged(final CharSequence charSequence, final int i, final int i2, final int i3)
-		{
+		public void onTextChanged(final CharSequence charSequence, final int i, final int i2, final int i3) {
 		}
 	};
 	private final OnFocusChangeListener onFocusChanged = new OnFocusChangeListener() {
 		@Override
-		public void onFocusChange(final View view, final boolean gotFocus)
-		{
+		public void onFocusChange(final View view, final boolean gotFocus) {
 			if (gotFocus) {
 				ObjectAnimator.ofFloat(hintTextView, "alpha", 0.33f, 1f).start();
 			} else {
@@ -68,16 +64,16 @@ public class FloatLabeledEditText extends LinearLayout {
 	private ColorStateList textColor;
 	private TextView hintTextView;
 	private EditText editText;
+	private float textSize;
+	private float editTextMargin;
 
-	public FloatLabeledEditText(final Context context)
-	{
+	public FloatLabeledEditText(final Context context) {
 		super(context);
 		mContext = context;
 		initialize();
 	}
 
-	public FloatLabeledEditText(final Context context, final AttributeSet attrs)
-	{
+	public FloatLabeledEditText(final Context context, final AttributeSet attrs) {
 		super(context, attrs);
 		mContext = context;
 		setAttributes(attrs);
@@ -85,47 +81,40 @@ public class FloatLabeledEditText extends LinearLayout {
 	}
 
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public FloatLabeledEditText(final Context context, final AttributeSet attrs, final int defStyle)
-	{
+	public FloatLabeledEditText(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs, defStyle);
 		mContext = context;
 		setAttributes(attrs);
 		initialize();
 	}
 
-	private static boolean isIcsOrAbove()
-	{
+	private static boolean isIcsOrAbove() {
 		return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 	}
 
 	/**
 	 * See {@link android.widget.EditText#extendSelection(int)}.
 	 */
-	public void extendSelection(final int index)
-	{
+	public void extendSelection(final int index) {
 		editText.extendSelection(index);
 	}
 
-	public EditText getEditText()
-	{
+	public EditText getEditText() {
 		return editText;
 	}
 
-	public String getHint()
-	{
+	public String getHint() {
 		return editText.getHint().toString();
 	}
 
-	public void setHint(final String hint)
-	{
+	public void setHint(final String hint) {
 		this.hint = hint;
 		editText.setHint(hint);
 		editText.setHintTextColor(hintColor);
 		hintTextView.setText(hint);
 	}
 
-	public Editable getText()
-	{
+	public Editable getText() {
 		return editText.getText();
 	}
 
@@ -134,21 +123,18 @@ public class FloatLabeledEditText extends LinearLayout {
 	 *
 	 * @param text
 	 */
-	public void setText(final CharSequence text)
-	{
+	public void setText(final CharSequence text) {
 		editText.setText(text);
 	}
 
 	/**
 	 * Convenience for {@link #setText} to get the {@link java.lang.String} of what is in the EditText.
 	 */
-	public String getTextString()
-	{
+	public String getTextString() {
 		return editText.getText().toString();
 	}
 
-	private void initialize()
-	{
+	private void initialize() {
 		setOrientation(VERTICAL);
 		if (isInEditMode()) {
 			return;
@@ -167,6 +153,10 @@ public class FloatLabeledEditText extends LinearLayout {
 			editText.setInputType(inputType);
 		}
 		editText.setImeOptions(imeOptions);
+		if (textSize > 0) {
+			editText.setTextSize(textSize);
+		}
+
 		if ((imeActionId > -1) && !TextUtils.isEmpty(imeActionLabel)) {
 			editText.setImeActionLabel(imeActionLabel, imeActionId);
 		}
@@ -177,12 +167,23 @@ public class FloatLabeledEditText extends LinearLayout {
 		hintTextView.setVisibility(INVISIBLE);
 		editText.addTextChangedListener(onTextChanged);
 		editText.setOnFocusChangeListener(onFocusChanged);
+
+		if (editTextMargin != 0) {
+			final LayoutParams lp = new LayoutParams(editText.getLayoutParams());
+			lp.topMargin = (int) editTextMargin;
+			editText.setLayoutParams(lp);
+		}
+	}
+
+	private int dipToPixels(final Context context, final float dips) {
+		final float scale = context.getResources().getDisplayMetrics().density;
+		final int paddingInPixels = (int) ((dips * scale) + 0.5f);
+		return paddingInPixels;
 	}
 
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	@Override
-	public void onInitializeAccessibilityEvent(final AccessibilityEvent event)
-	{
+	public void onInitializeAccessibilityEvent(final AccessibilityEvent event) {
 		if (isIcsOrAbove()) {
 			super.onInitializeAccessibilityEvent(event);
 			editText.onInitializeAccessibilityEvent(event);
@@ -191,8 +192,7 @@ public class FloatLabeledEditText extends LinearLayout {
 
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	@Override
-	public void onInitializeAccessibilityNodeInfo(final AccessibilityNodeInfo info)
-	{
+	public void onInitializeAccessibilityNodeInfo(final AccessibilityNodeInfo info) {
 		if (isIcsOrAbove()) {
 			super.onInitializeAccessibilityNodeInfo(info);
 			editText.onInitializeAccessibilityNodeInfo(info);
@@ -200,8 +200,7 @@ public class FloatLabeledEditText extends LinearLayout {
 	}
 
 	@Override
-	public void onRestoreInstanceState(final Parcelable state)
-	{
+	public void onRestoreInstanceState(final Parcelable state) {
 		if (!(state instanceof FloatEditTextSavedState)) {
 			super.onRestoreInstanceState(state);
 			return;
@@ -218,8 +217,7 @@ public class FloatLabeledEditText extends LinearLayout {
 	}
 
 	@Override
-	public Parcelable onSaveInstanceState()
-	{
+	public Parcelable onSaveInstanceState() {
 		final Parcelable parcelable = super.onSaveInstanceState();
 		final FloatEditTextSavedState ss = new FloatEditTextSavedState(parcelable);
 		ss.hint = hint;
@@ -237,8 +235,7 @@ public class FloatLabeledEditText extends LinearLayout {
 	/**
 	 * Requests focus on the EditText.
 	 */
-	public void requestFieldFocus()
-	{
+	public void requestFieldFocus() {
 		if (editText != null) {
 			editText.requestFocus();
 		}
@@ -247,13 +244,11 @@ public class FloatLabeledEditText extends LinearLayout {
 	/**
 	 * See {@link android.widget.EditText#selectAll()}.
 	 */
-	public void selectAll()
-	{
+	public void selectAll() {
 		editText.selectAll();
 	}
 
-	private void setAttributes(final AttributeSet attrs)
-	{
+	private void setAttributes(final AttributeSet attrs) {
 		final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.FloatLabeledEditText);
 		inputType = InputType.TYPE_NULL;
 		try {
@@ -265,6 +260,8 @@ public class FloatLabeledEditText extends LinearLayout {
 			singleLine = a.getBoolean(R.styleable.FloatLabeledEditText_fletSingleLine, false);
 			hintColor = a.getColorStateList(R.styleable.FloatLabeledEditText_fletHintTextColor);
 			textColor = a.getColorStateList(R.styleable.FloatLabeledEditText_fletTextColor);
+			textSize = a.getDimension(R.styleable.FloatLabeledEditText_fletTextSize, 0);
+			editTextMargin = a.getDimension(R.styleable.FloatLabeledEditText_fletEditTextMargin, 0);
 		} finally {
 			a.recycle();
 		}
@@ -273,24 +270,21 @@ public class FloatLabeledEditText extends LinearLayout {
 	/**
 	 * See {@link android.widget.EditText#setEllipsize(android.text.TextUtils.TruncateAt)}.
 	 */
-	public void setEllipsize(final TextUtils.TruncateAt ellipsize)
-	{
+	public void setEllipsize(final TextUtils.TruncateAt ellipsize) {
 		editText.setEllipsize(ellipsize);
 	}
 
 	/**
 	 * See {@link android.widget.TextView#setError(CharSequence)}.
 	 */
-	public void setError(final CharSequence text)
-	{
+	public void setError(final CharSequence text) {
 		editText.setError(text);
 	}
 
 	/**
 	 * See {@link android.widget.TextView#setError(CharSequence, android.graphics.drawable.Drawable)}.
 	 */
-	public void setError(final CharSequence text, final Drawable icon)
-	{
+	public void setError(final CharSequence text, final Drawable icon) {
 		editText.setError(text, icon);
 	}
 
@@ -299,8 +293,7 @@ public class FloatLabeledEditText extends LinearLayout {
 	 *
 	 * @param resourceId
 	 */
-	public void setErrorResource(final int resourceId)
-	{
+	public void setErrorResource(final int resourceId) {
 		editText.setError(mContext.getString(resourceId));
 	}
 
@@ -309,26 +302,22 @@ public class FloatLabeledEditText extends LinearLayout {
 	 *
 	 * @param resourceId
 	 */
-	public void setErrorResource(final int resourceId, final Drawable icon)
-	{
+	public void setErrorResource(final int resourceId, final Drawable icon) {
 		editText.setError(mContext.getString(resourceId), icon);
 	}
 
-	public void setHintTextColor(final ColorStateList colors)
-	{
+	public void setHintTextColor(final ColorStateList colors) {
 		hintTextView.setTextColor(colors);
 	}
 
-	public void setHintTextColor(final int color)
-	{
+	public void setHintTextColor(final int color) {
 		hintTextView.setTextColor(color);
 	}
 
 	/**
 	 * See {@link android.widget.EditText#setImeActionLabel(CharSequence, int)}.
 	 */
-	public void setImeActionLabel(final CharSequence label, final int actionId)
-	{
+	public void setImeActionLabel(final CharSequence label, final int actionId) {
 		editText.setImeActionLabel(label, actionId);
 	}
 
@@ -337,29 +326,25 @@ public class FloatLabeledEditText extends LinearLayout {
 	 *
 	 * @param listener
 	 */
-	public void setOnEditorActionListener(final TextView.OnEditorActionListener listener)
-	{
+	public void setOnEditorActionListener(final TextView.OnEditorActionListener listener) {
 		editText.setOnEditorActionListener(listener);
 	}
 
 	/**
 	 * See {@link android.widget.EditText#setSelection(int)}.
 	 */
-	public void setSelection(final int index)
-	{
+	public void setSelection(final int index) {
 		editText.setSelection(index);
 	}
 
 	/**
 	 * See {@link android.widget.EditText#setSelection(int, int)}.
 	 */
-	public void setSelection(final int start, final int stop)
-	{
+	public void setSelection(final int start, final int stop) {
 		editText.setSelection(start, stop);
 	}
 
-	private void setShowHint(final boolean show)
-	{
+	private void setShowHint(final boolean show) {
 		AnimatorSet animation = null;
 		if ((hintTextView.getVisibility() == VISIBLE) && !show) {
 			animation = new AnimatorSet();
@@ -376,15 +361,13 @@ public class FloatLabeledEditText extends LinearLayout {
 		if (animation != null) {
 			animation.addListener(new AnimatorListenerAdapter() {
 				@Override
-				public void onAnimationEnd(final Animator animation)
-				{
+				public void onAnimationEnd(final Animator animation) {
 					super.onAnimationEnd(animation);
 					hintTextView.setVisibility(show ? VISIBLE : INVISIBLE);
 				}
 
 				@Override
-				public void onAnimationStart(final Animator animation)
-				{
+				public void onAnimationStart(final Animator animation) {
 					super.onAnimationStart(animation);
 					hintTextView.setVisibility(VISIBLE);
 				}
@@ -399,20 +382,17 @@ public class FloatLabeledEditText extends LinearLayout {
 	 * @param text
 	 * @param type
 	 */
-	public void setText(final CharSequence text, final TextView.BufferType type)
-	{
+	public void setText(final CharSequence text, final TextView.BufferType type) {
 		editText.setText(text, type);
 	}
 
 	// Dealing with saving the state
 
-	public void setTextColor(final ColorStateList colors)
-	{
+	public void setTextColor(final ColorStateList colors) {
 		editText.setTextColor(colors);
 	}
 
-	public void setTextColor(final int color)
-	{
+	public void setTextColor(final int color) {
 		editText.setTextColor(color);
 	}
 
@@ -424,14 +404,12 @@ public class FloatLabeledEditText extends LinearLayout {
 		// required field that makes Parcelables from a Parcel
 		public static final Parcelable.Creator<FloatEditTextSavedState> CREATOR = new Parcelable.Creator<FloatEditTextSavedState>() {
 			@Override
-			public FloatEditTextSavedState createFromParcel(final Parcel in)
-			{
+			public FloatEditTextSavedState createFromParcel(final Parcel in) {
 				return new FloatEditTextSavedState(in);
 			}
 
 			@Override
-			public FloatEditTextSavedState[] newArray(final int size)
-			{
+			public FloatEditTextSavedState[] newArray(final int size) {
 				return new FloatEditTextSavedState[size];
 			}
 		};
@@ -445,8 +423,7 @@ public class FloatLabeledEditText extends LinearLayout {
 		ColorStateList hintColor;
 		ColorStateList textColor;
 
-		private FloatEditTextSavedState(final Parcel in)
-		{
+		private FloatEditTextSavedState(final Parcel in) {
 			super(in);
 			text = in.readString();
 			hint = in.readString();
@@ -459,14 +436,12 @@ public class FloatLabeledEditText extends LinearLayout {
 			textColor = in.readParcelable(ColorStateList.class.getClassLoader());
 		}
 
-		FloatEditTextSavedState(final Parcelable superState)
-		{
+		FloatEditTextSavedState(final Parcelable superState) {
 			super(superState);
 		}
 
 		@Override
-		public void writeToParcel(final Parcel out, final int flags)
-		{
+		public void writeToParcel(final Parcel out, final int flags) {
 			super.writeToParcel(out, flags);
 			out.writeString(text);
 			out.writeString(hint);

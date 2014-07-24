@@ -22,13 +22,6 @@ import butterknife.ButterKnife;
 
 public class ViewUtils {
 
-	public static final ButterKnife.Action<View> DISABLE = new ButterKnife.Action<View>() {
-		@Override
-		public void apply(View view, int index) {
-			view.setEnabled(false);
-		}
-	};
-
 	public static final ButterKnife.Setter<View, Boolean> VISIBLE = new ButterKnife.Setter<View, Boolean>() {
 		@Override
 		public void set(View view, Boolean value, int index) {
@@ -49,6 +42,7 @@ public class ViewUtils {
 					spanGroup.setProgress(value);
 				}
 			};
+
 	private static final AccelerateDecelerateInterpolator sSmoothInterpolator = new AccelerateDecelerateInterpolator();
 
 	public static void animateText(final TextView mText) {

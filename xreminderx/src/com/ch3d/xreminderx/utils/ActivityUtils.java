@@ -27,15 +27,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 public class ActivityUtils {
 	public static void showKeyboard(EditText view) {
-		InputMethodManager imm = (InputMethodManager) view.getContext()
-				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 		view.requestFocus();
 		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 	}
 
 	public static ViewTreeObserver.OnGlobalLayoutListener createKeyboardListener(final View view,
-	                                                                             final
-	                                                                             KeyboardVisibilityListener listener) {
+	                                                                             final KeyboardVisibilityListener listener) {
 		return new ViewTreeObserver.OnGlobalLayoutListener() {
 
 			private final Rect r = new Rect();
@@ -57,8 +55,7 @@ public class ActivityUtils {
 	}
 
 	public static void hideKeyboard(EditText view) {
-		InputMethodManager imm = (InputMethodManager) view.getContext()
-				.getSystemService(Context.INPUT_METHOD_SERVICE);
+		InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromInputMethod(view.getWindowToken(), 0);
 	}
 
@@ -74,25 +71,21 @@ public class ActivityUtils {
 		final int width = v.getWidth();
 		final boolean isFirst = position == 0;
 		final int startY = isFirst ? height >> 2 : (int) (v.getY() - (height >> 1));
-		final ActivityOptions options =
-				ActivityOptions.makeScaleUpAnimation(v, width >> 2, startY, width >> 1, height);
+		final ActivityOptions options = ActivityOptions.makeScaleUpAnimation(v, width >> 2, startY, width >> 1, height);
 		return options;
 	}
 
-	public static Intent getContactDetailsIntent(final Context context,
-	                                             final ReminderEntry reminder) {
+	public static Intent getContactDetailsIntent(final Context context, final ReminderEntry reminder) {
 		return getContactDetailsIntent(context, reminder.getContactUri());
 	}
 
 	public static Intent getContactDetailsIntent(final Context context, final Uri contactUri) {
 		Cursor cursor = null;
 		try {
-			cursor = context.getContentResolver()
-					.query(contactUri, new String[]{ContactsContract.Contacts.LOOKUP_KEY}, null,
-					       null, null);
+			cursor = context.getContentResolver().query(contactUri, new String[]{ContactsContract.Contacts.LOOKUP_KEY}, null, null, null);
 			if ((cursor != null) && cursor.moveToFirst()) {
-				final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.withAppendedPath(
-						ContactsContract.Contacts.CONTENT_LOOKUP_URI, cursor.getString(0)));
+				final Intent intent = new Intent(Intent.ACTION_VIEW,
+				                                 Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, cursor.getString(0)));
 				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				return intent;
 			}
@@ -130,8 +123,7 @@ public class ActivityUtils {
 		Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
 	}
 
-	public static void startDetailsActivity(final Context context, final View v,
-	                                        final int position) {
+	public static void startDetailsActivity(final Context context, final View v, final int position) {
 		final RemindersAdapter.ViewHolder holder = (ViewHolder) v.getTag();
 		final Uri uri = ContentUris.withAppendedId(RemindersProvider.REMINDERS_URI, holder.id);
 		final Intent intent = ReminderDetailsActivity.newIntent(context, Intent.ACTION_VIEW, uri);
