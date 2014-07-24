@@ -3,6 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin_large"
+    android:paddingRight="@dimen/activity_horizontal_margin_large"
     android:orientation="vertical">
 
     <LinearLayout
@@ -62,32 +64,31 @@
             android:textColor="@android:color/holo_green_light"/>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+f_reminder_view/panelColor"
+    <!--Color-->
+    <Space
         android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_horizontal_margin_large"/>
+
+    <TextView
+        style="@style/Text.Header"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/activity_horizontal_margin">
+        android:text="@string/color"/>
 
-        <TextView
-            style="@style/Text.Header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/color"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/header_delimiter_height"
+        style="@style/View.Delimiter.Horizontal"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/header_delimiter_height"
-            style="@style/View.Delimiter.Horizontal"/>
+    <View
+        android:id="@+f_reminder_view/color"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:padding="8dp"
+        style="@style/View.Container.Color"/>
 
-        <View
-            android:id="@+f_reminder_view/color"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:padding="8dp"
-            style="@style/View.Container.Color"/>
-    </LinearLayout>
 
+    <!--Contact-->
     <LinearLayout
         android:id="@+f_reminder_view/panelSelectContact"
         android:layout_width="match_parent"
@@ -113,60 +114,59 @@
             android:layout="@layout/x_contact_badge"
             android:padding="4dp"
             style="@style/View.Container.Color"/>
+
     </LinearLayout>
 
-    <LinearLayout
+    <!--Timestamp-->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_horizontal_margin_large"/>
+
+    <TextView
+        style="@style/Text.Header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/event_time"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/header_delimiter_height"
+        style="@style/View.Delimiter.Horizontal"/>
+
+    <TextView
+        android:id="@+f_reminder_view/timestamp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/activity_horizontal_margin">
+        android:fontFamily="sans-serif-light"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textIsSelectable="false"
+        style="@style/View.Container"/>
 
-        <TextView
-            style="@style/Text.Header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/event_time"/>
+    <!--alarm timestamp-->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_horizontal_margin_large"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/header_delimiter_height"
-            style="@style/View.Delimiter.Horizontal"/>
+    <TextView
+        android:id="@+id/alarmTimestamp_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/alarm_time"
+        style="@style/Text.Header"/>
 
-        <TextView
-            android:id="@+f_reminder_view/timestamp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textIsSelectable="false"
-            style="@style/View.Container"/>
-    </LinearLayout>
+    <View
+        android:id="@+id/alarmTimestamp_delimiter"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/header_delimiter_height"
+        style="@style/View.Delimiter.Horizontal"/>
 
-    <LinearLayout
-        android:id="@+id/panel_alarm"
+    <TextView
+        android:id="@+id/alarmTimestamp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/activity_horizontal_margin">
+        android:fontFamily="sans-serif-light"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textIsSelectable="false"
+        style="@style/View.Container"/>
 
-        <TextView
-            style="@style/Text.Header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/alarm_time"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/header_delimiter_height"
-            style="@style/View.Delimiter.Horizontal"/>
-
-        <TextView
-            android:id="@+f_reminder_view/alarmTimestamp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-light"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textIsSelectable="false"
-            style="@style/View.Container"/>
-    </LinearLayout>
 </LinearLayout>

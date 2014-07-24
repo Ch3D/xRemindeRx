@@ -57,7 +57,7 @@
     <style name="View.Delimiter"/>
 
     <style name="View.Delimiter.Horizontal">
-        <!--<item name="android:background">?android:attr/textColorHighlight</item>-->
+        <item name="android:background">?android:attr/textColorHighlight</item>
         <item name="android:layout_marginBottom">@dimen/activity_vertical_margin</item>
     </style>
 </resources>

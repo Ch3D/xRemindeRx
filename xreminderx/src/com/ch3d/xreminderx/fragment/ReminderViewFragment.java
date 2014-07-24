@@ -29,8 +29,11 @@ import com.ch3d.xreminderx.utils.ContactBadgeHolder;
 import com.ch3d.xreminderx.utils.ReminderUtils;
 import com.ch3d.xreminderx.utils.ViewUtils;
 
+import java.util.List;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.InjectViews;
 
 import static com.ch3d.xreminderx.utils.ViewUtils.setVisible;
 
@@ -43,7 +46,7 @@ public class ReminderViewFragment extends Fragment {
 	@InjectView(R.f_reminder_view.timestamp)
 	protected TextView mTimestamp;
 
-	@InjectView(R.f_reminder_view.alarmTimestamp)
+	@InjectView(R.id.alarmTimestamp)
 	protected TextView mAlarmTimstamp;
 
 	@InjectView(R.f_reminder_view.icon_type)
@@ -61,8 +64,8 @@ public class ReminderViewFragment extends Fragment {
 	@InjectView(R.f_reminder_view.color)
 	protected View mColor;
 
-	@InjectView(R.id.panel_alarm)
-	protected View panelAlarm;
+	@InjectViews({R.id.alarmTimestamp, R.id.alarmTimestamp_delimiter, R.id.alarmTimestamp_header})
+	List<View> alarmViews;
 
 	private ContactBadgeHolder mContactBadgeHolder;
 
@@ -95,7 +98,7 @@ public class ReminderViewFragment extends Fragment {
 		final boolean isContactRelated = reminder.isContactRelated();
 		setVisible(mPanelContact, isContactRelated);
 		bindContactData(reminder, isContactRelated);
-		setVisible(panelAlarm, !reminder.isQuick());
+		setVisible(alarmViews, !reminder.isQuick());
 	}
 
 	private ReminderEntry getReminder() {
