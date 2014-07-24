@@ -53,20 +53,19 @@ import com.nhaarman.listviewanimations.swinginadapters.prepared.SwingBottomInAni
 
 import javax.inject.Inject;
 
-public class RemindersListFragment extends ListFragment implements LoaderCallbacks<Cursor>, RemoteSynchronizer.Callback {
+public class RemindersListFragment extends ListFragment implements LoaderCallbacks<Cursor>, RemoteSynchronizer.Callback<Object> {
 
 	public static final int TAG_TODAY = 0;
 	public static final int TAG_ALL = 1;
 
-	protected boolean mVisibile = true;
-
 	@Inject
-	RemoteSynchronizer mRemoteSynchronizer;
+	RemoteSynchronizer<Object> mRemoteSynchronizer;
 
 //	@Inject
 //	RemoteSyncProtocol mSyncProtocol;
 
 	private ActionMode mActionMode;
+
 	private final MultiChoiceModeListener mActionModeCallback = new MultiChoiceModeListener() {
 
 		@Override
@@ -95,25 +94,15 @@ public class RemindersListFragment extends ListFragment implements LoaderCallbac
 
 		@Override
 		public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
-			return false; // Return
-			// false
-			// if
-			// nothing
-			// is
-			// done
+			return false;
 		}
 	};
 	private RemindersAdapter mAdapter;
 	private SwipeDismissListViewTouchListener mSwipeListener;
 	private Handler mHandler;
 	private SwipeRefreshLayout mSwipeLayout;
-	private ListView mListView;
 
 	public RemindersListFragment() {
-	}
-
-	private View getContainerBottom() {
-		return getActivity().findViewById(R.id.panel_bottom);
 	}
 
 	@Override
@@ -136,7 +125,6 @@ public class RemindersListFragment extends ListFragment implements LoaderCallbac
 		final LoaderManager loaderManager = getLoaderManager();
 		loaderManager.initLoader(0, getArguments(), this);
 		mAdapter = new RemindersAdapter(getActivity(), null, true);
-		mListView = (ListView) view.findViewById(android.R.id.list);
 		return view;
 	}
 
@@ -289,25 +277,26 @@ public class RemindersListFragment extends ListFragment implements LoaderCallbac
 					PreferenceHelper.setShowDisplayPrompt(context, !isChecked);
 				}
 			});
+
 			final AlertDialog.Builder builder = new Builder(context);
 			builder.setView(dialogView);
 			builder.setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
-				                          @Override
-				                          public void onClick(final DialogInterface dialog, final int which) {
-					                          for (final int position : reverseSortedPositions) {
-						                          final ViewGroup view = (ViewGroup) getListView().getChildAt(position);
-						                          final ViewHolder tag = (ViewHolder) view.getTag();
-						                          ReminderUtils.deleteReminder(context, (int) tag.id);
-					                          }
-					                          dialog.dismiss();
-				                          }
-			                          });
+				@Override
+				public void onClick(final DialogInterface dialog, final int which) {
+					for (final int position : reverseSortedPositions) {
+						final ViewGroup view = (ViewGroup) getListView().getChildAt(position);
+						final ViewHolder tag = (ViewHolder) view.getTag();
+						ReminderUtils.deleteReminder(context, (int) tag.id);
+					}
+					dialog.dismiss();
+				}
+			});
 			builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-				                          @Override
-				                          public void onClick(final DialogInterface dialog, final int which) {
-					                          dialog.dismiss();
-				                          }
-			                          });
+				@Override
+				public void onClick(final DialogInterface dialog, final int which) {
+					dialog.dismiss();
+				}
+			});
 			builder.show();
 		} else {
 			for (final int position : reverseSortedPositions) {
