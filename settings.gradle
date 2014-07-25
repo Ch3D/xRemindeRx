@@ -1,1 +1,4 @@
-include ':xreminderx',':libraries:floatlabel'/*,':libraries:xreminderx.theming'*/
+include ':xreminderx', ':libraries:floatlabel', ':libraries:GreenDaoForAndroidStudio:GreenDaoForAndroidStudio', ':MyDaoGenerator'/*,
+        ':DaoExample'*/
+project(':MyDaoGenerator').projectDir = new File('libraries/GreenDaoForAndroidStudio/GreenDaoForAndroidStudio/MyDaoGenerator')
+// project(':DaoExample').projectDir = new File('libraries/GreenDaoForAndroidStudio/GreenDaoForAndroidStudio/DaoExample')
