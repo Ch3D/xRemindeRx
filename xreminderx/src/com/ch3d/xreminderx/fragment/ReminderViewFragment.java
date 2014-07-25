@@ -45,22 +45,22 @@ public class ReminderViewFragment extends Fragment {
 	@InjectView(R.id.timestamp)
 	protected TextView mTimestamp;
 
-	@InjectView(R.id.alarmTimestamp)
+	@InjectView(R.id.alarm_timestamp)
 	protected TextView mAlarmTimstamp;
 
-	@InjectView(R.id.panelSelectContact)
+	@InjectView(R.id.panel_select_contact)
 	protected View mPanelContact;
 
-	@InjectView(R.id.textOngoing)
+	@InjectView(R.id.text_ongoing)
 	protected TextView mOngoing;
 
-	@InjectView(R.id.textSilent)
+	@InjectView(R.id.text_silent)
 	protected TextView mSilent;
 
 	@InjectView(R.id.color)
 	protected View mColor;
 
-	@InjectViews({R.id.alarmTimestamp, R.id.alarmTimestamp_delimiter, R.id.alarmTimestamp_header})
+	@InjectViews({R.id.alarm_timestamp, R.id.alarm_timestamp_delimiter, R.id.alarm_timestamp_header})
 	protected List<View> alarmViews;
 
 	private ContactBadgeHolder mContactBadgeHolder;
@@ -68,7 +68,7 @@ public class ReminderViewFragment extends Fragment {
 	private void bindContactData(final ReminderEntry reminder, final boolean isContactRelated) {
 		if (isContactRelated) {
 			mContactBadgeHolder.setVisibility(View.VISIBLE);
-			getActivity().findViewById(R.x_contact_badge.btnRemove).setVisibility(View.GONE);
+			getActivity().findViewById(R.id.btn_remove).setVisibility(View.GONE);
 			mContactBadgeHolder.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(final View v) {

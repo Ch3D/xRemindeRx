@@ -16,6 +16,8 @@ import android.widget.TextView;
 import com.ch3d.xreminderx.R;
 import com.ch3d.xreminderx.view.RoundedDrawable;
 
+import static com.ch3d.xreminderx.utils.ViewUtils.setVisible;
+
 public class ContactBadgeHolder {
 	private final Activity activity;
 
@@ -31,15 +33,12 @@ public class ContactBadgeHolder {
 
 	public void setData(final Uri uri, final OnClickListener removeClickListener) {
 		if (uri != null) {
-			final TextView txtContactName = (TextView) activity.findViewById(R.x_contact_badge.txtName);
-			final Button btnContactRemove = (Button) activity.findViewById(R.x_contact_badge.btnRemove);
-
+			final TextView txtContactName = (TextView) activity.findViewById(R.id.title);
+			final Button btnContactRemove = (Button) activity.findViewById(R.id.btn_remove);
 			Cursor c = null;
 			try {
 				c = activity.getContentResolver().query(uri, new String[]{ContactsContract.Contacts.PHOTO_ID,
-						                                        ContactsContract.CommonDataKinds.Nickname.DISPLAY_NAME,
-						                                        ContactsContract.Contacts.LOOKUP_KEY}, null, null, null
-				                                       );
+						ContactsContract.CommonDataKinds.Nickname.DISPLAY_NAME, ContactsContract.Contacts.LOOKUP_KEY}, null, null, null);
 
 				if ((c != null) && c.moveToFirst()) {
 					final int photoId = c.getInt(0);
@@ -48,12 +47,12 @@ public class ContactBadgeHolder {
 					setQuickContactData(photoId);
 					btnContactRemove.setOnClickListener(removeClickListener);
 					txtContactName.setText(contactName);
-					btnContactRemove.setVisibility(removeClickListener != null ? View.VISIBLE : View.GONE);
+					setVisible(btnContactRemove, removeClickListener != null);
 				} else {
-					final ImageView imgContactAvatar = (ImageView) activity.findViewById(R.x_contact_badge.imgAvatar);
+					final ImageView imgContactAvatar = (ImageView) activity.findViewById(R.id.img_avatar);
 					imgContactAvatar.setImageBitmap(mImgDefaultAvatar);
 					txtContactName.setText(R.string.no_contact);
-					btnContactRemove.setVisibility(View.GONE);
+					setVisible(btnContactRemove, false);
 				}
 			} finally {
 				DBUtils.close(c);
@@ -62,12 +61,12 @@ public class ContactBadgeHolder {
 	}
 
 	public void setOnClickListener(final View.OnClickListener listener) {
-		activity.findViewById(R.x_contact_badge.root).setOnClickListener(listener);
+		activity.findViewById(R.id.root).setOnClickListener(listener);
 	}
 
 	private void setQuickContactData(int photoId) {
 		mContactBadge.setVisibility(View.VISIBLE);
-		ImageView imgContactAvatar = (ImageView) activity.findViewById(R.x_contact_badge.imgAvatar);
+		ImageView imgContactAvatar = (ImageView) activity.findViewById(R.id.img_avatar);
 		Bitmap bitmap = ReminderUtils.fetchThumbnail(activity, photoId, mImgDefaultAvatar);
 		RoundedDrawable.setRoundedDrawable(imgContactAvatar, bitmap);
 	}

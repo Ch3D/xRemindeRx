@@ -69,8 +69,7 @@ public class ReminderDBHelper extends SQLiteOpenHelper {
 
 	public Cursor queryToday() {
 		return getReadableDatabase().query(TABLE_NAME, null, "ts > strftime(\"%s\",\"now\",\"-1 days\") * 1000" + " AND "
-				                                   + "ts < strftime(\"%s\",\"now\",\"+1 days\") * 1000", null, null, null, "ts ASC"
-		                                  );
+				+ "ts < strftime(\"%s\",\"now\",\"+1 days\") * 1000", null, null, null, "ts ASC");
 	}
 
 	public int updateReminder(final Uri uri, final ContentValues values, final String selection, final String[] selectionArgs) {

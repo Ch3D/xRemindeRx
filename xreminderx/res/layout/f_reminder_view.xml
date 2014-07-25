@@ -22,7 +22,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/textSilent"
+            android:id="@+id/text_silent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
@@ -33,7 +33,7 @@
             android:textColor="@android:color/holo_orange_light"/>
 
         <TextView
-            android:id="@+id/textOngoing"
+            android:id="@+id/text_ongoing"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="gone"
@@ -70,7 +70,7 @@
 
     <!--Contact-->
     <LinearLayout
-        android:id="@+id/panelSelectContact"
+        android:id="@+id/panel_select_contact"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -128,20 +128,20 @@
         android:layout_height="@dimen/activity_horizontal_margin_large"/>
 
     <TextView
-        android:id="@+id/alarmTimestamp_header"
+        android:id="@+id/alarm_timestamp_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/alarm_time"
         style="@style/Text.Header"/>
 
     <View
-        android:id="@+id/alarmTimestamp_delimiter"
+        android:id="@+id/alarm_timestamp_delimiter"
         android:layout_width="match_parent"
         android:layout_height="@dimen/header_delimiter_height"
         style="@style/View.Delimiter.Horizontal"/>
 
     <TextView
-        android:id="@+id/alarmTimestamp"
+        android:id="@+id/alarm_timestamp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-light"
